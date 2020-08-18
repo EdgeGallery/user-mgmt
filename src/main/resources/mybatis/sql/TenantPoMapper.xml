@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  Copyright 2020 Huawei Technologies Co., Ltd.
+  ~
+  ~  Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~  You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing, software
+  ~  distributed under the License is distributed on an "AS IS" BASIS,
+  ~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  See the License for the specific language governing permissions and
+  ~  limitations under the License.
+  -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mec.auth.server.db.mapper.TenantPoMapper">
+
+    <select id="getRolePoByTenantId" resultType="org.mec.auth.server.db.entity.RolePo">
+        select id, platform, role
+        from tbl_tenant_role a left join tbl_role b on a.roleid = b.id
+        where a.tenantid = #{tenantId}
+    </select>
+
+    <select id="getTenantBasicPoData" resultType="org.mec.auth.server.db.entity.TenantPo">
+        SELECT
+        *
+        FROM
+        tbl_tenant
+        WHERE
+        TENANTID=#{tenantId}
+    </select>
+
+    <select id="getTenantByTelephone" resultType="org.mec.auth.server.db.entity.TenantPo">
+        SELECT
+        *
+        FROM
+        tbl_tenant
+        WHERE
+        TELEPHONENUMBER=#{telephoneNumber}
+    </select>
+
+    <select id="getTenantByUsername" resultType="org.mec.auth.server.db.entity.TenantPo">
+        SELECT
+        *
+        FROM
+        tbl_tenant
+        WHERE
+        USERNAME=#{username}
+    </select>
+
+    <insert id="addTenantPo" parameterType="org.mec.auth.server.db.entity.TenantPo">
+        INSERT INTO
+        tbl_tenant
+        (TENANTID, USERNAME, PASSWORD, COMPANY, TELEPHONENUMBER, GENDER)
+        VALUES
+        (#{tenantId}, #{username}, #{password}, #{company}, #{telephoneNumber}, #{gender})
+    </insert>
+
+    <insert id="modifyPassword">
+        UPDATE
+        tbl_tenant
+        SET PASSWORD = #{param2}
+        WHERE
+        TENANTID = #{param1};
+    </insert>
+
+    <insert id ="insertPermission" parameterType="java.util.List" >
+        insert into
+        tbl_tenant_role (tenantid, roleid)
+        values
+        <foreach collection ="param2" item="role" index= "index" separator =",">
+            ( #{param1}, (select id from tbl_role where platform = #{role.platform} and role = #{role.role}))
+        </foreach>
+    </insert>
+
+
+</mapper>
