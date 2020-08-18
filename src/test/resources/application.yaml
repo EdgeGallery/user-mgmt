@@ -1,0 +1,40 @@
+servicecomb-config-order: 2
+APPLICATION_ID: openMec  #应用名
+service_description:
+  name: user-mgmt-be-test  #微服务名
+  version: 1.0.0   #微服务版本
+  environment: development
+servicecomb:
+  service:
+    registry:
+      address: http://service-center:30100  #连接SC(Service Center,注册中心)的地址
+  rest:
+    address: 0.0.0.0:8047  #Rest通信地址
+
+###spring config######
+server:
+  port: 8060
+  servlet:
+    context-path: /auth-server
+    session:
+      timeout: 600
+      cookie:
+        name: AUTHSERVERSESSIONID
+spring:
+  datasource:
+    url: jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    username:
+    password:
+    driver-class-name: org.h2.Driver
+    schema: classpath:usermgmt-test.sql
+  main:
+    allow-bean-definition-overriding: true
+
+###spring mybatis####
+mybatis:
+  mapper-locations: classpath:mybatis/sql/*.xml
+oauth2:
+  clients:
+    - clientId: test
+      clientSecret: test
+      clientUrl: test

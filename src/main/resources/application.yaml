@@ -1,0 +1,58 @@
+###servicecomb config####
+servicecomb-config-order: 1
+APPLICATION_ID: openMec  #应用名
+service_description:
+  name: user-mgmt-be  #微服务名
+  version: 1.0.0   #微服务版本
+  environment: development
+servicecomb:
+  service:
+    registry:
+      address: ${SC_ADDRESS} #连接SC(Service Center,注册中心)的地址
+  rest:
+    address: ${LISTEN_IP:0.0.0.0}:8067  #Rest通信地址
+    servlet:
+      urlPattern: /cse/*  #using spring mvc rest server to handle requests
+  handler:
+    chain:
+      Provider:
+        default: bizkeeper-provider
+###spring config######
+server:
+  port: 8067
+  ssl:
+    enabled: ${SSL_ENABLED:false}
+    key-store: ${SSL_KEY_STORE_PATH:}
+    key-store-password: ${SSL_KEY_STORE_PASSWORD:}
+    key-store-type: ${SSL_KEY_STORE_TYPE:}
+    key-alias: ${SSL_KEY_ALIAS:}
+  servlet:
+    session:
+      timeout: 3600
+      cookie:
+        name: AUTHSERVERSESSIONID
+spring:
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_IP:user-mgmt-postgres-svc}:${POSTGRES_PORT:5432}/${POSTGRES_DB_NAME:usermgmtdb}
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  main:
+    allow-bean-definition-overriding: true
+
+###mybtis config####
+mybatis:
+  mapper-locations: classpath:mybatis/sql/*.xml
+
+###oauth2 config####
+oauth2:
+  clients:
+    - clientId: ${OAUTH_APPSTORE_CLIENT_ID:appstore-fe}
+      clientSecret: ${OAUTH_APPSTORE_CLIENT_SECRET:}
+      clientUrl: ${OAUTH_APPSTORE_CLIENT_URL:}
+    - clientId: ${OAUTH_DEVELOPER_CLIENT_ID:developer-fe}
+      clientSecret: ${OAUTH_DEVELOPER_CLIENT_SECRET:}
+      clientUrl: ${OAUTH_DEVELOPER_CLIENT_URL:}
+    - clientId: ${OAUTH_MECM_CLIENT_ID:mecm-fe}
+      clientSecret: ${OAUTH_MECM_CLIENT_SECRET:}
+      clientUrl: ${OAUTH_MECM_CLIENT_URL:}
