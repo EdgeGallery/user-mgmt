@@ -52,9 +52,4 @@ public class UserMgmtTest {
     @MockBean
     protected TenantTransactionRepository tenantTransaction;
 
-    @Test
-    public void init() {
-        // empty method to avoid no runnable method exception
-    }
-
 }
