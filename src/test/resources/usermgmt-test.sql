@@ -22,15 +22,3 @@ CREATE TABLE if not exists tbl_tenant_role (
     	  PLATFORM             VARCHAR(50)            NOT NULL,
     	  ROLE		             VARCHAR(50)            NOT NULL
     );
-
-    insert into tbl_role (ID, PLATFORM, ROLE) values(1, 'APPSTORE', 'GUEST');
-    insert into tbl_role (ID, PLATFORM, ROLE) values(2, 'APPSTORE', 'TENANT');
-    insert into tbl_role (ID, PLATFORM, ROLE) values(3, 'APPSTORE', 'ADMIN');
-
-    insert into tbl_role (ID, PLATFORM, ROLE) values(4, 'DEVELOPER', 'GUEST');
-    insert into tbl_role (ID, PLATFORM, ROLE) values(5, 'DEVELOPER', 'TENANT');
-    insert into tbl_role (ID, PLATFORM, ROLE) values(6, 'DEVELOPER', 'ADMIN');
-
-    insert into tbl_role (ID, PLATFORM, ROLE) values(7, 'MECM', 'GUEST');
-    insert into tbl_role (ID, PLATFORM, ROLE) values(8, 'MECM', 'TENANT');
-    insert into tbl_role (ID, PLATFORM, ROLE) values(9, 'MECM', 'ADMIN');

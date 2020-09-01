@@ -25,14 +25,22 @@ import mockit.Mock;
 import mockit.MockUp;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mec.auth.server.MainServer;
 import org.mec.auth.server.controller.dto.request.VerificationReqDto;
 import org.mec.auth.server.controller.dto.response.FormatRespDto;
 import org.mec.auth.server.utils.redis.RedisUtil;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-public class VerificationTest extends UserMgmtTest {
+@SpringBootTest(classes = {MainServer.class})
+@RunWith(SpringJUnit4ClassRunner.class)
+@EnableAspectJAutoProxy(proxyTargetClass = true)
+public class VerificationTest {
 
     @Autowired
     private IdentityService identityService;
@@ -41,7 +49,7 @@ public class VerificationTest extends UserMgmtTest {
     private HwCloudVerification hwCloudVerification;
 
     @Test
-    public void sendVerificationSuccess() throws IOException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+    public void should_successfully_when_right_verify_code() throws IOException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         VerificationReqDto request = new VerificationReqDto();
         request.setTelephone("15191881235");
         new MockUp<RedisUtil>() {
@@ -56,7 +64,7 @@ public class VerificationTest extends UserMgmtTest {
     }
 
     @Test
-    public void sendVerificationFail() throws IOException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+    public void should_failed_when_wrong_verify_code() throws IOException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         VerificationReqDto request = new VerificationReqDto();
         request.setTelephone("15191881235");
         new MockUp<RedisUtil>() {

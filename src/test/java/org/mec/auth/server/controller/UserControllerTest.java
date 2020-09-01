@@ -18,19 +18,15 @@ package org.mec.auth.server.controller;
 
 import com.google.gson.Gson;
 import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mec.auth.server.service.UserMgmtService;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.filter.CorsFilter;
 
-@RunWith(MockitoJUnitRunner.class)
 public class UserControllerTest {
 
     protected MockMvc mvc;
@@ -50,11 +46,6 @@ public class UserControllerTest {
     public void setUp() {
         this.mvc = MockMvcBuilders.standaloneSetup(userController).build();
         MockitoAnnotations.initMocks(this);
-    }
-
-    @Test
-    public void initTest() {
-        // empty method to avoid no runnable method exception
     }
 
 }

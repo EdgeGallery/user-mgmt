@@ -19,13 +19,16 @@ package org.mec.auth.server.controller;
 import fj.data.Either;
 import javax.ws.rs.core.Response;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mec.auth.server.controller.dto.request.RetrievePasswordReqDto;
 import org.mec.auth.server.controller.dto.response.FormatRespDto;
 import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ForgetPasswordApiTest extends UserControllerTest {
     @Test
     public void testForgetPasswordSuccess() throws Exception {

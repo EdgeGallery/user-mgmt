@@ -19,14 +19,17 @@ package org.mec.auth.server.controller;
 import fj.data.Either;
 import javax.ws.rs.core.Response.Status;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mec.auth.server.controller.dto.request.TenantRegisterReqDto;
 import org.mec.auth.server.controller.dto.response.FormatRespDto;
 import org.mec.auth.server.controller.dto.response.TenantRespDto;
 import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+@RunWith(MockitoJUnitRunner.class)
 public class RegisterApiTest extends UserControllerTest {
 
     @Test
