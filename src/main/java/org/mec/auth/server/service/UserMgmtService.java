@@ -164,8 +164,8 @@ public class UserMgmtService {
 
         int result = 0;
         try {
-            result += mapper.modifyPassword(tenantPo.getTenantId(),
-                passwordEncoder.encode(retireveRequest.getNewPassword()));
+            result += mapper
+                .modifyPassword(tenantPo.getTenantId(), passwordEncoder.encode(retireveRequest.getNewPassword()));
         } catch (Exception e) {
             LOGGER.error("Database Operate Exception: " + e.getMessage());
             return Either.right(new FormatRespDto(Status.INTERNAL_SERVER_ERROR, "Database Exception."));
@@ -200,4 +200,9 @@ public class UserMgmtService {
         }
         return Either.left(uniquenessResponse);
     }
+
+    public boolean deleteUser(String tenantId) {
+        return mapper.deleteUser(tenantId);
+    }
+
 }

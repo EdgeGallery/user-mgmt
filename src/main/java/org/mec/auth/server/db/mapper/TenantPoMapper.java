@@ -42,4 +42,6 @@ public interface TenantPoMapper {
 
     int insertPermission(String tenantId, List<RolePo> roles);
 
+    boolean deleteUser(String tenantId);
+
 }
