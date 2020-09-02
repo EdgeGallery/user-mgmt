@@ -36,7 +36,7 @@ public abstract class BeGenericServlet {
         return ResponseEntity.status(Status.CREATED.getStatusCode()).body(entity);
     }
 
-    private <T> ResponseEntity<Object> buildErrorResponse(FormatRespDto formatRespDto) {
+    private ResponseEntity<Object> buildErrorResponse(FormatRespDto formatRespDto) {
         return ResponseEntity.status(formatRespDto.getErrStatus().getStatusCode())
             .body(formatRespDto.getErrorRespDto());
     }
