@@ -16,7 +16,6 @@
 
 package org.mec.auth.server;
 
-import java.util.List;
 import java.util.UUID;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Assert;
@@ -26,40 +25,40 @@ import org.mec.auth.server.db.entity.TenantPo;
 import org.mec.auth.server.db.mapper.TenantPoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+@SpringBootTest(classes = {MainServer.class})
 @RunWith(SpringJUnit4ClassRunner.class)
-@ActiveProfiles("test")
-@SpringBootTest
+@EnableAspectJAutoProxy(proxyTargetClass = true)
 public class DBTest {
 
     @Autowired
     private TenantPoMapper mapper;
 
     @Test
-    public void testAddTetant() {
+    public void should_successfully_when_add_tenant() {
         TenantPo po = addTenantPo();
         Assert.assertNotNull(po);
     }
 
     @Test
-    public void testGetTenantBasicPoData() {
+    public void should_successfully_when_get_tenant_by_tenantId() {
         TenantPo tenantPoAdd = addTenantPo();
         TenantPo tenantPoGet = mapper.getTenantBasicPoData(tenantPoAdd.getTenantId());
         Assert.assertEquals(tenantPoAdd.getUsername(), tenantPoGet.getUsername());
     }
 
     @Test
-    public void testGetTenantByTelephone() {
+    public void should_successfully_when_get_tenant_by_telephone() {
         TenantPo tenantPoAdd = addTenantPo();
         TenantPo tenantPoGet = mapper.getTenantByTelephone(tenantPoAdd.getTelephoneNumber());
         Assert.assertEquals(tenantPoAdd.getUsername(), tenantPoGet.getUsername());
     }
 
     @Test
-    public void testGetTenantByUsername() {
+    public void should_successfully_when_get_tenant_by_name() {
         TenantPo tenantPoAdd = addTenantPo();
         TenantPo tenantPoGet = mapper.getTenantByUsername(tenantPoAdd.getUsername());
         Assert.assertEquals(tenantPoAdd.getTenantId(), tenantPoGet.getTenantId());
@@ -69,8 +68,8 @@ public class DBTest {
         TenantPo po = new TenantPo();
         po.setTenantId(UUID.randomUUID().toString());
         po.setUsername(RandomStringUtils.randomAlphanumeric(16));
-        po.setPassword("password");
-        po.setTelephoneNumber(RandomStringUtils.randomAlphanumeric(11));
+        po.setPassword("pw12#$");
+        po.setTelephoneNumber("13"+ RandomStringUtils.randomNumeric(9));
         po.setGender("male");
         po.setCompany("huawei");
 

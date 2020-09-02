@@ -42,15 +42,13 @@ public class MecUserDetailsService implements UserDetailsService {
         if (tenant == null) {
             tenant = tenantPoMapper.getTenantByTelephone(userNameOrTelephoneNum);
             if (tenant == null) {
-                throw new UsernameNotFoundException("Can't find user by userNameOrTelephoneNum:"
-                        + userNameOrTelephoneNum);
+                throw new UsernameNotFoundException(
+                    "Can't find user by userNameOrTelephoneNum:" + userNameOrTelephoneNum);
             }
         }
         List<RolePo> rolePos = tenantPoMapper.getRolePoByTenantId(tenant.getTenantId());
         List<GrantedAuthority> authorities = new ArrayList<>();
-        rolePos.forEach(rolePo -> {
-            authorities.add(new SimpleGrantedAuthority("ROLE_" + rolePo.toString()));
-        });
+        rolePos.forEach(rolePo -> authorities.add(new SimpleGrantedAuthority("ROLE_" + rolePo.toString())));
         return new User(tenant.getTenantId(), tenant.getPassword(), authorities);
     }
 }

@@ -27,6 +27,7 @@ spring:
     password:
     driver-class-name: org.h2.Driver
     schema: classpath:usermgmt-test.sql
+    data: classpath:usermgmt-test-data.sql
   main:
     allow-bean-definition-overriding: true
 

@@ -17,54 +17,38 @@
 package org.mec.auth.server.service;
 
 import fj.data.Either;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import mockit.Mock;
 import mockit.MockUp;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mec.auth.server.MainServer;
 import org.mec.auth.server.controller.dto.request.TenantRegisterReqDto;
 import org.mec.auth.server.controller.dto.response.FormatRespDto;
 import org.mec.auth.server.controller.dto.response.TenantRespDto;
-import org.mec.auth.server.db.EnumPlatform;
-import org.mec.auth.server.db.EnumRole;
-import org.mec.auth.server.db.entity.RolePo;
-import org.mec.auth.server.db.entity.TenantPermissionVo;
-import org.mec.auth.server.db.entity.TenantPo;
-import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-public class RegisterTest extends UserMgmtTest{
+@SpringBootTest(classes = {MainServer.class})
+@RunWith(SpringJUnit4ClassRunner.class)
+@EnableAspectJAutoProxy(proxyTargetClass = true)
+public class RegisterTest {
+
+    @Autowired
+    protected UserMgmtService userMgmtService;
 
     @Test
-    public void registerSuccessful() {
+    public void should_successfully_when_register_new_user() {
         String username = "s" + RandomStringUtils.randomAlphanumeric(16);
-        String telephone = "13" + RandomStringUtils.random(9);
+        String telephone = "13" + RandomStringUtils.randomNumeric(9);
 
-        Mockito.when(tenantTransaction.registerTenant(Mockito.any(TenantPermissionVo.class))).thenReturn(5);
-
-        Mockito.when(mapper.getTenantByTelephone(Mockito.anyString())).thenReturn(null);
-        Mockito.when(mapper.getTenantByUsername(Mockito.anyString())).thenReturn(null);
-
-        TenantPo tenantPo = new TenantPo();
-        tenantPo.setTenantId(UUID.randomUUID().toString());
-        tenantPo.setUsername(username);
-        tenantPo.setCompany("huawei");
-        tenantPo.setTelephoneNumber(telephone);
-        tenantPo.setGender("male");
-        Mockito.when(mapper.getTenantBasicPoData(Mockito.anyString())).thenReturn(tenantPo);
-
-        List<RolePo> rolePoList = new ArrayList<>();
-        rolePoList.add(new RolePo(EnumPlatform.APPSTORE, EnumRole.TENANT));
-        rolePoList.add(new RolePo(EnumPlatform.DEVELOPER, EnumRole.TENANT));
-        rolePoList.add(new RolePo(EnumPlatform.MECM, EnumRole.TENANT));
-
-        Mockito.when(mapper.getRolePoByTenantId(Mockito.anyString())).thenReturn(rolePoList);
         TenantRegisterReqDto request = new TenantRegisterReqDto();
         request.setUsername(username);
         request.setPassword("password1234.");
-        request.setTelephone("15712345678");
+        request.setTelephone(telephone);
         request.setCompany("huawei");
         request.setGender("male");
         new MockUp<UserMgmtService>() {
@@ -80,25 +64,26 @@ public class RegisterTest extends UserMgmtTest{
 
     // username length fail
     @Test
-    public void registerFail1() {
+    public void should_failed_when_username_less_6() {
         TenantRegisterReqDto request = new TenantRegisterReqDto();
-        request.setUsername("user");
-        request.setPassword("password");
+        request.setUsername("user5");
+        request.setPassword("nihao!@123456");
         request.setTelephone("15012345678");
         request.setCompany("huawei");
         request.setGender("male");
 
         Either<TenantRespDto, FormatRespDto> either = userMgmtService.register(request);
         Assert.assertTrue(either.isRight());
+        Assert.assertEquals(400, either.right().value().getErrStatus().getStatusCode());
 
     }
 
     // password length fail
     @Test
-    public void registerFail2() {
+    public void should_failed_when_pw_less_6() {
         TenantRegisterReqDto request = new TenantRegisterReqDto();
         request.setUsername("username");
-        request.setPassword("pass");
+        request.setPassword("!@1Ab");
         request.setTelephone("15012345678");
         request.setCompany("huawei");
         request.setGender("male");
@@ -110,9 +95,9 @@ public class RegisterTest extends UserMgmtTest{
 
     // no username
     @Test
-    public void registerFail4() {
+    public void should_failed_when_no_username() {
         TenantRegisterReqDto request = new TenantRegisterReqDto();
-        request.setPassword("password");
+        request.setPassword("nihao!@123456");
         request.setTelephone("15012345678");
         request.setCompany("huawei");
         request.setGender("male");
@@ -124,7 +109,7 @@ public class RegisterTest extends UserMgmtTest{
 
     // no password
     @Test
-    public void registerFail5() {
+    public void should_failed_when_no_password() {
         TenantRegisterReqDto request = new TenantRegisterReqDto();
         request.setUsername("username");
         request.setTelephone("15012345678");
@@ -138,47 +123,45 @@ public class RegisterTest extends UserMgmtTest{
 
     // telephone has existed
     @Test
-    public void registerFail6() {
+    public void should_failed_when_telNo_existed() {
         TenantRegisterReqDto request = new TenantRegisterReqDto();
         request.setUsername("username");
-        request.setPassword("password");
+        request.setPassword("nihao!@123456");
         request.setTelephone("15012345678");
         request.setCompany("huawei");
         request.setGender("male");
 
-        Mockito.when(mapper.getTenantByTelephone(Mockito.anyString())).thenReturn(new TenantPo());
         Either<TenantRespDto, FormatRespDto> either = userMgmtService.register(request);
         Assert.assertTrue(either.isRight());
     }
 
     // username has existed
     @Test
-    public void registerFail7() {
+    public void should_failed_when_username_existed() {
         TenantRegisterReqDto request = new TenantRegisterReqDto();
         request.setUsername("username");
-        request.setPassword("password");
+        request.setPassword("nihao!@123456");
         request.setTelephone("15012345678");
         request.setCompany("huawei");
         request.setGender("male");
 
-        Mockito.when(mapper.getTenantByTelephone(Mockito.anyString())).thenReturn(null);
-        Mockito.when(mapper.getTenantByUsername(Mockito.anyString())).thenReturn(new TenantPo());
         Either<TenantRespDto, FormatRespDto> either = userMgmtService.register(request);
+        Assert.assertTrue(either.isLeft());
+        request.setTelephone("15012345677");
+        either = userMgmtService.register(request);
         Assert.assertTrue(either.isRight());
     }
 
     // verification code is error
     @Test
-    public void registerFail8() {
+    public void should_failed_when_sms_code_error() {
         TenantRegisterReqDto request = new TenantRegisterReqDto();
         request.setUsername("username");
-        request.setPassword("password");
+        request.setPassword("nihao!@123456");
         request.setTelephone("15012345678");
         request.setCompany("huawei");
         request.setGender("male");
 
-        Mockito.when(mapper.getTenantByTelephone(Mockito.anyString())).thenReturn(null);
-        Mockito.when(mapper.getTenantByUsername(Mockito.anyString())).thenReturn(null);
         new MockUp<UserMgmtService>() {
             @Mock
             private boolean verifySmsCode(String verificationCode, String telephone) {
@@ -190,54 +173,25 @@ public class RegisterTest extends UserMgmtTest{
         Assert.assertTrue(either.isRight());
     }
 
-    // db exception
-    @Test
-    public void registerFail9() {
-
-        TenantRegisterReqDto request = new TenantRegisterReqDto();
-        request.setUsername("username");
-        request.setPassword("password");
-        request.setTelephone("15012345678");
-        request.setCompany("huawei");
-        request.setGender("male");
-        new MockUp<UserMgmtService>() {
-            @Mock
-            private boolean verifySmsCode(String verificationCode, String telephone) {
-                return true;
-            }
-        };
-
-        Mockito.when(mapper.getTenantByTelephone(Mockito.anyString())).thenReturn(null);
-        Mockito.when(mapper.getTenantByUsername(Mockito.anyString())).thenReturn(null);
-        Mockito.when(mapper.addTenantPo(Mockito.any(TenantPo.class))).thenThrow(new RuntimeException("mapper exception"));
-        Either<TenantRespDto, FormatRespDto> either = userMgmtService.register(request);
-        Assert.assertTrue(either.isRight());
-
-    }
-
-    // something error
-    @Test
-    public void registerFail10() {
-        TenantRegisterReqDto request = new TenantRegisterReqDto();
-        request.setUsername("username");
-        request.setPassword("password");
-        request.setTelephone("15012345678");
-        request.setCompany("huawei");
-        request.setGender("male");
-        new MockUp<UserMgmtService>() {
-            @Mock
-            private boolean verifySmsCode(String verificationCode, String telephone) {
-                return true;
-            }
-        };
-
-        Mockito.when(mapper.getTenantByTelephone(Mockito.anyString())).thenReturn(null);
-        Mockito.when(mapper.getTenantByUsername(Mockito.anyString())).thenReturn(null);
-        Mockito.when(mapper.addTenantPo(Mockito.any(TenantPo.class))).thenReturn(0);
-        Mockito.when(mapper.insertPermission(Mockito.anyString(), Mockito.anyList())).thenReturn(0);
-
-        Either<TenantRespDto, FormatRespDto> either = userMgmtService.register(request);
-        Assert.assertTrue(either.isRight());
-    }
+    // // something error
+    // @Test
+    // public void registerFail10() {
+    //     TenantRegisterReqDto request = new TenantRegisterReqDto();
+    //     request.setUsername("username");
+    //     request.setPassword("nihao!@123456");
+    //     request.setTelephone("15012345678");
+    //     request.setCompany("huawei");
+    //     request.setGender("male");
+    //     new MockUp<UserMgmtService>() {
+    //         @Mock
+    //         private boolean verifySmsCode(String verificationCode, String telephone) {
+    //             return true;
+    //         }
+    //     };
+    //
+    //     Either<TenantRespDto, FormatRespDto> either = userMgmtService.register(request);
+    //     Assert.assertTrue(either.isRight());
+    //     System.out.println(either.right().value());
+    // }
 
 }

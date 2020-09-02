@@ -18,6 +18,9 @@ package org.mec.auth.server.config;
 
 public class ServiceConfig {
 
+    private ServiceConfig() {
+    }
+
     public static final String PATTERN_VERIFICATION_CODE = "^\\d{6,6}$";
 
     public static final String PATTERN_USERNAME = "^[a-zA-Z][a-zA-Z0-9_]{5,29}$";

@@ -18,23 +18,26 @@ package org.mec.auth.server.config;
 
 public class DescriptionConfig {
 
+    private DescriptionConfig() {
+    }
+
     public static final String REGISTER_MSG = "The API can receive register user request. If register success, it will "
-            + "return status 201. If username or telephone has existed, or verification code is error, it will reutrn "
-            + "status 403. If database connection has exception, it will return status 500. If register failed, it "
-            + "will return status 400.";
+        + "return status 201. If username or telephone has existed, or verification code is error, it will reutrn "
+        + "status 403. If database connection has exception, it will return status 500. If register failed, it "
+        + "will return status 400.";
 
     public static final String RETRIEVE_PASSWORD_MSG = "The API can receive the retrieve password request. If retrieve "
-            + "success, it will return status 200. If telephone do not exist or the verification code is error, it "
-            + "will return status 403. If database connection has exception, it will return status 500. If retrieve "
-            + "failed, it will return status 400.";
+        + "success, it will return status 200. If telephone do not exist or the verification code is error, it "
+        + "will return status 403. If database connection has exception, it will return status 500. If retrieve "
+        + "failed, it will return status 400.";
 
     public static final String VERIFICATION_MSG = "The API can receive the send verification code request. If send "
-            + "verification code success, it will return status 200. If send verification code error, it will return "
-            + "status 417.";
+        + "verification code success, it will return status 200. If send verification code error, it will return "
+        + "status 417.";
 
     public static final String UNIQUENESS_MSG = "The API can receive the unique verify request for telephone or "
-            + "username. If the request param is unique, it will return status 200, otherwise it will return status "
-            + "400.";
+        + "username. If the request param is unique, it will return status 200, otherwise it will return status "
+        + "400.";
 
     public static final String LOGOUT_MSG = "The API can receive the logout request, If logout successful, it will"
         + " return status 200, otherwise it will return status 500.";

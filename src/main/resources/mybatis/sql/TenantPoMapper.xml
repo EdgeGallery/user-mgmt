@@ -58,6 +58,10 @@
         (#{tenantId}, #{username}, #{password}, #{company}, #{telephoneNumber}, #{gender})
     </insert>
 
+    <delete id="deleteUser" >
+        delete from tbl_tenant where TENANTID = #{tenantId}
+    </delete>
+
     <insert id="modifyPassword">
         UPDATE
         tbl_tenant

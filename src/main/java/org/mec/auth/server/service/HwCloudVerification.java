@@ -56,7 +56,7 @@ public class HwCloudVerification {
      * @param verificationCode verification code
      * @return
      */
-    public Boolean sendVerificationCode(String telephone, String verificationCode) {
+    public boolean sendVerificationCode(String telephone, String verificationCode) {
         String receiver = "+86" + telephone;
         String templateParas = "[\"" + verificationCode + "\"]";
         String wsseHeader = buildWsseHeader(smsConfig.getAppKey(), smsConfig.getAppSecret());
@@ -71,7 +71,7 @@ public class HwCloudVerification {
 
     static String buildRequestBody(String sender, String receiver, String templateId, String templateParas,
         String statusCallbackUrl, String signature) {
-        List<NameValuePair> keyValues = new ArrayList<NameValuePair>();
+        List<NameValuePair> keyValues = new ArrayList<>();
         keyValues.add(new BasicNameValuePair("from", sender));
         keyValues.add(new BasicNameValuePair("to", receiver));
         keyValues.add(new BasicNameValuePair("templateId", templateId));
