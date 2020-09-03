@@ -10,6 +10,8 @@ servicecomb:
       address: http://service-center:30100  #连接SC(Service Center,注册中心)的地址
   rest:
     address: 0.0.0.0:8047  #Rest通信地址
+  boot:
+    waitUp.timeoutInMilliseconds: 1000
 
 ###spring config######
 server:
