@@ -54,28 +54,24 @@ public class RedisUtil {
     public static void saveVerificationCode(String key, String value) {
 
         try (StatefulRedisConnection<String, String> connection = RedisPoolUtil.getConnection()) {
-            if (connection != null) {
-                RedisCommands<String,String> commands = connection.sync();
-                commands.set(key, value);
-                commands.expire(key, redisConfig.getVerificationTimeout());
-            } else {
-                LOGGER.error("redis connection is null");
-            }
+            RedisCommands<String, String> commands = connection.sync();
+            commands.set(key, value);
+            commands.expire(key, redisConfig.getVerificationTimeout());
+        } catch (Exception e) {
+            LOGGER.error("failed to connect redis.");
         }
     }
 
     /**
      * get value by key.
+     *
      * @return
      */
     public static String get(String key) {
-
         try (StatefulRedisConnection<String, String> connection = RedisPoolUtil.getConnection()) {
-            if (connection != null) {
-                return connection.sync().get(key);
-            } else {
-                LOGGER.error("redis connection is null");
-            }
+            return connection.sync().get(key);
+        } catch (Exception e) {
+            LOGGER.error("failed to connect redis.");
         }
         return null;
 
@@ -85,13 +81,10 @@ public class RedisUtil {
      * delete key and value.
      */
     public static void delete(String key) {
-
         try (StatefulRedisConnection<String, String> connection = RedisPoolUtil.getConnection()) {
-            if (connection != null) {
-                connection.sync().del(key);
-            } else {
-                LOGGER.error("redis connection is null");
-            }
+            connection.sync().del(key);
+        } catch (Exception e) {
+            LOGGER.error("failed to connect redis.");
         }
     }
 

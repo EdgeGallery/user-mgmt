@@ -44,18 +44,13 @@ public class MainServer {
         // do not check host name
         TrustManager[] trustAllCerts = new TrustManager[] {
             new X509TrustManager() {
-                @SuppressWarnings("unchecked")
                 public X509Certificate[] getAcceptedIssuers() {
                     return new X509Certificate[0];
                 }
 
-                // no check client
-                @SuppressWarnings("unchecked")
                 public void checkClientTrusted(X509Certificate[] certs, String authType) {
                 }
 
-                // no check server
-                @SuppressWarnings("unchecked")
                 public void checkServerTrusted(X509Certificate[] certs, String authType) {
                 }
             }

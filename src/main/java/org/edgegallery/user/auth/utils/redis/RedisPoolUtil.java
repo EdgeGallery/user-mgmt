@@ -55,25 +55,23 @@ public class RedisPoolUtil {
 
     /**
      * statefull redis connection.
+     *
      * @return
      */
-    public static StatefulRedisConnection<String, String> getConnection() {
-        try {
-            return getPoolInstance().borrowObject();
-        } catch (Exception e) {
-            LOGGER.error("pool getobject exception:", e);
-            return null;
-        }
+    public static StatefulRedisConnection<String, String> getConnection() throws Exception {
+        return getPoolInstance().borrowObject();
     }
 
     static class RedisPoolUtilHandler {
 
         static GenericObjectPool<StatefulRedisConnection<String, String>> instance;
 
+        private RedisPoolUtilHandler() {
+        }
+
         static {
-            RedisURI redisUri = RedisURI.builder()
-                .withHost(redisConfig.getIp()).withPort(redisConfig.getPort()).withPassword(redisConfig.getPassword())
-                .build();
+            RedisURI redisUri = RedisURI.builder().withHost(redisConfig.getIp()).withPort(redisConfig.getPort())
+                .withPassword(redisConfig.getPassword()).build();
             GenericObjectPoolConfig<Object> poolConfig = new GenericObjectPoolConfig<>();
             poolConfig.setMaxTotal(redisConfig.getMaxTotal());
             poolConfig.setMaxIdle(redisConfig.getMaxIdle());

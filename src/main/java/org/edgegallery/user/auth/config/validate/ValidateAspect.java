@@ -40,7 +40,7 @@ public class ValidateAspect {
      * @param joinPoint joinPoint
      */
     @Around("@annotation(org.edgegallery.user.auth.config.validate.annotation.ParameterValidate)")
-    public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
+    public Object around(ProceedingJoinPoint joinPoint) {
         Either<Boolean, FormatRespDto> result = validate(joinPoint.getArgs());
         if (result.isRight()) {
             LOGGER
