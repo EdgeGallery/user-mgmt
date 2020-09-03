@@ -15,15 +15,15 @@
   ~  limitations under the License.
   -->
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="org.mec.auth.server.db.mapper.TenantPoMapper">
+<mapper namespace="org.edgegallery.user.auth.db.mapper.TenantPoMapper">
 
-    <select id="getRolePoByTenantId" resultType="org.mec.auth.server.db.entity.RolePo">
+    <select id="getRolePoByTenantId" resultType="org.edgegallery.user.auth.db.entity.RolePo">
         select id, platform, role
         from tbl_tenant_role a left join tbl_role b on a.roleid = b.id
         where a.tenantid = #{tenantId}
     </select>
 
-    <select id="getTenantBasicPoData" resultType="org.mec.auth.server.db.entity.TenantPo">
+    <select id="getTenantBasicPoData" resultType="org.edgegallery.user.auth.db.entity.TenantPo">
         SELECT
         *
         FROM
@@ -32,7 +32,7 @@
         TENANTID=#{tenantId}
     </select>
 
-    <select id="getTenantByTelephone" resultType="org.mec.auth.server.db.entity.TenantPo">
+    <select id="getTenantByTelephone" resultType="org.edgegallery.user.auth.db.entity.TenantPo">
         SELECT
         *
         FROM
@@ -41,7 +41,7 @@
         TELEPHONENUMBER=#{telephoneNumber}
     </select>
 
-    <select id="getTenantByUsername" resultType="org.mec.auth.server.db.entity.TenantPo">
+    <select id="getTenantByUsername" resultType="org.edgegallery.user.auth.db.entity.TenantPo">
         SELECT
         *
         FROM
@@ -50,7 +50,7 @@
         USERNAME=#{username}
     </select>
 
-    <insert id="addTenantPo" parameterType="org.mec.auth.server.db.entity.TenantPo">
+    <insert id="addTenantPo" parameterType="org.edgegallery.user.auth.db.entity.TenantPo">
         INSERT INTO
         tbl_tenant
         (TENANTID, USERNAME, PASSWORD, COMPANY, TELEPHONENUMBER, GENDER)
