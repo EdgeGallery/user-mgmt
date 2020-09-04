@@ -20,6 +20,7 @@ import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.sync.RedisCommands;
 import javax.annotation.PostConstruct;
 import org.edgegallery.user.auth.config.RedisConfig;
+import org.edgegallery.user.auth.exception.UserAuthException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +58,7 @@ public class RedisUtil {
             RedisCommands<String, String> commands = connection.sync();
             commands.set(key, value);
             commands.expire(key, redisConfig.getVerificationTimeout());
-        } catch (Exception e) {
+        } catch (UserAuthException e) {
             LOGGER.error("failed to connect redis.");
         }
     }
@@ -70,7 +71,7 @@ public class RedisUtil {
     public static String get(String key) {
         try (StatefulRedisConnection<String, String> connection = RedisPoolUtil.getConnection()) {
             return connection.sync().get(key);
-        } catch (Exception e) {
+        } catch (UserAuthException e) {
             LOGGER.error("failed to connect redis.");
         }
         return null;
@@ -83,7 +84,7 @@ public class RedisUtil {
     public static void delete(String key) {
         try (StatefulRedisConnection<String, String> connection = RedisPoolUtil.getConnection()) {
             connection.sync().del(key);
-        } catch (Exception e) {
+        } catch (UserAuthException e) {
             LOGGER.error("failed to connect redis.");
         }
     }
