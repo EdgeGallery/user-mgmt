@@ -24,6 +24,7 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.edgegallery.user.auth.config.RedisConfig;
+import org.edgegallery.user.auth.exception.UserAuthException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,8 +59,13 @@ public class RedisPoolUtil {
      *
      * @return
      */
-    public static StatefulRedisConnection<String, String> getConnection() throws Exception {
-        return getPoolInstance().borrowObject();
+    public static StatefulRedisConnection<String, String> getConnection() throws UserAuthException {
+        try {
+            return getPoolInstance().borrowObject();
+        } catch (Exception e) {
+            LOGGER.error("can not get redis connection.");
+            throw new UserAuthException("can not get redis connection.");
+        }
     }
 
     static class RedisPoolUtilHandler {

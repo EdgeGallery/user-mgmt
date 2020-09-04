@@ -21,7 +21,6 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
-import org.springframework.validation.annotation.Validated;
 
 public class ValidatorUtil {
 

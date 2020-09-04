@@ -21,6 +21,9 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.edgegallery.user.auth.controller.dto.response.LoginRespDto;
+import org.edgegallery.user.auth.service.UserMgmtService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
@@ -30,6 +33,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoginFailHandler extends SimpleUrlAuthenticationFailureHandler {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoginFailHandler.class);
+
     @Override
     public void onAuthenticationFailure(HttpServletRequest request,
         HttpServletResponse response,
@@ -38,5 +43,6 @@ public class LoginFailHandler extends SimpleUrlAuthenticationFailureHandler {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.getWriter().println(new Gson().toJson(
             new LoginRespDto("UNAUTHORIZED", exception.getLocalizedMessage())));
+        LOGGER.error("get token failed, IP:{}", request.getRemoteAddr());
     }
 }
