@@ -33,8 +33,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.RestTemplate;
 
 @Slf4j
@@ -50,7 +50,7 @@ public class OAuthServerController {
     /**
      * logout.
      */
-    @RequestMapping(value = "/logout", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/logout", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "logout", response = String.class, notes = DescriptionConfig.LOGOUT_MSG)
     @ApiResponses(value = {
         @ApiResponse(code = org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR, message = "Internal error",

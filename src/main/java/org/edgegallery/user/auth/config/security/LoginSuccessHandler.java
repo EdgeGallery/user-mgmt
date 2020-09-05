@@ -31,6 +31,7 @@ import org.springframework.stereotype.Component;
 public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginSuccessHandler.class);
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
         Authentication authentication) throws IOException, ServletException {

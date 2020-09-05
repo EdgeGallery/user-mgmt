@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -43,7 +44,7 @@ public class VerificationController extends BeGenericServlet {
     @Autowired
     private IdentityService identityService;
 
-    @RequestMapping(value = "/sms", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/sms", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "verification", response = Object.class, notes =
             DescriptionConfig.VERIFICATION_MSG)
     @ApiResponses(value = {

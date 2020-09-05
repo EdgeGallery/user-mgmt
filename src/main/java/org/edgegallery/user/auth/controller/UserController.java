@@ -34,9 +34,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 @RestSchema(schemaId = "user-mgmt-be")
 @RequestMapping("/v1/users")
@@ -46,46 +47,41 @@ public class UserController extends BeGenericServlet {
     @Autowired
     private UserMgmtService userMgmtService;
 
-    @RequestMapping(value = "", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "register", response = Object.class, notes = DescriptionConfig.REGISTER_MSG)
     @ApiResponses(value = {
-            @ApiResponse(code = HttpStatus.SC_CREATED, message = "register success",
-                    response = TenantRespDto.class),
-            @ApiResponse(code = HttpStatus.SC_BAD_REQUEST, message = "Bad Request",
-                    response = ErrorRespDto.class),
-            @ApiResponse(code = HttpStatus.SC_FORBIDDEN, message = "FORBIDDEN",
-                    response = ErrorRespDto.class),
-            @ApiResponse(code = HttpStatus.SC_INTERNAL_SERVER_ERROR, message = "INTERNAL ERROR",
-                    response = ErrorRespDto.class)})
+        @ApiResponse(code = HttpStatus.SC_CREATED, message = "register success", response = TenantRespDto.class),
+        @ApiResponse(code = HttpStatus.SC_BAD_REQUEST, message = "Bad Request", response = ErrorRespDto.class),
+        @ApiResponse(code = HttpStatus.SC_FORBIDDEN, message = "FORBIDDEN", response = ErrorRespDto.class),
+        @ApiResponse(code = HttpStatus.SC_INTERNAL_SERVER_ERROR, message = "INTERNAL ERROR",
+            response = ErrorRespDto.class)
+    })
     public ResponseEntity<Object> register(
-            @ApiParam(value = "TenantRegisterReqDto", required = true) @RequestBody TenantRegisterReqDto request) {
+        @ApiParam(value = "TenantRegisterReqDto", required = true) @RequestBody TenantRegisterReqDto request) {
         return buildCreatedResponse(userMgmtService.register(request));
     }
 
-    @RequestMapping(value = "/password", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/password", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "forget password", response = Object.class, notes = DescriptionConfig.RETRIEVE_PASSWORD_MSG)
     @ApiResponses(value = {
-            @ApiResponse(code = HttpStatus.SC_BAD_REQUEST, message = "Bad Request",
-                    response = ErrorRespDto.class),
-            @ApiResponse(code = HttpStatus.SC_FORBIDDEN, message = "Forbidden",
-                    response = ErrorRespDto.class),
-            @ApiResponse(code = HttpStatus.SC_INTERNAL_SERVER_ERROR, message = "INTERNAL ERROR",
-                    response = ErrorRespDto.class)})
+        @ApiResponse(code = HttpStatus.SC_BAD_REQUEST, message = "Bad Request", response = ErrorRespDto.class),
+        @ApiResponse(code = HttpStatus.SC_FORBIDDEN, message = "Forbidden", response = ErrorRespDto.class),
+        @ApiResponse(code = HttpStatus.SC_INTERNAL_SERVER_ERROR, message = "INTERNAL ERROR",
+            response = ErrorRespDto.class)
+    })
     public ResponseEntity<Object> retrievePassword(
-            @ApiParam(value = "RetrievePasswordReqDto", required = true) @RequestBody RetrievePasswordReqDto request) {
+        @ApiParam(value = "RetrievePasswordReqDto", required = true) @RequestBody RetrievePasswordReqDto request) {
         return buildResponse(userMgmtService.retrievePassword(request));
     }
 
-    @RequestMapping(value = "/action/uniqueness", method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/action/uniqueness", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "check uniqueness", response = Object.class, notes = DescriptionConfig.UNIQUENESS_MSG)
     @ApiResponses(value = {
-            @ApiResponse(code = HttpStatus.SC_BAD_REQUEST, message = "Bad Request",
-                    response = ErrorRespDto.class)})
+        @ApiResponse(code = HttpStatus.SC_BAD_REQUEST, message = "Bad Request", response = ErrorRespDto.class)
+    })
     public ResponseEntity<Object> uniqueness(
-            @ApiParam(value = "uniquenessRequest", required = true) @RequestBody UniqueReqDto request) {
+        @ApiParam(value = "uniquenessRequest", required = true) @RequestBody UniqueReqDto request) {
         return buildResponse(userMgmtService.uniqueness(request));
     }
-
 
 }

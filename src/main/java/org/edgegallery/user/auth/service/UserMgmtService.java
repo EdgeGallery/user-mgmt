@@ -103,7 +103,7 @@ public class UserMgmtService {
         try {
             result += tenantTransaction.registerTenant(tenantVo);
         } catch (Exception e) {
-            LOGGER.error("Database Operate Exception: " + e.getMessage());
+            LOGGER.error("Database Operate Exception: {}", e.getMessage());
             return Either.right(new FormatRespDto(Status.INTERNAL_SERVER_ERROR, "Database Exception"));
         }
 
@@ -167,7 +167,7 @@ public class UserMgmtService {
             result += mapper
                 .modifyPassword(tenantPo.getTenantId(), passwordEncoder.encode(retireveRequest.getNewPassword()));
         } catch (Exception e) {
-            LOGGER.error("Database Operate Exception: " + e.getMessage());
+            LOGGER.error("Database Operate Exception: {}", e.getMessage());
             return Either.right(new FormatRespDto(Status.INTERNAL_SERVER_ERROR, "Database Exception."));
         }
 
