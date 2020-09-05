@@ -48,21 +48,20 @@ public class HttpsUtil {
         try {
             LOGGER.info("Begin sms connect");
             client = HttpClients.custom().setSSLContext(
-                new SSLContextBuilder().loadTrustMaterial(null, (x509CertChain, authType) -> true)
-                    .build())
+                new SSLContextBuilder().loadTrustMaterial(null, (x509CertChain, authType) -> true).build())
                 .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE).build();
             try (CloseableHttpResponse response = client.execute(httpRequest)) {
                 int respCode = response.getStatusLine().getStatusCode();
                 if (HttpResponseStatus.OK.code() == respCode) {
                     res = true;
                 } else {
-                    LOGGER.error("Send sms fail. respCode={}",respCode);
+                    LOGGER.error("Send sms fail. respCode={}", respCode);
                 }
             }
         } catch (IOException e) {
-            LOGGER.error("https io exception: " + e.getMessage());
+            LOGGER.error("https io exception: {}", e.getMessage());
         } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
-            LOGGER.error("SSL Context exception: " + e.getMessage());
+            LOGGER.error("SSL Context exception: {}", e.getMessage());
         } finally {
             if (client != null) {
                 try {
