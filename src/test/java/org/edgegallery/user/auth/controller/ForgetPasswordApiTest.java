@@ -35,7 +35,7 @@ public class ForgetPasswordApiTest extends UserControllerTest {
         RetrievePasswordReqDto request = new RetrievePasswordReqDto();
         request.setVerificationCode("123456");
         request.setNewPassword("password");
-        request.setTelephone("15194251243");
+        request.setTelephone("18012345678");
 
         Either<Boolean, FormatRespDto> response = Either.left(true);
         Mockito.when(userMgmtService.retrievePassword(Mockito.any(RetrievePasswordReqDto.class))).thenReturn(response);
@@ -49,7 +49,7 @@ public class ForgetPasswordApiTest extends UserControllerTest {
         RetrievePasswordReqDto request = new RetrievePasswordReqDto();
         request.setVerificationCode("123456");
         request.setNewPassword("password");
-        request.setTelephone("15194251243");
+        request.setTelephone("18012345678");
 
         Either<Boolean, FormatRespDto> response = Either.right(new FormatRespDto(Response.Status.FORBIDDEN, "Forbidden or No Permission to Access."));
         Mockito.when(userMgmtService.retrievePassword(Mockito.any(RetrievePasswordReqDto.class))).thenReturn(response);
