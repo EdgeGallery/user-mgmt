@@ -30,6 +30,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ForgetPasswordApiTest extends UserControllerTest {
+
     @Test
     public void should_successfully_when_retrieve_pw_right() throws Exception {
         RetrievePasswordReqDto request = new RetrievePasswordReqDto();
