@@ -31,7 +31,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @RunWith(MockitoJUnitRunner.class)
 public class ForgetPasswordApiTest extends UserControllerTest {
     @Test
-    public void testForgetPasswordSuccess() throws Exception {
+    public void should_successfully_when_retrieve_pw_right() throws Exception {
         RetrievePasswordReqDto request = new RetrievePasswordReqDto();
         request.setVerificationCode("123456");
         request.setNewPassword("password");
@@ -45,7 +45,7 @@ public class ForgetPasswordApiTest extends UserControllerTest {
     }
 
     @Test
-    public void testForgetPasswordFail1() throws Exception {
+    public void should_failed_when_retrieve_pw_error() throws Exception {
         RetrievePasswordReqDto request = new RetrievePasswordReqDto();
         request.setVerificationCode("123456");
         request.setNewPassword("password");
