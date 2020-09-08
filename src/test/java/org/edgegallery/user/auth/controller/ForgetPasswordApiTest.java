@@ -34,7 +34,7 @@ public class ForgetPasswordApiTest extends UserControllerTest {
     public void should_successfully_when_retrieve_pw_right() throws Exception {
         RetrievePasswordReqDto request = new RetrievePasswordReqDto();
         request.setVerificationCode("123456");
-        request.setNewPassword("password");
+        request.setNewPassword("pw12#$W");
         request.setTelephone("18012345678");
 
         Either<Boolean, FormatRespDto> response = Either.left(true);
