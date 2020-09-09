@@ -30,12 +30,13 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ForgetPasswordApiTest extends UserControllerTest {
+
     @Test
-    public void testForgetPasswordSuccess() throws Exception {
+    public void should_successfully_when_retrieve_pw_right() throws Exception {
         RetrievePasswordReqDto request = new RetrievePasswordReqDto();
         request.setVerificationCode("123456");
-        request.setNewPassword("password");
-        request.setTelephone("15194251243");
+        request.setNewPassword("pw12#$W");
+        request.setTelephone("18012345678");
 
         Either<Boolean, FormatRespDto> response = Either.left(true);
         Mockito.when(userMgmtService.retrievePassword(Mockito.any(RetrievePasswordReqDto.class))).thenReturn(response);
@@ -45,11 +46,11 @@ public class ForgetPasswordApiTest extends UserControllerTest {
     }
 
     @Test
-    public void testForgetPasswordFail1() throws Exception {
+    public void should_failed_when_retrieve_pw_error() throws Exception {
         RetrievePasswordReqDto request = new RetrievePasswordReqDto();
         request.setVerificationCode("123456");
         request.setNewPassword("password");
-        request.setTelephone("15194251243");
+        request.setTelephone("18012345678");
 
         Either<Boolean, FormatRespDto> response = Either.right(new FormatRespDto(Response.Status.FORBIDDEN, "Forbidden or No Permission to Access."));
         Mockito.when(userMgmtService.retrievePassword(Mockito.any(RetrievePasswordReqDto.class))).thenReturn(response);

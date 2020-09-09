@@ -33,7 +33,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 public class RegisterApiTest extends UserControllerTest {
 
     @Test
-    public void registerSuccessful() throws Exception {
+    public void should_successfully_when_register_right() throws Exception {
         TenantRegisterReqDto request = new TenantRegisterReqDto();
         request.setUsername("username");
         request.setPassword("password");
@@ -48,7 +48,7 @@ public class RegisterApiTest extends UserControllerTest {
     }
 
     @Test
-    public void registerFailUserLength() throws Exception {
+    public void should_failed_when_username_less_then_6() throws Exception {
         TenantRegisterReqDto request = new TenantRegisterReqDto();
         request.setUsername("user");
         request.setPassword("password");
@@ -63,7 +63,7 @@ public class RegisterApiTest extends UserControllerTest {
     }
 
     @Test
-    public void registerFailPasswordLength() throws Exception {
+    public void should_failed_when_pw_less_then_6() throws Exception {
         TenantRegisterReqDto request = new TenantRegisterReqDto();
         request.setUsername("username");
         request.setPassword("pass");
@@ -78,7 +78,7 @@ public class RegisterApiTest extends UserControllerTest {
     }
 
     @Test
-    public void registerFailDB() throws Exception {
+    public void should_failed_when_db_error() throws Exception {
 
         TenantRegisterReqDto request = new TenantRegisterReqDto();
         request.setUsername("username");
@@ -93,7 +93,7 @@ public class RegisterApiTest extends UserControllerTest {
     }
 
     @Test
-    public void registerFailUsernameRequire() throws Exception {
+    public void should_failed_when_no_username() throws Exception {
         TenantRegisterReqDto request = new TenantRegisterReqDto();
         request.setPassword("password");
         Either<TenantRespDto, FormatRespDto> response = Either.right(new FormatRespDto(Status.BAD_REQUEST, "Data Required error."));
@@ -106,7 +106,7 @@ public class RegisterApiTest extends UserControllerTest {
     }
 
     @Test
-    public void registerFailPasswordRequire() throws Exception {
+    public void should_failed_when_no_pw() throws Exception {
         TenantRegisterReqDto request = new TenantRegisterReqDto();
         request.setUsername("username");
         Either<TenantRespDto, FormatRespDto> response = Either.right(new FormatRespDto(Status.BAD_REQUEST, "Data Required error."));

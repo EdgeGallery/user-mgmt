@@ -21,7 +21,6 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.edgegallery.user.auth.controller.dto.response.LoginRespDto;
-import org.edgegallery.user.auth.service.UserMgmtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

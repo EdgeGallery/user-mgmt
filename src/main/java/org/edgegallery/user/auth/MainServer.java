@@ -41,6 +41,7 @@ public class MainServer {
      * Main.
      */
     public static void main(String[] args) throws NoSuchAlgorithmException, KeyManagementException {
+
         // do not check host name
         TrustManager[] trustAllCerts = new TrustManager[] {
             new X509TrustManager() {

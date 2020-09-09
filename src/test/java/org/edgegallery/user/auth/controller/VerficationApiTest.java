@@ -56,7 +56,7 @@ public class VerficationApiTest {
     }
 
     @Test
-    public void testVerificationSuccess() throws Exception {
+    public void should_successfully_when_verify_tel_true() throws Exception {
         VerificationReqDto request = new VerificationReqDto();
         request.setTelephone("15194251243");
 
@@ -69,7 +69,7 @@ public class VerficationApiTest {
     }
 
     @Test
-    public void testVerificationFail() throws Exception {
+    public void should_fail_when_verify_tel_bad_request() throws Exception {
         VerificationReqDto request = new VerificationReqDto();
         request.setTelephone("15194251243");
 
