@@ -1,7 +1,7 @@
 # User Management 用户管理
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-![Jenkins](https://img.shields.io/jenkins/build?jobUrl=http://119.8.34.36:8080/view/GITEE-MEC-PLATFORM-BUILD/job/user-mgmt-docker-master-daily/)
+![Jenkins](https://img.shields.io/jenkins/build?jobUrl=http://jenkins.edgegallery.org/view/GITEE-MEC-PLATFORM-BUILD/job/user-mgmt-docker-master-daily/)
 
   User Management 用户管理模块，为EdgeGallery提供了基本的用户增删改查功能，定义了用户的角色与权限，并且包含了两个关键特性：手机验证和单点登录（Single Sign On）能力。
 
