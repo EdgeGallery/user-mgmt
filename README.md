@@ -47,7 +47,7 @@
   | Redis  | 3.2.100 or above | [download](https://github.com/microsoftarchive/redis/releases) |
   
   **2.源码下载：** 使用 git clone 或者下载压缩包的形式将User Management源代码下载到本地，默认master分支
-  ```
+  ```sh
   git clone https://gitee.com/edgegallery/user-mgmt.git
   ```
   
