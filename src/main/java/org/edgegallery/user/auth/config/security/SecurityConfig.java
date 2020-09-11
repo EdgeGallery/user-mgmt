@@ -55,7 +55,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
             .authorizeRequests()
             .antMatchers("/", "/oauth/**", "/login", "/css/**", "/fonts/**", "/img/**",
-                "/js/**", "/favicon.ico", "/index.html")
+                "/js/**", "/favicon.ico", "/index.html", "/user-privacy.md", "/user-agreement.md")
             .permitAll()
             .antMatchers(HttpMethod.POST, "/v1/users", "/v1/users/action/uniqueness", "/v1/identity/sms")
             .permitAll()
