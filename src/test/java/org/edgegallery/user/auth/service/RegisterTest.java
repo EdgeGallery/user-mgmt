@@ -118,6 +118,18 @@ public class RegisterTest {
     }
 
     @Test
+    public void should_failed_when_no_telNo() {
+        TenantRegisterReqDto request = new TenantRegisterReqDto();
+        request.setUsername("username");
+        request.setPassword("nihao!@123456");
+        request.setCompany("huawei");
+        request.setGender("male");
+
+        Either<TenantRespDto, FormatRespDto> either = userMgmtService.register(request);
+        Assert.assertTrue(either.isRight());
+    }
+
+    @Test
     public void should_failed_when_telNo_existed() {
         TenantRegisterReqDto request = new TenantRegisterReqDto();
         request.setUsername("username");
