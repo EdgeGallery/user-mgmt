@@ -15,6 +15,7 @@
 
 ## 特性简介
 
+
 - **手机验证**
 
   新用户在注册时，需要填写手机号和验证码，只有通过校验才能成功注册，一个手机号只能注册一个账户，忘记密码可以通过手机号找回；
@@ -39,7 +40,7 @@
 
   |  Name     | Version   | Link |
   |  ----     | ----  |  ---- |
-  | JDK1.8 |1.8xxx | [download](https://www.oracle.com/java/technologies/javase-jdk8-downloads.html)
+  | OpenJDK1.8 |1.8.0 | [download](http://openjdk.java.net/install/)
   | MavApache Maven |3.6.3 | [download](https://maven.apache.org/download.cgi)
   | IntelliJ IDEA |Community |[download](https://www.jetbrains.com/idea/download/)
   | Servicecomb Service-Center    | 1.3.0 | [download](https://servicecomb.apache.org/cn/release/service-center-downloads/)
