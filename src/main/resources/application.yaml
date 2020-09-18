@@ -1,6 +1,6 @@
 ###servicecomb config####
 servicecomb-config-order: 1
-APPLICATION_ID: openMec  #应用名
+APPLICATION_ID: edgegallery  #应用名
 service_description:
   name: user-mgmt-be  #微服务名
   version: 1.0.0   #微服务版本
