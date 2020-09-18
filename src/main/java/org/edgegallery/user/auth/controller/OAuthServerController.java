@@ -26,8 +26,6 @@ import org.edgegallery.user.auth.config.DescriptionConfig;
 import org.edgegallery.user.auth.config.OAuthClientDetailsConfig;
 import org.edgegallery.user.auth.controller.dto.response.ErrorRespDto;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -61,11 +59,7 @@ public class OAuthServerController {
         oauthClientDetailsConfig.getClients().forEach(clientDetail -> {
             String clientUrl = clientDetail.getClientUrl();
             String url = clientUrl + "/auth/logout?ssoSessionId=" + ssoSessionId;
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            String requestJson = "";
-            HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
-            REST_TEMPLATE.postForObject(url, entity, String.class);
+            REST_TEMPLATE.getForObject(url, String.class);
         });
         return new ResponseEntity<>("Succeed", HttpStatus.OK);
     }
