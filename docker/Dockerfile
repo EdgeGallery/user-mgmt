@@ -28,7 +28,7 @@ RUN apk update &&\
 RUN mkdir -p -m 750 /var/log/usermgmt &&\
     chown -hR app:app /var/log/usermgmt
 
-RUN mkdir -p /var/log/usermgmt_test
+RUN mkdir -p -m 750 /var/log/usermgmt_test
 
 ENV TZ='Asia/Shanghai'
 ENV APP_HOME /usr/app
