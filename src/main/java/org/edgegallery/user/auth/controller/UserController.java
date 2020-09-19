@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-@RestSchema(schemaId = "user-mgmt-be")
+@RestSchema(schemaId = "users-mgmt")
 @RequestMapping("/v1/users")
 @Controller
 public class UserController extends BeGenericServlet {
