@@ -28,7 +28,7 @@ ENV TZ='Asia/Shanghai'
 ENV APP_HOME /usr/app
 WORKDIR $APP_HOME
 
-RUN mkdir -p -m 750 /var/log/usermgmt
+RUN mkdir -p -m 760 /var/log/usermgmt
 
 EXPOSE 8067
 COPY --chown=app:app target/*.jar $APP_HOME/
