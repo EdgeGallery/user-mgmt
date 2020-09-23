@@ -29,18 +29,20 @@ import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 import org.springframework.web.util.WebUtils;
 
+@Component
 public class HttpTraceLogFilter extends OncePerRequestFilter implements Ordered {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpTraceLogFilter.class);
 
     @Override
     public int getOrder() {
-        return Ordered.LOWEST_PRECEDENCE - 10;
+        return Ordered.HIGHEST_PRECEDENCE;
     }
 
     @Override
