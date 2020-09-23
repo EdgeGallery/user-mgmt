@@ -42,6 +42,6 @@ public class LoginFailHandler extends SimpleUrlAuthenticationFailureHandler {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.getWriter().println(new Gson().toJson(
             new LoginRespDto("UNAUTHORIZED", exception.getLocalizedMessage())));
-        LOGGER.error("get token failed, IP:{}", request.getRemoteAddr());
+        LOGGER.info("failed to get token.");
     }
 }

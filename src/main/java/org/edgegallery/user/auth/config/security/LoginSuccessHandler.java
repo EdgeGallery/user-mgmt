@@ -36,6 +36,6 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
         Authentication authentication) throws IOException, ServletException {
         response.setStatus(HttpStatus.OK.value());
-        LOGGER.error("get token failed, IP:{}", request.getRemoteAddr());
+        LOGGER.info("get token success.");
     }
 }
