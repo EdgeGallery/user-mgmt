@@ -62,5 +62,4 @@ public class MainServer {
         HttpsURLConnection.setDefaultHostnameVerifier(NoopHostnameVerifier.INSTANCE);
         SpringApplication.run(MainServer.class, args);
     }
-
 }
