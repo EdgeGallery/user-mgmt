@@ -44,7 +44,7 @@ public class ValidateAspect {
         Either<Boolean, FormatRespDto> result = validate(joinPoint.getArgs());
         if (result.isRight()) {
             LOGGER
-                .error("method={} invoke fail. error={}", joinPoint.getSignature(), result.right().value().toString());
+                .error("method={} invoke fail. error={}", joinPoint.getSignature(), result.right().value());
             return result;
         }
         try {

@@ -18,11 +18,11 @@ package org.edgegallery.user.auth;
 
 import java.util.UUID;
 import org.apache.commons.lang.RandomStringUtils;
+import org.edgegallery.user.auth.db.entity.TenantPo;
+import org.edgegallery.user.auth.db.mapper.TenantPoMapper;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.edgegallery.user.auth.db.entity.TenantPo;
-import org.edgegallery.user.auth.db.mapper.TenantPoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -68,7 +68,7 @@ public class DBTest {
         po.setTenantId(UUID.randomUUID().toString());
         po.setUsername(RandomStringUtils.randomAlphanumeric(16));
         po.setPassword("pw12#$");
-        po.setTelephoneNumber("13"+ RandomStringUtils.randomNumeric(9));
+        po.setTelephoneNumber("13" + RandomStringUtils.randomNumeric(9));
         po.setGender("male");
         po.setCompany("huawei");
 
