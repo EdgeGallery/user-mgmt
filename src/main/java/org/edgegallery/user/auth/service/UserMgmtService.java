@@ -131,7 +131,8 @@ public class UserMgmtService {
             LOGGER.info("Sms is not enabled,no need to verify sms code");
             return true;
         }
-        if (StringUtils.isEmpty(verificationCode) || !verificationCode.equals(RedisUtil.get(RedisUtil.RedisKeyType.VerificationCode, telephone))) {
+        if (StringUtils.isEmpty(verificationCode) || !verificationCode
+            .equals(RedisUtil.get(RedisUtil.RedisKeyType.VerificationCode, telephone))) {
             return false;
         }
         RedisUtil.delete(RedisUtil.RedisKeyType.VerificationCode, telephone);

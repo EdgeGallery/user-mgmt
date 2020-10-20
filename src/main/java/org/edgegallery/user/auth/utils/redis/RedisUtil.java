@@ -50,7 +50,8 @@ public class RedisUtil {
     }
 
     /**
-     * save value by key
+     * save value by key.
+     *
      */
     public static void save(RedisKeyType type, String key, String value) {
         try (StatefulRedisConnection<String, String> connection = RedisPoolUtil.getConnection()) {
