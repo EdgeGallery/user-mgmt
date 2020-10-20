@@ -27,7 +27,6 @@ import java.util.Set;
 import org.edgegallery.user.auth.db.entity.RolePo;
 import org.edgegallery.user.auth.db.entity.TenantPo;
 import org.edgegallery.user.auth.db.mapper.TenantPoMapper;
-import org.edgegallery.user.auth.utils.redis.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +46,7 @@ public class MecUserDetailsService implements UserDetailsService {
     private TenantPoMapper tenantPoMapper;
 
     private Set<RequestLimitRule> rules = Collections.singleton(RequestLimitRule.of(Duration.ofMinutes(5), 3));
+
     private RequestRateLimiter limiter = new InMemorySlidingWindowRequestRateLimiter(rules);
 
     @Override
@@ -64,8 +64,7 @@ public class MecUserDetailsService implements UserDetailsService {
         rolePos.forEach(rolePo -> authorities.add(new SimpleGrantedAuthority("ROLE_" + rolePo.toString())));
 
         boolean isOverLimit = isOverLimit(userNameOrTelephoneNum);
-        User user = new User(tenant.getTenantId(), tenant.getPassword(), true,
-            true, true, !isOverLimit, authorities);
+        User user = new User(tenant.getTenantId(), tenant.getPassword(), true, true, true, !isOverLimit, authorities);
         if (isOverLimit) {
             LOGGER.info("user has been locked, username: {}", userNameOrTelephoneNum);
         }
