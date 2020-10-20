@@ -31,9 +31,7 @@ public class RedisConfig {
 
     private Integer port;
 
-    private Integer timeout;
-
-    private Integer verificationTimeout;
+    private Integer verificationTimeOut;
 
     private String password;
 

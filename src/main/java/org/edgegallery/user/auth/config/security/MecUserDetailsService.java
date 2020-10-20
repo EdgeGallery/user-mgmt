@@ -16,11 +16,20 @@
 
 package org.edgegallery.user.auth.config.security;
 
+import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
+import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
+import es.moki.ratelimitj.inmemory.request.InMemorySlidingWindowRequestRateLimiter;
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import org.edgegallery.user.auth.db.entity.RolePo;
 import org.edgegallery.user.auth.db.entity.TenantPo;
 import org.edgegallery.user.auth.db.mapper.TenantPoMapper;
+import org.edgegallery.user.auth.utils.redis.RedisUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -32,9 +41,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class MecUserDetailsService implements UserDetailsService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoginSuccessHandler.class);
 
     @Autowired
-    TenantPoMapper tenantPoMapper;
+    private TenantPoMapper tenantPoMapper;
+
+    private Set<RequestLimitRule> rules = Collections.singleton(RequestLimitRule.of(Duration.ofMinutes(5), 3));
+    private RequestRateLimiter limiter = new InMemorySlidingWindowRequestRateLimiter(rules);
 
     @Override
     public UserDetails loadUserByUsername(String userNameOrTelephoneNum) throws UsernameNotFoundException {
@@ -49,6 +62,25 @@ public class MecUserDetailsService implements UserDetailsService {
         List<RolePo> rolePos = tenantPoMapper.getRolePoByTenantId(tenant.getTenantId());
         List<GrantedAuthority> authorities = new ArrayList<>();
         rolePos.forEach(rolePo -> authorities.add(new SimpleGrantedAuthority("ROLE_" + rolePo.toString())));
-        return new User(tenant.getTenantId(), tenant.getPassword(), authorities);
+
+        boolean isOverLimit = isOverLimit(userNameOrTelephoneNum);
+        User user = new User(tenant.getTenantId(), tenant.getPassword(), true,
+            true, true, !isOverLimit, authorities);
+        if (isOverLimit) {
+            LOGGER.info("user has been locked, username: {}", userNameOrTelephoneNum);
+        }
+        return user;
+    }
+
+    public void addFailedCount(String userId) {
+        limiter.overLimitWhenIncremented(userId);
+    }
+
+    public boolean isOverLimit(String userId) {
+        return limiter.geLimitWhenIncremented(userId, 0);
+    }
+
+    public void clearFailedCount(String userId) {
+        limiter.resetLimit(userId);
     }
 }
