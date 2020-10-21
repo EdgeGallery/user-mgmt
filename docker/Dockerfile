@@ -50,8 +50,7 @@ RUN chmod 750 $APP_HOME &&\
     mkdir -p -m 750 $APP_HOME/log &&\
     mkdir -p -m 700 $APP_HOME/ssl &&\
     chown -R $USER_NAME:$GROUP_NAME $APP_HOME &&\
-    chown -R $USER_NAME:$GROUP_NAME $APP_HOME/log &&\
-    chown -R $USER_NAME:$GROUP_NAME $APP_HOME/ssl
+    chown -R $USER_NAME:$GROUP_NAME $APP_HOME/log
 
 EXPOSE 8067
 # Change to the app user.
