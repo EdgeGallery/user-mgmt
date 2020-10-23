@@ -50,14 +50,14 @@ public class RedisUtil {
     }
 
     /**
-     * save verification code.
+     * save value by key.
+     *
      */
-    public static void saveVerificationCode(String key, String value) {
-
+    public static void save(RedisKeyType type, String key, String value) {
         try (StatefulRedisConnection<String, String> connection = RedisPoolUtil.getConnection()) {
             RedisCommands<String, String> commands = connection.sync();
-            commands.set(key, value);
-            commands.expire(key, redisConfig.getVerificationTimeout());
+            commands.set(type + "-" + key, value);
+            commands.expire(key, type.timeOut);
         } catch (UserAuthException e) {
             LOGGER.error("failed to connect redis.");
         }
@@ -68,25 +68,33 @@ public class RedisUtil {
      *
      * @return
      */
-    public static String get(String key) {
+    public static String get(RedisKeyType type, String key) {
         try (StatefulRedisConnection<String, String> connection = RedisPoolUtil.getConnection()) {
-            return connection.sync().get(key);
+            return connection.sync().get(type + "-" + key);
         } catch (UserAuthException e) {
             LOGGER.error("failed to connect redis.");
         }
         return null;
-
     }
 
     /**
      * delete key and value.
      */
-    public static void delete(String key) {
+    public static void delete(RedisKeyType type, String key) {
         try (StatefulRedisConnection<String, String> connection = RedisPoolUtil.getConnection()) {
-            connection.sync().del(key);
+            connection.sync().del(type + "-" + key);
         } catch (UserAuthException e) {
             LOGGER.error("failed to connect redis.");
         }
     }
 
+    public enum RedisKeyType {
+        VerificationCode(redisConfig.getVerificationTimeOut());
+
+        private int timeOut;
+
+        RedisKeyType(int timeOut) {
+            this.timeOut = timeOut;
+        }
+    }
 }

@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
@@ -32,10 +33,16 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginSuccessHandler.class);
 
+    @Autowired
+    private MecUserDetailsService mecUserDetailsService;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
         Authentication authentication) throws IOException, ServletException {
         response.setStatus(HttpStatus.OK.value());
         LOGGER.info("get token success.");
+
+        String userId = authentication.getName();
+        mecUserDetailsService.clearFailedCount(userId);
     }
 }

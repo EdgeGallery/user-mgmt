@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
@@ -35,13 +36,18 @@ public class LoginFailHandler extends SimpleUrlAuthenticationFailureHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginFailHandler.class);
 
     @Override
-    public void onAuthenticationFailure(HttpServletRequest request,
-        HttpServletResponse response,
+    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
         AuthenticationException exception) throws IOException {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        response.getWriter().println(new Gson().toJson(
-            new LoginRespDto("UNAUTHORIZED", exception.getLocalizedMessage())));
+        if (exception instanceof LockedException) {
+            response.setStatus(HttpStatus.LOCKED.value());
+            response.getWriter().println(
+                new Gson().toJson(new LoginRespDto(HttpStatus.LOCKED.toString(), exception.getLocalizedMessage())));
+        } else {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.getWriter().println(new Gson()
+                .toJson(new LoginRespDto(HttpStatus.UNAUTHORIZED.toString(), exception.getLocalizedMessage())));
+        }
         LOGGER.info("failed to get token.");
     }
 }

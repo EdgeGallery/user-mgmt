@@ -54,7 +54,7 @@ public class VerificationTest {
         request.setTelephone("15191881235");
         new MockUp<RedisUtil>() {
             @Mock
-            public void saveVerificationCode(String key, String value) {
+            public void save(RedisUtil.RedisKeyType type, String key, String value) {
                 return;
             }
         };
@@ -69,7 +69,7 @@ public class VerificationTest {
         request.setTelephone("15191881235");
         new MockUp<RedisUtil>() {
             @Mock
-            public void saveVerificationCode(String key, String value) {
+            public void save(RedisUtil.RedisKeyType type, String key, String value) {
                 return;
             }
         };
