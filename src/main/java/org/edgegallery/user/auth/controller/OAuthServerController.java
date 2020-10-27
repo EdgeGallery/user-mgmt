@@ -21,6 +21,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.servicecomb.provider.rest.common.RestSchema;
 import org.edgegallery.user.auth.config.DescriptionConfig;
 import org.edgegallery.user.auth.config.OAuthClientDetailsConfig;
@@ -58,6 +59,9 @@ public class OAuthServerController {
         String ssoSessionId = request.getRequestedSessionId();
         oauthClientDetailsConfig.getClients().forEach(clientDetail -> {
             String clientUrl = clientDetail.getClientUrl();
+            if (StringUtils.isEmpty(clientUrl)) {
+                return;
+            }
             String url = clientUrl + "/auth/logout?ssoSessionId=" + ssoSessionId;
             REST_TEMPLATE.getForObject(url, String.class);
         });
