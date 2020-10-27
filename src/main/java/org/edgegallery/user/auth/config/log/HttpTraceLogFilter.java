@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
@@ -39,6 +40,7 @@ import org.springframework.web.util.WebUtils;
 public class HttpTraceLogFilter extends OncePerRequestFilter implements Ordered {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpTraceLogFilter.class);
+    private static final String[] urlPatterns = {"/login", "/logout", "/auth/", "/v1/"};
 
     @Override
     public int getOrder() {
@@ -48,7 +50,11 @@ public class HttpTraceLogFilter extends OncePerRequestFilter implements Ordered 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
         throws ServletException, IOException {
-
+        String url = request.getRequestURI();
+        if (!StringUtils.startsWithAny(url, urlPatterns)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         if (!(request instanceof ContentCachingRequestWrapper)) {
             request = new ContentCachingRequestWrapper(request);
         }
@@ -56,31 +62,49 @@ public class HttpTraceLogFilter extends OncePerRequestFilter implements Ordered 
             response = new ContentCachingResponseWrapper(response);
         }
 
-        String accessId = UUID.randomUUID().toString();
+        HttpRequestLog logs = new HttpRequestLog();
         try {
-            logForRequest(accessId, request);
+            logs.setRequest(logForRequest(request));
             filterChain.doFilter(request, response);
         } finally {
-            logForResponse(accessId, response);
+            logs.setResponse(logForResponse(response));
             updateResponse(response);
+            LOGGER.info("Http Request log: {}", new Gson().toJson(logs));
         }
     }
 
-    private void logForRequest(String accessId, HttpServletRequest request) {
+    private HttpRequestTraceLog logForRequest(HttpServletRequest request) {
         HttpRequestTraceLog requestTraceLog = new HttpRequestTraceLog();
-        requestTraceLog.setAccessId(accessId);
         requestTraceLog.setTime(LocalDateTime.now().toString());
         requestTraceLog.setPath(request.getRequestURI());
         requestTraceLog.setMethod(request.getMethod());
-        LOGGER.info("Http request trace log: {}", new Gson().toJson(requestTraceLog));
+        requestTraceLog.setIp(getIpAddress(request));
+        return requestTraceLog;
     }
 
-    private void logForResponse(String accessId, HttpServletResponse response) {
+    private HttpResponseTraceLog logForResponse(HttpServletResponse response) {
         HttpResponseTraceLog responseTraceLog = new HttpResponseTraceLog();
-        responseTraceLog.setAccessId(accessId);
         responseTraceLog.setStatus(response.getStatus());
         responseTraceLog.setTime(LocalDateTime.now().toString());
-        LOGGER.info("Http response trace log: {}", new Gson().toJson(responseTraceLog));
+        return responseTraceLog;
+    }
+
+    private String getIpAddress(HttpServletRequest request) {
+        String ip = request.getHeader("x-forwarded-for");
+        if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        // the first IP is the real IP
+        if (!StringUtils.isEmpty(ip) && ip.indexOf(",") > 0) {
+            ip = ip.substring(0, ip.indexOf(","));
+        }
+        return ip;
     }
 
     private void updateResponse(HttpServletResponse response) throws IOException {
@@ -93,22 +117,35 @@ public class HttpTraceLogFilter extends OncePerRequestFilter implements Ordered 
 
     @Setter
     @Getter
+    private static class HttpRequestLog {
+        HttpRequestTraceLog request;
+
+        HttpResponseTraceLog response;
+    }
+
+    @Setter
+    @Getter
     private static class HttpRequestTraceLog {
-        private String accessId;
         private String path;
+
         private String userId;
-        private String parameterMap;
+
         private String method;
+
         private String time;
+
         private String requestBody;
+
+        private String ip;
     }
 
     @Setter
     @Getter
     private static class HttpResponseTraceLog {
-        private String accessId;
         private Integer status;
+
         private String time;
+
         private String body;
     }
 }
