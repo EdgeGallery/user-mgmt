@@ -56,4 +56,4 @@ EXPOSE 8067
 # Change to the app user.
 USER $USER_NAME
 # Execute script & application
-ENTRYPOINT ["java","-jar", "./bin/user-mgmt-be.jar && tail -f /dev/null"]
+CMD java -jar ./bin/user-mgmt-be.jar
