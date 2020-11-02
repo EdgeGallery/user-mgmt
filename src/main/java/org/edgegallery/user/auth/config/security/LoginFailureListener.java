@@ -18,8 +18,8 @@ package org.edgegallery.user.auth.config.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -30,10 +30,9 @@ public class LoginFailureListener implements ApplicationListener<AuthenticationF
 
     @Override
     public void onApplicationEvent(AuthenticationFailureBadCredentialsEvent event) {
-        if (event.getException().getClass().equals(UsernameNotFoundException.class)) {
-            return;
+        if (event.getException().getClass().equals(BadCredentialsException.class)) {
+            String userId = event.getAuthentication().getName();
+            mecUserDetailsService.addFailedCount(userId);
         }
-        String userId = event.getAuthentication().getName();
-        mecUserDetailsService.addFailedCount(userId);
     }
 }
