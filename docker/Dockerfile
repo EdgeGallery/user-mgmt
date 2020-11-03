@@ -42,7 +42,6 @@ RUN apk update &&\
 WORKDIR $APP_HOME
 
 COPY target/*.jar $APP_HOME/bin
-COPY configs/*.sh $APP_HOME/bin
 
 RUN chmod 750 $APP_HOME &&\
     chmod -R 550 $APP_HOME/bin &&\
