@@ -56,4 +56,5 @@ EXPOSE 8067
 # Change to the app user.
 USER $USER_NAME
 # Execute script & application
-ENTRYPOINT ["sh", "./bin/start.sh"]
+ENTRYPOINT ["sh", "-c"]
+CMD ["exec java -jar ./bin/$APP_FILE"]
