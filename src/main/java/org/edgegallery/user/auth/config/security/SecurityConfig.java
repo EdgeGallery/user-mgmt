@@ -18,6 +18,8 @@ package org.edgegallery.user.auth.config.security;
 
 import java.util.Arrays;
 import org.edgegallery.user.auth.config.SmsConfig;
+import org.edgegallery.user.auth.config.filter.GuestUserAuthenticationFilter;
+import org.edgegallery.user.auth.config.filter.ExternalLoginAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -28,6 +30,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -74,6 +77,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
             .csrf()
             .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+        httpSecurity.addFilterBefore(guestAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        // httpSecurity.addFilterAfter(externalLoginAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+    }
+
+    @Bean
+    GuestUserAuthenticationFilter guestAuthenticationFilter() throws Exception {
+        GuestUserAuthenticationFilter filter = new GuestUserAuthenticationFilter();
+        filter.setAuthenticationManager(authenticationManagerBean());
+        filter.setAuthenticationSuccessHandler(loginSuccessHandler);
+        filter.setAuthenticationFailureHandler(loginFailHandler);
+        return filter;
     }
 
     @Override
@@ -106,5 +120,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         Pbkdf2PasswordEncoder encoder = new Pbkdf2PasswordEncoder();
         encoder.setAlgorithm(Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA256);
         return encoder;
+    }
+
+    @Bean
+    ExternalLoginAuthenticationFilter externalLoginAuthenticationFilter() throws Exception {
+        ExternalLoginAuthenticationFilter filter = new ExternalLoginAuthenticationFilter();
+        filter.setAuthenticationManager(authenticationManagerBean());
+        filter.setAuthenticationSuccessHandler(loginSuccessHandler);
+        filter.setAuthenticationFailureHandler(loginFailHandler);
+        return filter;
     }
 }
