@@ -22,7 +22,9 @@ import es.moki.ratelimitj.inmemory.request.InMemorySlidingWindowRequestRateLimit
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.edgegallery.user.auth.db.entity.RolePo;
 import org.edgegallery.user.auth.db.entity.TenantPo;
@@ -42,12 +44,18 @@ import org.springframework.stereotype.Component;
 public class MecUserDetailsService implements UserDetailsService {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginSuccessHandler.class);
 
+    // when login failed 5 times, account will be locked.
+    private static final Set<RequestLimitRule> rules = Collections.singleton(RequestLimitRule.of(Duration.ofMinutes(5), 4));
+
+    // locked overtime
+    private static final long OVERTIME = 5 * 60 * 1000;
+
+    private static final RequestRateLimiter LIMITER = new InMemorySlidingWindowRequestRateLimiter(rules);
+
+    private static Map<String, Long> LOCKED_USERS_MAP = new Hashtable<String, Long>();
+
     @Autowired
     private TenantPoMapper tenantPoMapper;
-
-    private Set<RequestLimitRule> rules = Collections.singleton(RequestLimitRule.of(Duration.ofMinutes(5), 3));
-
-    private RequestRateLimiter limiter = new InMemorySlidingWindowRequestRateLimiter(rules);
 
     @Override
     public UserDetails loadUserByUsername(String userNameOrTelephoneNum) throws UsernameNotFoundException {
@@ -56,30 +64,44 @@ public class MecUserDetailsService implements UserDetailsService {
             tenant = tenantPoMapper.getTenantByTelephone(userNameOrTelephoneNum);
             if (tenant == null) {
                 throw new UsernameNotFoundException(
-                    "Can't find user by userNameOrTelephoneNum:" + userNameOrTelephoneNum);
+                    "Can't find user by username or telephone:" + userNameOrTelephoneNum);
             }
         }
+
         List<RolePo> rolePos = tenantPoMapper.getRolePoByTenantId(tenant.getTenantId());
         List<GrantedAuthority> authorities = new ArrayList<>();
         rolePos.forEach(rolePo -> authorities.add(new SimpleGrantedAuthority("ROLE_" + rolePo.toString())));
 
-        boolean isOverLimit = isOverLimit(userNameOrTelephoneNum);
-        User user = new User(tenant.getTenantId(), tenant.getPassword(), true, true, true, !isOverLimit, authorities);
-        if (isOverLimit) {
-            LOGGER.info("user has been locked, username: {}", userNameOrTelephoneNum);
+        boolean isLocked = isLocked(userNameOrTelephoneNum);
+        if (isLocked) {
+            LOGGER.info("username:{} have been locked.", tenant.getUsername());
         }
+        User user = new User(tenant.getUsername(), tenant.getPassword(), true, true, true, !isLocked, authorities);
         return user;
     }
 
-    public void addFailedCount(String userId) {
-        limiter.overLimitWhenIncremented(userId);
+    public boolean isLocked(String userId) {
+        if (LOCKED_USERS_MAP.containsKey(userId)) {
+            long lockedTime = LOCKED_USERS_MAP.get(userId);
+            if (System.currentTimeMillis() - lockedTime < OVERTIME) {
+                return true;
+            } else {
+                LOCKED_USERS_MAP.remove(userId);
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 
-    public boolean isOverLimit(String userId) {
-        return limiter.geLimitWhenIncremented(userId, 0);
+    public void addFailedCount(String userId) {
+        boolean isOver = LIMITER.overLimitWhenIncremented(userId);
+        if (isOver) {
+            LOCKED_USERS_MAP.put(userId, System.currentTimeMillis());
+        }
     }
 
     public void clearFailedCount(String userId) {
-        limiter.resetLimit(userId);
+        LIMITER.resetLimit(userId);
     }
 }
