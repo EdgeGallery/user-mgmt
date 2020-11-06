@@ -97,7 +97,6 @@ public class MecUserDetailsService implements UserDetailsService {
 
     /**
      * when login failed.
-     * @param userId
      */
     public void addFailedCount(String userId) {
         boolean isOver = LIMITER.overLimitWhenIncremented(userId);
@@ -108,7 +107,6 @@ public class MecUserDetailsService implements UserDetailsService {
 
     /**
      * when login success.
-     * @param userId
      */
     public void clearFailedCount(String userId) {
         LIMITER.resetLimit(userId);
