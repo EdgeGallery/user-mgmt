@@ -45,7 +45,8 @@ public class MecUserDetailsService implements UserDetailsService {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginSuccessHandler.class);
 
     // when login failed 5 times, account will be locked.
-    private static final Set<RequestLimitRule> rules = Collections.singleton(RequestLimitRule.of(Duration.ofMinutes(5), 4));
+    private static final Set<RequestLimitRule> rules =
+        Collections.singleton(RequestLimitRule.of(Duration.ofMinutes(5), 4));
 
     // locked overtime
     private static final long OVERTIME = 5 * 60 * 1000;
@@ -80,7 +81,7 @@ public class MecUserDetailsService implements UserDetailsService {
         return user;
     }
 
-    public boolean isLocked(String userId) {
+    private boolean isLocked(String userId) {
         if (LOCKED_USERS_MAP.containsKey(userId)) {
             long lockedTime = LOCKED_USERS_MAP.get(userId);
             if (System.currentTimeMillis() - lockedTime < OVERTIME) {
@@ -94,6 +95,10 @@ public class MecUserDetailsService implements UserDetailsService {
         }
     }
 
+    /**
+     * when login failed.
+     * @param userId
+     */
     public void addFailedCount(String userId) {
         boolean isOver = LIMITER.overLimitWhenIncremented(userId);
         if (isOver) {
@@ -101,6 +106,10 @@ public class MecUserDetailsService implements UserDetailsService {
         }
     }
 
+    /**
+     * when login success.
+     * @param userId
+     */
     public void clearFailedCount(String userId) {
         LIMITER.resetLimit(userId);
     }
