@@ -42,7 +42,7 @@ public class AuthServerTokenEnhancer implements TokenEnhancer {
     public OAuth2AccessToken enhance(OAuth2AccessToken oauth2AccessToken,
                                      OAuth2Authentication oauth2Authentication) {
         User user = (User) oauth2Authentication.getPrincipal();
-        TenantPo tenant = tenantPoMapper.getTenantBasicPoData(user.getUsername());
+        TenantPo tenant = tenantPoMapper.getTenantByUsername(user.getUsername());
         if (tenant == null) {
             return oauth2AccessToken;
         }

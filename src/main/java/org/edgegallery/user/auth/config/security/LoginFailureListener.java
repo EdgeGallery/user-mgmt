@@ -19,17 +19,17 @@ package org.edgegallery.user.auth.config.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
+import org.springframework.security.authentication.event.AbstractAuthenticationFailureEvent;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LoginFailureListener implements ApplicationListener<AuthenticationFailureBadCredentialsEvent> {
+public class LoginFailureListener implements ApplicationListener<AbstractAuthenticationFailureEvent> {
 
     @Autowired
     private MecUserDetailsService mecUserDetailsService;
 
     @Override
-    public void onApplicationEvent(AuthenticationFailureBadCredentialsEvent event) {
+    public void onApplicationEvent(AbstractAuthenticationFailureEvent event) {
         if (event.getException().getClass().equals(BadCredentialsException.class)) {
             String userId = event.getAuthentication().getName();
             mecUserDetailsService.addFailedCount(userId);
