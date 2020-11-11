@@ -76,7 +76,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
             .csrf()
             .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
-        httpSecurity.addFilterBefore(guestAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+            httpSecurity.addFilterAfter(guestAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
     @Bean

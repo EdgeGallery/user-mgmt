@@ -1,5 +1,6 @@
 package org.edgegallery.user.auth.config.filter;
 
+import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,7 +18,7 @@ public class GuestUserAuthenticationFilter extends AbstractAuthenticationProcess
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
-        throws AuthenticationException {
+        throws AuthenticationException, IOException {
         UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken("guest", "guest");
         this.setDetails(request, authRequest);
         return this.getAuthenticationManager().authenticate(authRequest);

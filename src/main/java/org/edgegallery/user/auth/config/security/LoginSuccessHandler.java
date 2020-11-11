@@ -17,6 +17,7 @@
 package org.edgegallery.user.auth.config.security;
 
 import java.io.IOException;
+import java.net.URL;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,6 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
+import org.springframework.security.web.savedrequest.RequestCache;
+import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -42,7 +46,34 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
         response.setStatus(HttpStatus.OK.value());
         LOGGER.info("get token success.");
 
-        String userId = authentication.getName();
-        mecUserDetailsService.clearFailedCount(userId);
+        String userName = authentication.getName();
+        mecUserDetailsService.clearFailedCount(userName);
+
+        if (userName.equalsIgnoreCase("guest")) {
+            String redirectUrl = getRedirectUrl(request, response);
+            if (redirectUrl != null) {
+                URL url = new URL(redirectUrl);
+                response.sendRedirect(String.format("%s://%s/#/index", url.getProtocol(), url.getAuthority()));
+            }
+        }
+    }
+
+    private String getRedirectUrl(HttpServletRequest request, HttpServletResponse response) {
+        RequestCache cache = new HttpSessionRequestCache();
+        SavedRequest savedRequest = cache.getRequest(request, response);
+        if (savedRequest == null) {
+            return null;
+        }
+        String url = savedRequest.getRedirectUrl();
+        String[] urlArray = url.split("\\?");
+        String[] parameters = urlArray[1].split("&");
+        String redirectUrl = null;
+        for (String parameter : parameters) {
+            String[] keyValue = parameter.split("=");
+            if (keyValue[0].equalsIgnoreCase("redirect_uri")) {
+                redirectUrl = keyValue[1];
+            }
+        }
+        return redirectUrl;
     }
 }
