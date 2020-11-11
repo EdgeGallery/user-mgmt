@@ -83,5 +83,4 @@ public class UserController extends BeGenericServlet {
         @ApiParam(value = "uniquenessRequest", required = true) @RequestBody UniqueReqDto request) {
         return buildResponse(userMgmtService.uniqueness(request));
     }
-
 }
