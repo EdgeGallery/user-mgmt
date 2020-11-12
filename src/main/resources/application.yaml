@@ -60,3 +60,7 @@ oauth2:
     - clientId: ${OAUTH_MECM_CLIENT_ID:mecm-fe}
       clientSecret: ${OAUTH_MECM_CLIENT_SECRET:}
       clientUrl: ${OAUTH_MECM_CLIENT_URL:}
+    - clientId: ${OAUTH_ATP_CLIENT_ID:atp-fe}
+      clientSecret: ${OAUTH_ATP_CLIENT_SECRET:}
+      clientUrl: ${OAUTH_ATP_CLIENT_URL:}
+
