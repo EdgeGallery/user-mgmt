@@ -41,6 +41,9 @@ spring:
     username: ${POSTGRES_USERNAME}
     password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
+    initialization-mode: always
+    schema: classpath:usermgmtdb.sql
+    data: classpath:usermgmtdb-data.sql
   main:
     allow-bean-definition-overriding: true
 
