@@ -44,6 +44,9 @@ public class TenantPo {
 
     private String gender;
 
+    // default is true
+    private boolean isNotDeleted = true;
+
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }

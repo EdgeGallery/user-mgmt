@@ -65,22 +65,22 @@
     <insert id="addTenantPo" parameterType="org.edgegallery.user.auth.db.entity.TenantPo">
         INSERT INTO
         tbl_tenant
-        (TENANTID, USERNAME, PASSWORD, COMPANY, TELEPHONENUMBER, GENDER)
+        (TENANTID, USERNAME, PASSWORD, COMPANY, TELEPHONENUMBER, GENDER, IS_NOT_DELETED)
         VALUES
-        (#{tenantId}, #{username}, #{password}, #{company}, #{telephoneNumber}, #{gender})
+        (#{tenantId}, #{username}, #{password}, #{company}, #{telephoneNumber}, #{gender}, #{isNotDeleted})
     </insert>
 
-    <delete id="deleteUser" >
-        delete from tbl_tenant where TENANTID = #{tenantId}
-    </delete>
+    <update id="deleteUser" >
+        update tbl_tenant set is_not_deleted = false where TENANTID = #{tenantId};
+    </update>
 
-    <insert id="modifyPassword">
+    <update id="modifyPassword">
         UPDATE
         tbl_tenant
         SET PASSWORD = #{param2}
         WHERE
         TENANTID = #{param1};
-    </insert>
+    </update>
 
     <insert id ="insertPermission" parameterType="java.util.List" >
         insert into
@@ -104,6 +104,7 @@
         from tbl_tenant a left join
         (select tenantid, platform, role from tbl_tenant_role left join tbl_role on tbl_tenant_role.roleid = tbl_role.id ) b
         on a.tenantid = b.tenantid
+        where a.is_not_deleted = true
     </select>
 
 

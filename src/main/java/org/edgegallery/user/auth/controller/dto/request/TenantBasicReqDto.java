@@ -42,6 +42,8 @@ public abstract class TenantBasicReqDto extends CheckParamsGenericUtils implemen
     @ApiModelProperty(required = true, example = "15533449966")
     private String telephone;
 
+    private boolean isNotDeleted = true;
+
     /**
      * check basic data by trim.
      */

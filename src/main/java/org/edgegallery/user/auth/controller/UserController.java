@@ -98,10 +98,11 @@ public class UserController extends BeGenericServlet {
     @ApiResponses(value = {
         @ApiResponse(code = HttpStatus.SC_BAD_REQUEST, message = "Bad Request", response = ErrorRespDto.class)
     })
-    @PreAuthorize("hasRole('APPSTORE_ADMIN') || hasRole('DEVELOPER_ADMIN') || hasRole('MECM_ADMIN') || hasRole('LAB_ADMIN')")
-    public ResponseEntity<Object> deleteUser(
-        @ApiParam(value = "user id") @PathVariable("userId") @Pattern(regexp = REG_UUID) String appId) {
-        return null;
+    // @PreAuthorize("hasRole('APPSTORE_ADMIN') || hasRole('DEVELOPER_ADMIN') || hasRole('MECM_ADMIN') || hasRole('LAB_ADMIN')")
+    public ResponseEntity<String> deleteUser(
+        @ApiParam(value = "user id") @PathVariable("userId") @Pattern(regexp = REG_UUID) String userId) {
+        userMgmtService.deleteUser(userId);
+        return ResponseEntity.ok("");
     }
 
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)

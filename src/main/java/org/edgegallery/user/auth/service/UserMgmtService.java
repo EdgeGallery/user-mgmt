@@ -92,6 +92,7 @@ public class UserMgmtService {
         tenantVo.setCompany(registerRequest.getCompany());
         tenantVo.setGender(registerRequest.getGender());
         tenantVo.setTelephoneNumber(registerRequest.getTelephone());
+        tenantVo.setNotDeleted(registerRequest.isNotDeleted());
 
         List<RolePo> rolePoList = new ArrayList<>();
         rolePoList.add(new RolePo(EnumPlatform.APPSTORE, EnumRole.TENANT));
@@ -204,6 +205,7 @@ public class UserMgmtService {
         return Either.left(uniquenessResponse);
     }
 
+    // set is_not_deleted to false
     public boolean deleteUser(String tenantId) {
         return mapper.deleteUser(tenantId);
     }
