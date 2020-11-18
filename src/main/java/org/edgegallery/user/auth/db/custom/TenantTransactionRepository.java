@@ -16,6 +16,11 @@
 
 package org.edgegallery.user.auth.db.custom;
 
+import java.util.ArrayList;
+import java.util.List;
+import org.edgegallery.user.auth.controller.dto.response.RoleDto;
+import org.edgegallery.user.auth.controller.dto.response.TenantRespDto;
+import org.edgegallery.user.auth.db.entity.RolePo;
 import org.edgegallery.user.auth.db.entity.TenantPermissionVo;
 import org.edgegallery.user.auth.db.mapper.TenantPoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +44,28 @@ public class TenantTransactionRepository {
     public int registerTenant(TenantPermissionVo tenantVo) {
         int result = 0;
         result += tenantPoMapper.addTenantPo(tenantVo);
-        result += tenantPoMapper.insertPermission(tenantVo.getTenantId(), tenantVo.getRoles());
+        result += tenantPoMapper.insertRolesByTenantId(tenantVo.getTenantId(), tenantVo.getRoles());
         return result;
     }
 
+    /**
+     * update tenant data.
+     *
+     * @param tenantDto request data
+     */
+    public int updateTenant(TenantRespDto tenantDto) {
+        int result = 0;
+        result += tenantPoMapper.updateTenantById(tenantDto);
+        List<RoleDto> roles = tenantDto.getPermissions();
+        tenantPoMapper.deleteRolesByTenantId(tenantDto.getUserId());
+        List<RolePo> rolePos = new ArrayList<RolePo>();
+        roles.forEach(role -> rolePos.add(new RolePo(role.getPlatform(), role.getRole())));
+        result += tenantPoMapper.insertRolesByTenantId(tenantDto.getUserId(), rolePos);
+        return result;
+    }
+
+    public void deleteUser(String tenantId) {
+        tenantPoMapper.deleteUser(tenantId);
+        tenantPoMapper.deleteRolesByTenantId(tenantId);
+    }
 }

@@ -37,6 +37,8 @@ public abstract class TenantBasicRespDto {
     @ApiModelProperty(required = true, example = "15533449966")
     private String telephone;
 
+    private boolean isAllowed;
+
     /**
      * check basic data by trim.
      */

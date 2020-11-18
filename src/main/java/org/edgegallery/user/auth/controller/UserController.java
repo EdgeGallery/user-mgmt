@@ -123,10 +123,12 @@ public class UserController extends BeGenericServlet {
         @ApiResponse(code = HttpStatus.SC_OK, message = "modify success", response = TenantRespDto.class),
         @ApiResponse(code = HttpStatus.SC_BAD_REQUEST, message = "Bad Request", response = ErrorRespDto.class)
     })
-    @PreAuthorize(
-        "hasRole('APPSTORE_ADMIN') || hasRole('DEVELOPER_ADMIN') || hasRole('MECM_ADMIN') || hasRole('LAB_ADMIN')")
+    // @PreAuthorize(
+    //     "hasRole('APPSTORE_ADMIN') || hasRole('DEVELOPER_ADMIN') || hasRole('MECM_ADMIN') || hasRole('LAB_ADMIN')")
     public ResponseEntity<Object> modifyUser(
-        @ApiParam(value = "TenantRegisterReqDto", required = true) @RequestBody TenantRegisterReqDto request) {
-        return null;
+        @ApiParam(value = "user id") @PathVariable("userId") @Pattern(regexp = REG_UUID) String userId,
+        @ApiParam(value = "TenantRegisterReqDto", required = true) @RequestBody TenantRespDto request) {
+        request.setUserId(userId);
+        return  buildResponse(userMgmtService.modifyUser(request));
     }
 }

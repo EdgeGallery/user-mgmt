@@ -35,13 +35,17 @@ public interface TenantPoMapper {
 
     TenantPo getTenantByUsername(String username);
 
+    int updateTenantById(TenantRespDto user);
+
+    void deleteRolesByTenantId(String tenantId);
+
     List<RolePo> getRolePoByTenantId(String tenantId);
 
     int addTenantPo(TenantPo tenantPo);
 
     int modifyPassword(String tenantId, String password);
 
-    int insertPermission(String tenantId, List<RolePo> roles);
+    int insertRolesByTenantId(String tenantId, List<RolePo> roles);
 
     boolean deleteUser(String tenantId);
 

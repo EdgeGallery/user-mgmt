@@ -23,6 +23,7 @@
         <result property="company" column="company"/>
         <result property="telephone" column="telephonenumber"/>
         <result property="gender" column="gender"/>
+        <result property="isAllowed" column="isallowed"/>
         <collection property="permissions" columnPrefix="permissions_" ofType="org.edgegallery.user.auth.controller.dto.response.RoleDto">
             <result column="platform" property="platform"/>
             <result column="role" property="role"/>
@@ -65,14 +66,14 @@
     <insert id="addTenantPo" parameterType="org.edgegallery.user.auth.db.entity.TenantPo">
         INSERT INTO
         tbl_tenant
-        (TENANTID, USERNAME, PASSWORD, COMPANY, TELEPHONENUMBER, GENDER, IS_NOT_DELETED)
+        (TENANTID, USERNAME, PASSWORD, COMPANY, TELEPHONENUMBER, GENDER, isallowed)
         VALUES
-        (#{tenantId}, #{username}, #{password}, #{company}, #{telephoneNumber}, #{gender}, #{isNotDeleted})
+        (#{tenantId}, #{username}, #{password}, #{company}, #{telephoneNumber}, #{gender}, #{isAllowed})
     </insert>
 
-    <update id="deleteUser" >
-        update tbl_tenant set is_not_deleted = false where TENANTID = #{tenantId};
-    </update>
+    <delete id="deleteUser" >
+        delete from tbl_tenant where TENANTID = #{tenantId};
+    </delete>
 
     <update id="modifyPassword">
         UPDATE
@@ -82,7 +83,7 @@
         TENANTID = #{param1};
     </update>
 
-    <insert id ="insertPermission" parameterType="java.util.List" >
+    <insert id ="insertRolesByTenantId" parameterType="java.util.List" >
         insert into
         tbl_tenant_role (tenantid, roleid)
         values
@@ -92,20 +93,27 @@
     </insert>
 
     <select id="getAllUsers" resultMap="TenantRespDto">
-<!--        select * from tbl_tenant;-->
         select
             a.tenantid,
             a.username,
             a.company,
             a.telephonenumber,
             a.gender,
+            a.isallowed,
             b.platform as permissions_platform,
             b.role as permissions_role
         from tbl_tenant a left join
         (select tenantid, platform, role from tbl_tenant_role left join tbl_role on tbl_tenant_role.roleid = tbl_role.id ) b
         on a.tenantid = b.tenantid
-        where a.is_not_deleted = true
     </select>
 
+    <update id="updateTenantById" parameterType="org.edgegallery.user.auth.controller.dto.response.TenantRespDto">
+        update tbl_tenant
+        set username = #{username}, company = #{company}, telephonenumber = #{telephone}, gender = #{gender}, isallowed = #{isAllowed}
+        where tenantid = #{userId}
+    </update>
 
+    <delete id="deleteRolesByTenantId">
+        delete from tbl_tenant_role where tenantid = #{tenantId}
+    </delete>
 </mapper>

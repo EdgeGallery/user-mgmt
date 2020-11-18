@@ -92,7 +92,7 @@ public class UserMgmtService {
         tenantVo.setCompany(registerRequest.getCompany());
         tenantVo.setGender(registerRequest.getGender());
         tenantVo.setTelephoneNumber(registerRequest.getTelephone());
-        tenantVo.setNotDeleted(registerRequest.isNotDeleted());
+        tenantVo.setAllowed(registerRequest.isAllowed());
 
         List<RolePo> rolePoList = new ArrayList<>();
         rolePoList.add(new RolePo(EnumPlatform.APPSTORE, EnumRole.TENANT));
@@ -205,9 +205,9 @@ public class UserMgmtService {
         return Either.left(uniquenessResponse);
     }
 
-    // set is_not_deleted to false
     public boolean deleteUser(String tenantId) {
-        return mapper.deleteUser(tenantId);
+        tenantTransaction.deleteUser(tenantId);
+        return true;
     }
 
     public List<TenantRespDto> getAllUsers() {
@@ -217,5 +217,34 @@ public class UserMgmtService {
         } else {
             return users;
         }
+    }
+
+    public Either<TenantRespDto, FormatRespDto> modifyUser(TenantRespDto user) {
+        TenantPo oldUserPo = mapper.getTenantBasicPoData(user.getUserId());
+        UniqueReqDto uniqueReqDto = new UniqueReqDto();
+        if (!oldUserPo.getUsername().equals(user.getUsername())) {
+            uniqueReqDto.setUsername(user.getUsername());
+        }
+        if (!oldUserPo.getTelephoneNumber().equals(user.getTelephone())) {
+            uniqueReqDto.setTelephone(user.getTelephone());
+        }
+        String msg = "";
+        Either<UniquenessRespDto, FormatRespDto> uniqueness = uniqueness(uniqueReqDto);
+        if (uniqueness.isLeft()) {
+             if (uniqueness.left().value().isTelephone()) {
+                 msg = "repeat of telephone.";
+             }
+             if (uniqueness.left().value().isUsername()) {
+                 msg += "repeat of username.";
+             }
+             if (!msg.isEmpty()) {
+                 return Either.right(new FormatRespDto(Status.BAD_REQUEST, msg));
+             }
+        }
+        tenantTransaction.updateTenant(user);
+        TenantRespDto tenantRespDto = new TenantRespDto();
+        tenantRespDto.setResponse(mapper.getTenantBasicPoData(user.getUserId()));
+        tenantRespDto.setPermission(mapper.getRolePoByTenantId(user.getUserId()));
+        return Either.left(tenantRespDto);
     }
 }

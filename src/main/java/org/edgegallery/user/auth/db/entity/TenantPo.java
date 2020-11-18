@@ -45,14 +45,15 @@ public class TenantPo {
     private String gender;
 
     // default is true
-    private boolean isNotDeleted = true;
+    private boolean isAllowed = true;
 
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
 
     /**
-     *  generate tenant id.
+     * generate tenant id.
+     *
      * @return
      */
     public String getTenantId() {
