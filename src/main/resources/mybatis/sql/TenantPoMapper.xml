@@ -17,6 +17,18 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.edgegallery.user.auth.db.mapper.TenantPoMapper">
 
+    <resultMap id="TenantRespDto" type="org.edgegallery.user.auth.controller.dto.response.TenantRespDto">
+        <id property="userId" column="tenantid"/>
+        <result property="username" column="username"/>
+        <result property="company" column="company"/>
+        <result property="telephone" column="telephonenumber"/>
+        <result property="gender" column="gender"/>
+        <collection property="permissions" columnPrefix="permissions_" ofType="org.edgegallery.user.auth.controller.dto.response.RoleDto">
+            <result column="platform" property="platform"/>
+            <result column="role" property="role"/>
+        </collection>
+    </resultMap>
+
     <select id="getRolePoByTenantId" resultType="org.edgegallery.user.auth.db.entity.RolePo">
         select id, platform, role
         from tbl_tenant_role a left join tbl_role b on a.roleid = b.id
@@ -78,6 +90,21 @@
             ( #{param1}, (select id from tbl_role where platform = #{role.platform} and role = #{role.role}))
         </foreach>
     </insert>
+
+    <select id="getAllUsers" resultMap="TenantRespDto">
+<!--        select * from tbl_tenant;-->
+        select
+            a.tenantid,
+            a.username,
+            a.company,
+            a.telephonenumber,
+            a.gender,
+            b.platform as permissions_platform,
+            b.role as permissions_role
+        from tbl_tenant a left join
+        (select tenantid, platform, role from tbl_tenant_role left join tbl_role on tbl_tenant_role.roleid = tbl_role.id ) b
+        on a.tenantid = b.tenantid
+    </select>
 
 
 </mapper>

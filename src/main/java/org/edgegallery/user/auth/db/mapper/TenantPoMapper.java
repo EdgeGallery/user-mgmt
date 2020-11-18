@@ -18,6 +18,7 @@ package org.edgegallery.user.auth.db.mapper;
 
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
+import org.edgegallery.user.auth.controller.dto.response.TenantRespDto;
 import org.edgegallery.user.auth.db.entity.RolePo;
 import org.edgegallery.user.auth.db.entity.TenantPo;
 
@@ -43,5 +44,7 @@ public interface TenantPoMapper {
     int insertPermission(String tenantId, List<RolePo> roles);
 
     boolean deleteUser(String tenantId);
+
+    List<TenantRespDto> getAllUsers();
 
 }

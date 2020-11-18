@@ -97,6 +97,8 @@ public class UserMgmtService {
         rolePoList.add(new RolePo(EnumPlatform.APPSTORE, EnumRole.TENANT));
         rolePoList.add(new RolePo(EnumPlatform.DEVELOPER, EnumRole.TENANT));
         rolePoList.add(new RolePo(EnumPlatform.MECM, EnumRole.TENANT));
+        rolePoList.add(new RolePo(EnumPlatform.ATP, EnumRole.TENANT));
+        rolePoList.add(new RolePo(EnumPlatform.LAB, EnumRole.TENANT));
         tenantVo.setRoles(rolePoList);
 
         int result = 0;
@@ -206,4 +208,12 @@ public class UserMgmtService {
         return mapper.deleteUser(tenantId);
     }
 
+    public List<TenantRespDto> getAllUsers() {
+        List<TenantRespDto> users = mapper.getAllUsers();
+        if (users == null) {
+            return new ArrayList<>();
+        } else {
+            return users;
+        }
+    }
 }
