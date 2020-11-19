@@ -31,7 +31,6 @@ import org.edgegallery.user.auth.controller.dto.request.TenantRegisterReqDto;
 import org.edgegallery.user.auth.controller.dto.request.UniqueReqDto;
 import org.edgegallery.user.auth.controller.dto.response.ErrorRespDto;
 import org.edgegallery.user.auth.controller.dto.response.TenantRespDto;
-import org.edgegallery.user.auth.db.entity.TenantPo;
 import org.edgegallery.user.auth.service.UserMgmtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -98,7 +97,8 @@ public class UserController extends BeGenericServlet {
     @ApiResponses(value = {
         @ApiResponse(code = HttpStatus.SC_BAD_REQUEST, message = "Bad Request", response = ErrorRespDto.class)
     })
-    // @PreAuthorize("hasRole('APPSTORE_ADMIN') || hasRole('DEVELOPER_ADMIN') || hasRole('MECM_ADMIN') || hasRole('LAB_ADMIN')")
+    // @PreAuthorize("hasRole('APPSTORE_ADMIN') || hasRole('DEVELOPER_ADMIN') || hasRole('MECM_ADMIN')
+    // || hasRole('LAB_ADMIN')")
     public ResponseEntity<String> deleteUser(
         @ApiParam(value = "user id") @PathVariable("userId") @Pattern(regexp = REG_UUID) String userId) {
         userMgmtService.deleteUser(userId);
@@ -129,6 +129,6 @@ public class UserController extends BeGenericServlet {
         @ApiParam(value = "user id") @PathVariable("userId") @Pattern(regexp = REG_UUID) String userId,
         @ApiParam(value = "TenantRegisterReqDto", required = true) @RequestBody TenantRespDto request) {
         request.setUserId(userId);
-        return  buildResponse(userMgmtService.modifyUser(request));
+        return buildResponse(userMgmtService.modifyUser(request));
     }
 }

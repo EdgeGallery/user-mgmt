@@ -205,11 +205,19 @@ public class UserMgmtService {
         return Either.left(uniquenessResponse);
     }
 
+    /**
+     * delete user by id.
+     *
+     * @param tenantId user id
+     */
     public boolean deleteUser(String tenantId) {
         tenantTransaction.deleteUser(tenantId);
         return true;
     }
 
+    /**
+     * get all user from db.
+     */
     public List<TenantRespDto> getAllUsers() {
         List<TenantRespDto> users = mapper.getAllUsers();
         if (users == null) {
@@ -219,6 +227,12 @@ public class UserMgmtService {
         }
     }
 
+    /**
+     * modify the user info
+     *
+     * @param user new user info
+     * @return TenantRespDto
+     */
     public Either<TenantRespDto, FormatRespDto> modifyUser(TenantRespDto user) {
         TenantPo oldUserPo = mapper.getTenantBasicPoData(user.getUserId());
         UniqueReqDto uniqueReqDto = new UniqueReqDto();
@@ -231,15 +245,15 @@ public class UserMgmtService {
         String msg = "";
         Either<UniquenessRespDto, FormatRespDto> uniqueness = uniqueness(uniqueReqDto);
         if (uniqueness.isLeft()) {
-             if (uniqueness.left().value().isTelephone()) {
-                 msg = "repeat of telephone.";
-             }
-             if (uniqueness.left().value().isUsername()) {
-                 msg += "repeat of username.";
-             }
-             if (!msg.isEmpty()) {
-                 return Either.right(new FormatRespDto(Status.BAD_REQUEST, msg));
-             }
+            if (uniqueness.left().value().isTelephone()) {
+                msg = "repeat of telephone.";
+            }
+            if (uniqueness.left().value().isUsername()) {
+                msg += "repeat of username.";
+            }
+            if (!msg.isEmpty()) {
+                return Either.right(new FormatRespDto(Status.BAD_REQUEST, msg));
+            }
         }
         tenantTransaction.updateTenant(user);
         TenantRespDto tenantRespDto = new TenantRespDto();
