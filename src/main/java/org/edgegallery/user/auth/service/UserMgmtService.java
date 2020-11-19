@@ -228,7 +228,7 @@ public class UserMgmtService {
     }
 
     /**
-     * modify the user info
+     * modify the user info.
      *
      * @param user new user info
      * @return TenantRespDto

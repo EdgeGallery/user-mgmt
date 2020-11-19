@@ -105,6 +105,9 @@ public class UserController extends BeGenericServlet {
         return ResponseEntity.ok("");
     }
 
+    /**
+     * get all users.
+     */
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "get all users.", response = Object.class)
     @ApiResponses(value = {
