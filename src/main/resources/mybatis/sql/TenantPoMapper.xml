@@ -17,6 +17,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.edgegallery.user.auth.db.mapper.TenantPoMapper">
 
+    <resultMap id="TenantRespDto" type="org.edgegallery.user.auth.controller.dto.response.TenantRespDto">
+        <id property="userId" column="tenantid"/>
+        <result property="username" column="username"/>
+        <result property="company" column="company"/>
+        <result property="telephone" column="telephonenumber"/>
+        <result property="gender" column="gender"/>
+        <result property="isAllowed" column="isallowed"/>
+        <collection property="permissions" columnPrefix="permissions_" ofType="org.edgegallery.user.auth.controller.dto.response.RoleDto">
+            <result column="platform" property="platform"/>
+            <result column="role" property="role"/>
+        </collection>
+    </resultMap>
+
     <select id="getRolePoByTenantId" resultType="org.edgegallery.user.auth.db.entity.RolePo">
         select id, platform, role
         from tbl_tenant_role a left join tbl_role b on a.roleid = b.id
@@ -53,24 +66,24 @@
     <insert id="addTenantPo" parameterType="org.edgegallery.user.auth.db.entity.TenantPo">
         INSERT INTO
         tbl_tenant
-        (TENANTID, USERNAME, PASSWORD, COMPANY, TELEPHONENUMBER, GENDER)
+        (TENANTID, USERNAME, PASSWORD, COMPANY, TELEPHONENUMBER, GENDER, isallowed)
         VALUES
-        (#{tenantId}, #{username}, #{password}, #{company}, #{telephoneNumber}, #{gender})
+        (#{tenantId}, #{username}, #{password}, #{company}, #{telephoneNumber}, #{gender}, #{isAllowed})
     </insert>
 
     <delete id="deleteUser" >
-        delete from tbl_tenant where TENANTID = #{tenantId}
+        delete from tbl_tenant where TENANTID = #{tenantId};
     </delete>
 
-    <insert id="modifyPassword">
+    <update id="modifyPassword">
         UPDATE
         tbl_tenant
         SET PASSWORD = #{param2}
         WHERE
         TENANTID = #{param1};
-    </insert>
+    </update>
 
-    <insert id ="insertPermission" parameterType="java.util.List" >
+    <insert id ="insertRolesByTenantId" parameterType="java.util.List" >
         insert into
         tbl_tenant_role (tenantid, roleid)
         values
@@ -79,5 +92,28 @@
         </foreach>
     </insert>
 
+    <select id="getAllUsers" resultMap="TenantRespDto">
+        select
+            a.tenantid,
+            a.username,
+            a.company,
+            a.telephonenumber,
+            a.gender,
+            a.isallowed,
+            b.platform as permissions_platform,
+            b.role as permissions_role
+        from tbl_tenant a left join
+        (select tenantid, platform, role from tbl_tenant_role left join tbl_role on tbl_tenant_role.roleid = tbl_role.id ) b
+        on a.tenantid = b.tenantid
+    </select>
 
+    <update id="updateTenantById" parameterType="org.edgegallery.user.auth.controller.dto.response.TenantRespDto">
+        update tbl_tenant
+        set username = #{username}, company = #{company}, telephonenumber = #{telephone}, gender = #{gender}, isallowed = #{isAllowed}
+        where tenantid = #{userId}
+    </update>
+
+    <delete id="deleteRolesByTenantId">
+        delete from tbl_tenant_role where tenantid = #{tenantId}
+    </delete>
 </mapper>

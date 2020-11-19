@@ -17,5 +17,5 @@
 package org.edgegallery.user.auth.db;
 
 public enum EnumPlatform {
-    APPSTORE, DEVELOPER, MECM
+    APPSTORE, DEVELOPER, MECM, ATP, LAB
 }

@@ -6,6 +6,7 @@
       	COMPANY             VARCHAR(50)       NULL,
       	TELEPHONENUMBER     VARCHAR(20)       NOT NULL,
       	GENDER              VARCHAR(10)       NULL,
+      	isallowed           boolean           NOT NULL,
       	CONSTRAINT USERNAME UNIQUE (username),
       	CONSTRAINT TELEPHONENUMBER UNIQUE (telephonenumber)
     );
