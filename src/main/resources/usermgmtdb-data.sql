@@ -8,15 +8,15 @@
     ON CONFLICT(id) do nothing;
 
 -- add a guest user
-    insert into tbl_tenant (TENANTID, USERNAME, PASSWORD, COMPANY, TELEPHONENUMBER, GENDER)
+    insert into tbl_tenant (TENANTID, USERNAME, PASSWORD, COMPANY, TELEPHONENUMBER, GENDER, isallowed)
     values('de3565b1-a7c2-42b9-b281-3f032af29ff7', 'guest',
-    '59756fda85ebddee6024d5cc0e6edcde3226693257a9c1eb662c56426b8a4f232b3d56c321adbd91', 'company', '13800000000', '1')
+    '59756fda85ebddee6024d5cc0e6edcde3226693257a9c1eb662c56426b8a4f232b3d56c321adbd91', 'company', '13800000000', '1', true)
     ON CONFLICT(TENANTID) do nothing;
 
 -- add a admin user
-    insert into tbl_tenant (TENANTID, USERNAME, PASSWORD, COMPANY, TELEPHONENUMBER, GENDER)
+    insert into tbl_tenant (TENANTID, USERNAME, PASSWORD, COMPANY, TELEPHONENUMBER, GENDER, isallowed)
     values('39937079-99fe-4cd8-881f-04ca8c4fe09d', 'admin',
-    '472645ad1af0101adaa6769cc865fec3b29fedeba6dc912900a59b1364b7a6bb17bb9a0575854547', 'company', '13800000001', '1')
+    '472645ad1af0101adaa6769cc865fec3b29fedeba6dc912900a59b1364b7a6bb17bb9a0575854547', 'company', '13800000001', '1', true)
     ON CONFLICT(TENANTID) do nothing;
 
 -- set the permissions for guest user
