@@ -26,6 +26,9 @@ import org.apache.servicecomb.provider.rest.common.RestSchema;
 import org.edgegallery.user.auth.config.DescriptionConfig;
 import org.edgegallery.user.auth.config.OAuthClientDetailsConfig;
 import org.edgegallery.user.auth.controller.dto.response.ErrorRespDto;
+import org.edgegallery.user.auth.service.UserMgmtService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -34,6 +37,7 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 @Slf4j
@@ -41,6 +45,9 @@ import org.springframework.web.client.RestTemplate;
 @RequestMapping("/auth")
 @Controller
 public class OAuthServerController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OAuthServerController.class);
+
     @Autowired
     private OAuthClientDetailsConfig oauthClientDetailsConfig;
 
@@ -63,7 +70,11 @@ public class OAuthServerController {
                 return;
             }
             String url = clientUrl + "/auth/logout?ssoSessionId=" + ssoSessionId;
-            REST_TEMPLATE.getForObject(url, String.class);
+            try {
+                REST_TEMPLATE.getForObject(url, String.class);
+            } catch (RestClientException e) {
+                LOGGER.warn("can not access logout: {}", url);
+            }
         });
         return new ResponseEntity<>("Succeed", HttpStatus.OK);
     }
