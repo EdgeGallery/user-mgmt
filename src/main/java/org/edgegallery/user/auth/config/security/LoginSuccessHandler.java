@@ -31,6 +31,7 @@ import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 @Component
 public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
@@ -44,7 +45,7 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
         Authentication authentication) throws IOException, ServletException {
         response.setStatus(HttpStatus.OK.value());
-        LOGGER.info("get token success.");
+        LOGGER.info("login success.");
 
         String userName = authentication.getName();
         mecUserDetailsService.clearFailedCount(userName);
@@ -65,7 +66,13 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
             return null;
         }
         String url = savedRequest.getRedirectUrl();
+        if (StringUtils.isEmpty(url)) {
+            return null;
+        }
         String[] urlArray = url.split("\\?");
+        if (urlArray.length != 2) {
+            return null;
+        }
         String[] parameters = urlArray[1].split("&");
         String redirectUrl = null;
         for (String parameter : parameters) {
