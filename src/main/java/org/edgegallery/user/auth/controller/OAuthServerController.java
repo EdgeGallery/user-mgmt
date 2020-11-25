@@ -26,14 +26,21 @@ import org.apache.servicecomb.provider.rest.common.RestSchema;
 import org.edgegallery.user.auth.config.DescriptionConfig;
 import org.edgegallery.user.auth.config.OAuthClientDetailsConfig;
 import org.edgegallery.user.auth.controller.dto.response.ErrorRespDto;
+import org.edgegallery.user.auth.controller.dto.response.TenantRespDto;
+import org.edgegallery.user.auth.db.mapper.TenantPoMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 @Slf4j
@@ -41,8 +48,14 @@ import org.springframework.web.client.RestTemplate;
 @RequestMapping("/auth")
 @Controller
 public class OAuthServerController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OAuthServerController.class);
+
     @Autowired
     private OAuthClientDetailsConfig oauthClientDetailsConfig;
+
+    @Autowired
+    private TenantPoMapper tenantPoMapper;
 
     private static final RestTemplate REST_TEMPLATE = new RestTemplate();
 
@@ -53,7 +66,8 @@ public class OAuthServerController {
     @ApiOperation(value = "logout", response = String.class, notes = DescriptionConfig.LOGOUT_MSG)
     @ApiResponses(value = {
         @ApiResponse(code = org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR, message = "Internal error",
-            response = ErrorRespDto.class)})
+            response = ErrorRespDto.class)
+    })
     public ResponseEntity<String> logout(HttpServletRequest request) {
         new SecurityContextLogoutHandler().logout(request, null, null);
         String ssoSessionId = request.getRequestedSessionId();
@@ -63,8 +77,30 @@ public class OAuthServerController {
                 return;
             }
             String url = clientUrl + "/auth/logout?ssoSessionId=" + ssoSessionId;
-            REST_TEMPLATE.getForObject(url, String.class);
+            try {
+                REST_TEMPLATE.getForObject(url, String.class);
+            } catch (RestClientException e) {
+                LOGGER.warn("can not access logout: {}", url);
+            }
         });
         return new ResponseEntity<>("Succeed", HttpStatus.OK);
+    }
+
+    /**
+     * get current login user.
+     */
+    @GetMapping(value = "/login-info", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "get current login user.", response = Object.class)
+    @ApiResponses(value = {
+        @ApiResponse(code = org.apache.http.HttpStatus.SC_BAD_REQUEST, message = "Bad Request",
+            response = ErrorRespDto.class)
+    })
+    public ResponseEntity<TenantRespDto> getLoginUserInfo() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        tenantPoMapper.getTenantByUsername(authentication.getName());
+        TenantRespDto tenantRespDto = new TenantRespDto();
+        tenantRespDto.setResponse(tenantPoMapper.getTenantByUsername(authentication.getName()));
+        tenantRespDto.setPermission(tenantPoMapper.getRolePoByTenantId(tenantRespDto.getUserId()));
+        return ResponseEntity.ok(tenantRespDto);
     }
 }
