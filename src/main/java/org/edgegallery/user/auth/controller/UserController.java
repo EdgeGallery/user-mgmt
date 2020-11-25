@@ -36,6 +36,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -97,8 +100,6 @@ public class UserController extends BeGenericServlet {
     @ApiResponses(value = {
         @ApiResponse(code = HttpStatus.SC_BAD_REQUEST, message = "Bad Request", response = ErrorRespDto.class)
     })
-    // @PreAuthorize("hasRole('APPSTORE_ADMIN') || hasRole('DEVELOPER_ADMIN') || hasRole('MECM_ADMIN')
-    // || hasRole('LAB_ADMIN')")
     public ResponseEntity<String> deleteUser(
         @ApiParam(value = "user id") @PathVariable("userId") @Pattern(regexp = REG_UUID) String userId) {
         userMgmtService.deleteUser(userId);
@@ -113,7 +114,6 @@ public class UserController extends BeGenericServlet {
     @ApiResponses(value = {
         @ApiResponse(code = HttpStatus.SC_BAD_REQUEST, message = "Bad Request", response = ErrorRespDto.class)
     })
-    @PreAuthorize("hasRole('ROLE_APPSTORE_ADMIN')")
     public ResponseEntity<List<TenantRespDto>> queryAllUsers() {
         // login user must be admin
         // return all of users
@@ -126,8 +126,6 @@ public class UserController extends BeGenericServlet {
         @ApiResponse(code = HttpStatus.SC_OK, message = "modify success", response = TenantRespDto.class),
         @ApiResponse(code = HttpStatus.SC_BAD_REQUEST, message = "Bad Request", response = ErrorRespDto.class)
     })
-    // @PreAuthorize(
-    //     "hasRole('APPSTORE_ADMIN') || hasRole('DEVELOPER_ADMIN') || hasRole('MECM_ADMIN') || hasRole('LAB_ADMIN')")
     public ResponseEntity<Object> modifyUser(
         @ApiParam(value = "user id") @PathVariable("userId") @Pattern(regexp = REG_UUID) String userId,
         @ApiParam(value = "TenantRegisterReqDto", required = true) @RequestBody TenantRespDto request) {
