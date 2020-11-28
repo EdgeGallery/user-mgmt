@@ -70,7 +70,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers(HttpMethod.DELETE, "/v1/users/**")
             .hasAnyRole("APPSTORE_ADMIN", "DEVELOPER_ADMIN", "MECM_ADMIN", "ATP_ADMIN", "LAB_ADMIN")
             .antMatchers(HttpMethod.GET, "/auth/login-info")
-            .hasAnyRole("APPSTORE_ADMIN", "DEVELOPER_ADMIN", "MECM_ADMIN", "ATP_ADMIN", "LAB_ADMIN")
+            .permitAll()
             .anyRequest()
             .authenticated()
             .and()

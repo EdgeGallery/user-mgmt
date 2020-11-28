@@ -66,4 +66,3 @@ oauth2:
     - clientId: ${OAUTH_ATP_CLIENT_ID:atp-fe}
       clientSecret: ${OAUTH_ATP_CLIENT_SECRET:}
       clientUrl: ${OAUTH_ATP_CLIENT_URL:}
-

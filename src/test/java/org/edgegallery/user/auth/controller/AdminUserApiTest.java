@@ -99,28 +99,6 @@ public class AdminUserApiTest {
         assertEquals("newName123", modifyUser.getUsername());
     }
 
-    // @Test
-    // public void should_return_200_when_register_user() throws Exception {
-    //     TenantRegisterReqDto request = new TenantRegisterReqDto();
-    //     request.setUsername("username_test");
-    //     request.setPassword("pw-test123");
-    //     request.setTelephone("15822224444");
-    //     request.setCompany("test");
-    //     request.setGender("1");
-    //
-    //     ResultActions result = mvc.perform(
-    //         MockMvcRequestBuilders.post("/v1/users").contentType(MediaType.APPLICATION_JSON_VALUE)
-    //             .header("X-XSRF-TOKEN", xsrfToken)
-    //             .content(gson.toJson(request)).cookie(cookies)
-    //             .accept(MediaType.APPLICATION_JSON_VALUE))
-    //         .andExpect(MockMvcResultMatchers.status().isCreated());
-    //     MvcResult mvcResult = result.andReturn();
-    //     String content = mvcResult.getResponse().getContentAsString(UTF_8);
-    //     // System.out.println(content);
-    //     TenantRespDto user = gson.fromJson(content, TenantRespDto.class);
-    //     // return user;
-    // }
-
     private TenantRespDto registerUser() throws Exception {
         TenantRegisterReqDto request = new TenantRegisterReqDto();
         request.setUsername("username_test");
