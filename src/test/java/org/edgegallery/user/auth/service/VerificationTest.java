@@ -16,24 +16,31 @@
 
 package org.edgegallery.user.auth.service;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+
+
 import fj.data.Either;
-import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
+import javax.ws.rs.core.Response;
 import mockit.Mock;
 import mockit.MockUp;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.edgegallery.user.auth.MainServer;
+import org.edgegallery.user.auth.config.SmsConfig;
 import org.edgegallery.user.auth.controller.dto.request.VerificationReqDto;
 import org.edgegallery.user.auth.controller.dto.response.FormatRespDto;
+import org.edgegallery.user.auth.utils.HttpsUtil;
 import org.edgegallery.user.auth.utils.redis.RedisUtil;
-import org.mockito.Mockito;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -45,11 +52,27 @@ public class VerificationTest {
     @Autowired
     private IdentityService identityService;
 
-    @MockBean
+    @Autowired
     private HwCloudVerification hwCloudVerification;
 
+    @Autowired
+    private SmsConfig smsConfig;
+
+    @Autowired
+    private HttpsUtil httpsUtil;
+
+    @Before
+    public void begin() {
+        smsConfig.setEnabled("true");
+    }
+
+    @After
+    public void end() {
+        smsConfig.setEnabled("false");
+    }
+
     @Test
-    public void should_successfully_when_right_verify_code() throws IOException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+    public void should_successfully_when_right_verify_code() {
         VerificationReqDto request = new VerificationReqDto();
         request.setTelephone("15191881235");
         new MockUp<RedisUtil>() {
@@ -58,13 +81,21 @@ public class VerificationTest {
                 return;
             }
         };
-        Mockito.when(hwCloudVerification.sendVerificationCode(Mockito.anyString(),Mockito.anyString())).thenReturn(true);
+        new MockUp<HttpsUtil>() {
+            @Mock
+            public boolean httpsPost(String url, Map<String, String> headers, String bodyParam) {
+                return true;
+            }
+        };
+        Map<String, String> anyMap = new HashMap<>();
+        // when(httpsUtil.httpsPost(anyString(), any(anyMap.getClass()), anyString())).thenReturn(true);
+        // verify(httpsUtil, times(1)).httpsPost(anyString(), any(anyMap.getClass()), anyString());
         Either<Boolean, FormatRespDto> either = identityService.verifyTelParam(request);
         Assert.assertTrue(either.isLeft());
     }
 
     @Test
-    public void should_failed_when_wrong_verify_code() throws IOException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+    public void should_failed_when_wrong_verify_code() {
         VerificationReqDto request = new VerificationReqDto();
         request.setTelephone("15191881235");
         new MockUp<RedisUtil>() {
@@ -73,8 +104,16 @@ public class VerificationTest {
                 return;
             }
         };
-        Mockito.when(hwCloudVerification.sendVerificationCode(Mockito.anyString(),Mockito.anyString())).thenReturn(false);
+        new MockUp<HttpsUtil>() {
+            @Mock
+            public boolean httpsPost(String url, Map<String, String> headers, String bodyParam) {
+                return false;
+            }
+        };
+        Map<String, String> anyMap = new HashMap<>();
+        // when(httpsUtil.httpsPost(anyString(), any(anyMap.getClass()), anyString())).thenReturn(false);
         Either<Boolean, FormatRespDto> either = identityService.verifyTelParam(request);
-        Assert.assertTrue(either.isLeft());
+        Assert.assertTrue(either.isRight());
+        Assert.assertEquals(either.right().value().getErrStatus(), Response.Status.EXPECTATION_FAILED);
     }
 }
