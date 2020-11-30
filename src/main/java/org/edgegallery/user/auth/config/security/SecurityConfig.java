@@ -39,7 +39,7 @@ import org.springframework.web.filter.CorsFilter;
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final static String[] ADMIN_ROLES = {
+    private static final String[] ADMIN_ROLES = {
         "APPSTORE_ADMIN", "DEVELOPER_ADMIN", "MECM_ADMIN", "ATP_ADMIN", "LAB_ADMIN"
     };
 
