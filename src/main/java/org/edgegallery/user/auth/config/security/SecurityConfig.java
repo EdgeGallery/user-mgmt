@@ -38,51 +38,47 @@ import org.springframework.web.filter.CorsFilter;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private final static String[] ADMIN_ROLES = {
+        "APPSTORE_ADMIN", "DEVELOPER_ADMIN", "MECM_ADMIN", "ATP_ADMIN", "LAB_ADMIN"
+    };
+
     @Value("${cors.allow.origins}")
     private String allowOrigins;
+
     @Autowired
     private SmsConfig smsConfig;
+
     @Autowired
     private MecUserDetailsService mecUserDetailsService;
+
     @Autowired
     private LoginFailHandler loginFailHandler;
+
     @Autowired
     private LoginSuccessHandler loginSuccessHandler;
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
-            .exceptionHandling()
+        httpSecurity.exceptionHandling()
             .authenticationEntryPoint(new OAuthUnauthorizedEntryPoint("/#/", smsConfig.getEnabled()))
             .and()
             .authorizeRequests()
-            .antMatchers("/", "/oauth/**", "/login", "/css/**", "/fonts/**", "/img/**",
-                "/js/**", "/favicon.ico", "/index.html", "/user-privacy.md", "/user-agreement.md")
+            .antMatchers("/", "/oauth/**", "/login", "/css/**", "/fonts/**", "/img/**", "/js/**", "/favicon.ico",
+                "/index.html", "/user-privacy.md", "/user-agreement.md")
             .permitAll()
             .antMatchers(HttpMethod.POST, "/v1/users", "/v1/users/action/uniqueness", "/v1/identity/sms")
             .permitAll()
             .antMatchers(HttpMethod.PUT, "/v1/users/password")
             .permitAll()
-            .antMatchers(HttpMethod.GET,"/v1/users")
-            .hasAnyRole("APPSTORE_ADMIN", "DEVELOPER_ADMIN", "MECM_ADMIN", "ATP_ADMIN", "LAB_ADMIN")
-            .antMatchers(HttpMethod.PUT, "/v1/users/**")
-            .hasAnyRole("APPSTORE_ADMIN", "DEVELOPER_ADMIN", "MECM_ADMIN", "ATP_ADMIN", "LAB_ADMIN")
-            .antMatchers(HttpMethod.DELETE, "/v1/users/**")
-            .hasAnyRole("APPSTORE_ADMIN", "DEVELOPER_ADMIN", "MECM_ADMIN", "ATP_ADMIN", "LAB_ADMIN")
-            .antMatchers(HttpMethod.GET, "/auth/login-info")
-            .permitAll()
-            .anyRequest()
-            .authenticated()
-            .and()
-            .formLogin()
-            .loginPage("/#/")
-            .loginProcessingUrl("/login")
-            .successHandler(loginSuccessHandler)
-            .failureHandler(loginFailHandler)
-            .and()
-            .cors()
-            .and()
-            .csrf()
+            .antMatchers(HttpMethod.GET, "/v1/users")
+            .hasAnyRole(ADMIN_ROLES).antMatchers(HttpMethod.PUT, "/v1/users/**")
+            .hasAnyRole(ADMIN_ROLES)
+            .antMatchers(HttpMethod.DELETE, "/v1/users/**").hasAnyRole(ADMIN_ROLES)
+            .antMatchers(HttpMethod.GET, "/auth/login-info").permitAll()
+            .anyRequest().authenticated().and().formLogin()
+            .loginPage("/#/").loginProcessingUrl("/login").successHandler(loginSuccessHandler)
+            .failureHandler(loginFailHandler).and().cors().and().csrf()
             .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
         httpSecurity.addFilterAfter(guestAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
@@ -103,6 +99,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     /**
      * CorsFilter solve cross-domain issues for logout api.
+     *
      * @return
      */
     @Bean
@@ -119,6 +116,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     /**
      * Define the PBKDF2 encoder with sha256.
+     *
      * @return
      */
     @Bean

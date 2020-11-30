@@ -19,7 +19,6 @@ package org.edgegallery.user.auth.config.log;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.UUID;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -101,10 +100,11 @@ public class HttpTraceLogFilter extends OncePerRequestFilter implements Ordered 
             ip = request.getRemoteAddr();
         }
         // the first IP is the real IP
-        if (!StringUtils.isEmpty(ip) && ip.indexOf(",") > 0) {
-            ip = ip.substring(0, ip.indexOf(","));
+        if (!StringUtils.isEmpty(ip)) {
+            return ip.split(",")[0];
+        } else {
+            return "unknown";
         }
-        return ip;
     }
 
     private void updateResponse(HttpServletResponse response) throws IOException {
