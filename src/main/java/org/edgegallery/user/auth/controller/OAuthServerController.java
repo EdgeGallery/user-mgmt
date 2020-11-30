@@ -97,6 +97,10 @@ public class OAuthServerController {
     })
     public ResponseEntity<TenantRespDto> getLoginUserInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication.getName() == null) {
+            ResponseEntity.ok();
+        }
+        LOGGER.info(String.format("%s want to logout.", authentication.getName()));
         tenantPoMapper.getTenantByUsername(authentication.getName());
         TenantRespDto tenantRespDto = new TenantRespDto();
         tenantRespDto.setResponse(tenantPoMapper.getTenantByUsername(authentication.getName()));

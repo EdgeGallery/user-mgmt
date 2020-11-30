@@ -58,7 +58,7 @@ public class TenantTransactionRepository {
         result += tenantPoMapper.updateTenantById(tenantDto);
         List<RoleDto> roles = tenantDto.getPermissions();
         tenantPoMapper.deleteRolesByTenantId(tenantDto.getUserId());
-        List<RolePo> rolePos = new ArrayList<RolePo>();
+        List<RolePo> rolePos = new ArrayList<>();
         roles.forEach(role -> rolePos.add(new RolePo(role.getPlatform(), role.getRole())));
         result += tenantPoMapper.insertRolesByTenantId(tenantDto.getUserId(), rolePos);
         return result;

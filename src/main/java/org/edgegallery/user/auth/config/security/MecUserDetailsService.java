@@ -53,7 +53,7 @@ public class MecUserDetailsService implements UserDetailsService {
 
     private static final RequestRateLimiter LIMITER = new InMemorySlidingWindowRequestRateLimiter(rules);
 
-    private static Map<String, Long> LOCKED_USERS_MAP = new Hashtable<String, Long>();
+    private static Map<String, Long> LOCKED_USERS_MAP = new Hashtable<>();
 
     @Autowired
     private TenantPoMapper tenantPoMapper;
@@ -77,8 +77,7 @@ public class MecUserDetailsService implements UserDetailsService {
         if (isLocked) {
             LOGGER.info("username:{} have been locked.", tenant.getUsername());
         }
-        User user = new User(tenant.getUsername(), tenant.getPassword(), true, true, true, !isLocked, authorities);
-        return user;
+        return new User(tenant.getUsername(), tenant.getPassword(), true, true, true, !isLocked, authorities);
     }
 
     private boolean isLocked(String userId) {
