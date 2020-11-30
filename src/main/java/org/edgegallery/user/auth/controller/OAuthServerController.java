@@ -27,6 +27,7 @@ import org.edgegallery.user.auth.config.DescriptionConfig;
 import org.edgegallery.user.auth.config.OAuthClientDetailsConfig;
 import org.edgegallery.user.auth.controller.dto.response.ErrorRespDto;
 import org.edgegallery.user.auth.controller.dto.response.TenantRespDto;
+import org.edgegallery.user.auth.db.entity.TenantPo;
 import org.edgegallery.user.auth.db.mapper.TenantPoMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,12 +99,15 @@ public class OAuthServerController {
     public ResponseEntity<TenantRespDto> getLoginUserInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getName() == null) {
-            ResponseEntity.ok();
+            return ResponseEntity.ok(null);
         }
         LOGGER.info(String.format("%s want to logout.", authentication.getName()));
-        tenantPoMapper.getTenantByUsername(authentication.getName());
+        TenantPo user = tenantPoMapper.getTenantByUsername(authentication.getName());
+        if (user == null) {
+            return ResponseEntity.ok(null);
+        }
         TenantRespDto tenantRespDto = new TenantRespDto();
-        tenantRespDto.setResponse(tenantPoMapper.getTenantByUsername(authentication.getName()));
+        tenantRespDto.setResponse(user);
         tenantRespDto.setPermission(tenantPoMapper.getRolePoByTenantId(tenantRespDto.getUserId()));
         return ResponseEntity.ok(tenantRespDto);
     }
