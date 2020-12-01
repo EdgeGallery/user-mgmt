@@ -8,7 +8,6 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import java.nio.charset.Charset;
 import java.util.List;
 import javax.servlet.http.Cookie;
 import org.edgegallery.user.auth.MainServer;
@@ -52,6 +51,7 @@ public class AdminUserApiTest {
     private WebApplicationContext webApplicationContext;
 
     private String xsrfToken;
+
     private Cookie[] cookies;
 
     @Before
@@ -109,18 +109,14 @@ public class AdminUserApiTest {
 
         ResultActions result = mvc.perform(
             MockMvcRequestBuilders.post("/v1/users").contentType(MediaType.APPLICATION_JSON_VALUE)
-                .header("X-XSRF-TOKEN", xsrfToken)
-                .content(gson.toJson(request)).cookie(cookies)
-                .accept(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(MockMvcResultMatchers.status().isCreated());
+                .header("X-XSRF-TOKEN", xsrfToken).content(gson.toJson(request)).cookie(cookies)
+                .accept(MediaType.APPLICATION_JSON_VALUE)).andExpect(MockMvcResultMatchers.status().isCreated());
         MvcResult mvcResult = result.andReturn();
         String content = mvcResult.getResponse().getContentAsString(UTF_8);
         // System.out.println(content);
         TenantRespDto user = gson.fromJson(content, TenantRespDto.class);
         return user;
     }
-
-
 
     @Test
     @WithMockUser(username = "admin",
@@ -135,11 +131,12 @@ public class AdminUserApiTest {
     @Test
     @WithMockUser(username = "guest",
         roles = {"APPSTORE_GUEST", "DEVELOPER_GUEST", "MECM_GUEST", "LAB_GUEST", "ATP_GUEST"})
-    public void should_return_200_when_delete_user_by_guest() throws Exception {
+    public void should_return_403_when_delete_user_by_guest() throws Exception {
         String userId = "123456qw123456qw123456qw123456qw";
         ResultActions result = mvc.perform(
             MockMvcRequestBuilders.delete("/v1/users/" + userId).contentType(MediaType.APPLICATION_JSON_VALUE)
-                .header("X-XSRF-TOKEN", xsrfToken).cookie(cookies)).andExpect(MockMvcResultMatchers.status().isForbidden());
+                .header("X-XSRF-TOKEN", xsrfToken).cookie(cookies))
+            .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 
     @Test
@@ -158,5 +155,54 @@ public class AdminUserApiTest {
         mvc.perform(MockMvcRequestBuilders.get("/v1/users").contentType(MediaType.APPLICATION_JSON_VALUE)
             .header("X-XSRF-TOKEN", xsrfToken).accept(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(MockMvcResultMatchers.status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "guest",
+        roles = {"APPSTORE_GUEST", "DEVELOPER_GUEST", "MECM_GUEST", "LAB_GUEST", "ATP_GUEST"})
+    public void should_return_403_when_modify_user_by_guest() throws Exception {
+        TenantRespDto tenant = registerUser();
+        String userId = tenant.getUserId();
+        tenant.setUsername("newName123");
+        tenant.setUserId(null);
+        mvc.perform(MockMvcRequestBuilders.put("/v1/users/" + userId).contentType(MediaType.APPLICATION_JSON_VALUE)
+            .header("X-XSRF-TOKEN", xsrfToken).content(gson.toJson(tenant)).cookie(cookies)
+            .accept(MediaType.APPLICATION_JSON_VALUE)).andExpect(MockMvcResultMatchers.status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "tenant",
+        roles = {"APPSTORE_TENANT", "DEVELOPER_TENANT", "MECM_TENANT", "LAB_TENANT", "ATP_TENANT"})
+    public void should_return_403_when_modify_user_by_tenant() throws Exception {
+        TenantRespDto tenant = registerUser();
+        String userId = tenant.getUserId();
+        tenant.setUsername("newName123");
+        tenant.setUserId(null);
+        mvc.perform(MockMvcRequestBuilders.put("/v1/users/" + userId).contentType(MediaType.APPLICATION_JSON_VALUE)
+            .header("X-XSRF-TOKEN", xsrfToken).content(gson.toJson(tenant)).cookie(cookies)
+            .accept(MediaType.APPLICATION_JSON_VALUE)).andExpect(MockMvcResultMatchers.status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "guest",
+        roles = {"APPSTORE_GUEST", "DEVELOPER_GUEST", "MECM_GUEST", "LAB_GUEST", "ATP_GUEST"})
+    public void should_return_guest_when_login_with_guest() throws Exception {
+        MvcResult mvcResult = mvc.perform(
+            MockMvcRequestBuilders.get("/auth/login-info").contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header("X-XSRF-TOKEN", xsrfToken).accept(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+        int result = mvcResult.getResponse().getStatus();
+        String content = mvcResult.getResponse().getContentAsString();
+        TenantRespDto user = gson.fromJson(content, TenantRespDto.class);
+        assertFalse(user == null);
+        assertEquals("guest", user.getUsername());
+    }
+
+    @Test
+    public void should_failed_when_not_login_user() throws Exception {
+        MvcResult mvcResult = mvc.perform(
+            MockMvcRequestBuilders.get("/auth/login-info").contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header("X-XSRF-TOKEN", xsrfToken).accept(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn();
     }
 }

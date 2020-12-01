@@ -88,8 +88,6 @@ public class VerificationTest {
             }
         };
         Map<String, String> anyMap = new HashMap<>();
-        // when(httpsUtil.httpsPost(anyString(), any(anyMap.getClass()), anyString())).thenReturn(true);
-        // verify(httpsUtil, times(1)).httpsPost(anyString(), any(anyMap.getClass()), anyString());
         Either<Boolean, FormatRespDto> either = identityService.verifyTelParam(request);
         Assert.assertTrue(either.isLeft());
     }
@@ -111,7 +109,6 @@ public class VerificationTest {
             }
         };
         Map<String, String> anyMap = new HashMap<>();
-        // when(httpsUtil.httpsPost(anyString(), any(anyMap.getClass()), anyString())).thenReturn(false);
         Either<Boolean, FormatRespDto> either = identityService.verifyTelParam(request);
         Assert.assertTrue(either.isRight());
         Assert.assertEquals(either.right().value().getErrStatus(), Response.Status.EXPECTATION_FAILED);
