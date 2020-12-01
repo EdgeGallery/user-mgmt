@@ -95,14 +95,14 @@ public class LoginTest {
         while (i < 5) {
             mvc.perform(MockMvcRequestBuilders.post("/login").contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .header("X-XSRF-TOKEN", xsrfToken).cookie(cookies).accept(MediaType.APPLICATION_JSON_VALUE)
-                .param("username", "admin").param("password", "wrong-password"))
+                .param("username", "tenant1").param("password", "wrong-password"))
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized());
             Thread.sleep(1000);
             i++;
         }
         mvc.perform(MockMvcRequestBuilders.post("/login").contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .header("X-XSRF-TOKEN", xsrfToken).cookie(cookies).accept(MediaType.APPLICATION_JSON_VALUE)
-            .param("username", "admin").param("password", "admin"))
+            .param("username", "tenant1").param("password", "tenant"))
             .andExpect(MockMvcResultMatchers.status().isLocked());
     }
 
@@ -112,23 +112,22 @@ public class LoginTest {
         while (i < 4) {
             mvc.perform(MockMvcRequestBuilders.post("/login").contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .header("X-XSRF-TOKEN", xsrfToken).cookie(cookies).accept(MediaType.APPLICATION_JSON_VALUE)
-                .param("username", "admin").param("password", "wrong-password"))
+                .param("username", "tenant2").param("password", "wrong-password"))
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized());
             Thread.sleep(1000);
             i++;
         }
         mvc.perform(MockMvcRequestBuilders.post("/login").contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .header("X-XSRF-TOKEN", xsrfToken).cookie(cookies).accept(MediaType.APPLICATION_JSON_VALUE)
-            .param("username", "admin").param("password", "admin"))
+            .param("username", "tenant2").param("password", "tenant"))
             .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
-    // @Setter
-    // @Getter
-    // @Builder
-    // class LoginInfo {
-    //     private String username;
-    //
-    //     private String password;
-    // }
+    @Test
+    public void should_failed_when_login_with_no_username() throws Exception {
+        MvcResult result = mvc.perform(MockMvcRequestBuilders.post("/login").contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .header("X-XSRF-TOKEN", xsrfToken).cookie(cookies).accept(MediaType.APPLICATION_JSON_VALUE)
+            .param("username", "not_found_user").param("password", "Test!123"))
+            .andExpect(MockMvcResultMatchers.status().isUnauthorized()).andReturn();
+    }
 }

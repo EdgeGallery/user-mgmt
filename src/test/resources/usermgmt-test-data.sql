@@ -35,12 +35,12 @@
 -- add a tenant1 user
     merge into tbl_tenant (TENANTID, USERNAME, PASSWORD, COMPANY, TELEPHONENUMBER, GENDER, isallowed) key(TENANTID)
     values('dad58d01-1251-4a4c-b01a-20f221da7d39', 'tenant1',
-    '59756fda85ebddee6024d5cc0e6edcde3226693257a9c1eb662c56426b8a4f232b3d56c321adbd91', 'company', '13800000003', '1', true);
+    '2079699a9b02ee7443dea821b0cca4d3213d41eecc47d7464885c3aa9f756718610c632566ae205b', 'company', '13800000003', '1', true);
 
 -- add a tenant2 user
     merge into tbl_tenant (TENANTID, USERNAME, PASSWORD, COMPANY, TELEPHONENUMBER, GENDER, isallowed) key(TENANTID)
     values('d1209326-6577-4cd5-8e8e-94709931734e', 'tenant2',
-    '59756fda85ebddee6024d5cc0e6edcde3226693257a9c1eb662c56426b8a4f232b3d56c321adbd91', 'company', '13800000004', '1', true);
+    '2079699a9b02ee7443dea821b0cca4d3213d41eecc47d7464885c3aa9f756718610c632566ae205b', 'company', '13800000004', '1', true);
 
 -- set the permissions for guest user
     merge into tbl_tenant_role (TENANTID, ROLEID) key(TENANTID, ROLEID)  values
