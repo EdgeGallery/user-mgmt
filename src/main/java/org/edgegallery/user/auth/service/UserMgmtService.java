@@ -135,10 +135,10 @@ public class UserMgmtService {
             return true;
         }
         if (StringUtils.isEmpty(verificationCode) || !verificationCode
-            .equals(RedisUtil.get(RedisUtil.RedisKeyType.VerificationCode, telephone))) {
+            .equals(RedisUtil.get(RedisUtil.RedisKeyType.verificationCode, telephone))) {
             return false;
         }
-        RedisUtil.delete(RedisUtil.RedisKeyType.VerificationCode, telephone);
+        RedisUtil.delete(RedisUtil.RedisKeyType.verificationCode, telephone);
         return true;
     }
 

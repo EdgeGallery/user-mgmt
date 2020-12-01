@@ -53,7 +53,7 @@ public class MecUserDetailsService implements UserDetailsService {
 
     private static final RequestRateLimiter LIMITER = new InMemorySlidingWindowRequestRateLimiter(rules);
 
-    private static Map<String, Long> LOCKED_USERS_MAP = new Hashtable<>();
+    private static final Map<String, Long> LOCKED_USERS_MAP = new Hashtable<>();
 
     @Autowired
     private TenantPoMapper tenantPoMapper;

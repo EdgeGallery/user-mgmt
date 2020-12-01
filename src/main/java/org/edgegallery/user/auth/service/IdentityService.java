@@ -74,7 +74,7 @@ public class IdentityService {
                     "connection out,please again try."));
         }
 
-        RedisUtil.save(RedisUtil.RedisKeyType.VerificationCode, telephone, verificationCode);
+        RedisUtil.save(RedisUtil.RedisKeyType.verificationCode, telephone, verificationCode);
         LOGGER.info("send verification code success");
         return Either.left(true);
     }

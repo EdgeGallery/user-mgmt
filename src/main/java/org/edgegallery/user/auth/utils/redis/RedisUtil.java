@@ -89,7 +89,7 @@ public class RedisUtil {
     }
 
     public enum RedisKeyType {
-        VerificationCode(redisConfig.getVerificationTimeOut());
+        verificationCode(redisConfig.getVerificationTimeOut());
 
         private int timeOut;
 
