@@ -40,10 +40,10 @@ public class HealthCheck {
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "health check", response = Object.class)
     @ApiResponses(value = {
-            @ApiResponse(code = org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR, message = "Internal error",
+            @ApiResponse(code = HttpStatus.SC_INTERNAL_SERVER_ERROR, message = "Internal error",
                     response = ErrorRespDto.class)
     })
     public ResponseEntity<Object> healthCheck() {
-        return new ResponseEntity<>("ok", org.springframework.http.HttpStatus.OK);
+        return ResponseEntity.ok("ok");
     }
 }
