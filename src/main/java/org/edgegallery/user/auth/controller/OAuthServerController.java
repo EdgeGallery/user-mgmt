@@ -101,7 +101,7 @@ public class OAuthServerController {
         if (authentication.getName() == null) {
             return ResponseEntity.ok(null);
         }
-        LOGGER.info(String.format("%s want to logout.", authentication.getName()));
+        LOGGER.info(String.format("%s want to get login user information.", authentication.getName()));
         TenantPo user = tenantPoMapper.getTenantByUsername(authentication.getName());
         if (user == null) {
             return ResponseEntity.ok(null);
