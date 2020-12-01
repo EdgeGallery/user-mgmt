@@ -197,4 +197,12 @@ public class AdminUserApiTest {
         assertFalse(user == null);
         assertEquals("guest", user.getUsername());
     }
+
+    @Test
+    public void should_failed_when_not_login_user() throws Exception {
+        MvcResult mvcResult = mvc.perform(
+            MockMvcRequestBuilders.get("/auth/login-info").contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header("X-XSRF-TOKEN", xsrfToken).accept(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn();
+    }
 }

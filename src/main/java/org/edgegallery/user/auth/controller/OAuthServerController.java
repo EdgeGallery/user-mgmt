@@ -20,12 +20,14 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.servicecomb.provider.rest.common.RestSchema;
 import org.edgegallery.user.auth.config.DescriptionConfig;
 import org.edgegallery.user.auth.config.OAuthClientDetailsConfig;
 import org.edgegallery.user.auth.controller.dto.response.ErrorRespDto;
+import org.edgegallery.user.auth.controller.dto.response.FormatRespDto;
 import org.edgegallery.user.auth.controller.dto.response.TenantRespDto;
 import org.edgegallery.user.auth.db.entity.TenantPo;
 import org.edgegallery.user.auth.db.mapper.TenantPoMapper;
@@ -96,15 +98,19 @@ public class OAuthServerController {
         @ApiResponse(code = org.apache.http.HttpStatus.SC_BAD_REQUEST, message = "Bad Request",
             response = ErrorRespDto.class)
     })
-    public ResponseEntity<TenantRespDto> getLoginUserInfo() {
+    public ResponseEntity<Object> getLoginUserInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getName() == null) {
-            return ResponseEntity.ok(null);
+            FormatRespDto response = new FormatRespDto(Response.Status.NOT_FOUND,
+                "Login user not found, may have logged out.");
+            return ResponseEntity.status(response.getErrStatus().getStatusCode()).body(response);
         }
         LOGGER.info(String.format("%s want to get login user information.", authentication.getName()));
         TenantPo user = tenantPoMapper.getTenantByUsername(authentication.getName());
         if (user == null) {
-            return ResponseEntity.ok(null);
+            FormatRespDto response = new FormatRespDto(Response.Status.NOT_FOUND,
+                "Login user not found, may have logged out.");
+            return ResponseEntity.status(response.getErrStatus().getStatusCode()).body(response);
         }
         TenantRespDto tenantRespDto = new TenantRespDto();
         tenantRespDto.setResponse(user);
