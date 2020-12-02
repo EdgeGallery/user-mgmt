@@ -40,6 +40,7 @@ public class HttpTraceLogFilter extends OncePerRequestFilter implements Ordered 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpTraceLogFilter.class);
     private static final String[] urlPatterns = {"/login", "/logout", "/auth/", "/v1/"};
+    private static final String UNKNOWN = "unknown";
 
     @Override
     public int getOrder() {
@@ -90,20 +91,20 @@ public class HttpTraceLogFilter extends OncePerRequestFilter implements Ordered 
 
     private String getIpAddress(HttpServletRequest request) {
         String ip = request.getHeader("x-forwarded-for");
-        if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
+        if (StringUtils.isEmpty(ip) || UNKNOWN.equalsIgnoreCase(ip)) {
             ip = request.getHeader("Proxy-Client-IP");
         }
-        if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
+        if (StringUtils.isEmpty(ip) || UNKNOWN.equalsIgnoreCase(ip)) {
             ip = request.getHeader("WL-Proxy-Client-IP");
         }
-        if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
+        if (StringUtils.isEmpty(ip) || UNKNOWN.equalsIgnoreCase(ip)) {
             ip = request.getRemoteAddr();
         }
         // the first IP is the real IP
         if (!StringUtils.isEmpty(ip)) {
             return ip.split(",")[0];
         } else {
-            return "unknown";
+            return UNKNOWN;
         }
     }
 
