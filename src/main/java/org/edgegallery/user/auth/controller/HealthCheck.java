@@ -17,19 +17,11 @@
 package org.edgegallery.user.auth.controller;
 
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import org.apache.http.HttpStatus;
 import org.apache.servicecomb.provider.rest.common.RestSchema;
-import org.edgegallery.user.auth.controller.dto.response.ErrorRespDto;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @RestSchema(schemaId = "health")
@@ -37,13 +29,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class HealthCheck {
 
+    /**
+     * Queries liveness & readiness.
+     *
+     * @return status code 200 when ready
+     */
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "health check", response = Object.class)
-    @ApiResponses(value = {
-            @ApiResponse(code = HttpStatus.SC_INTERNAL_SERVER_ERROR, message = "Internal error",
-                    response = ErrorRespDto.class)
-    })
-    public ResponseEntity<Object> healthCheck() {
+    @ApiOperation(value = "health check", response = String.class)
+    public ResponseEntity<String> healthCheck() {
         return ResponseEntity.ok("ok");
     }
 }
