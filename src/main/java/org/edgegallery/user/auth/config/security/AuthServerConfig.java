@@ -88,7 +88,7 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
                 .scopes("all")
                 .secret(encodedClientSecret)
                 .redirectUris(clientUrl + "/login")
-                .accessTokenValiditySeconds(3600)
+                .accessTokenValiditySeconds(3600 * 12)
                 .autoApprove(true);
         }
     }
