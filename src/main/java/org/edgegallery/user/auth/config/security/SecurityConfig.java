@@ -65,7 +65,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .authenticationEntryPoint(new OAuthUnauthorizedEntryPoint("/#/", smsConfig.getEnabled()))
             .and()
             .authorizeRequests()
-            .antMatchers("/", "/oauth/**", "/login", "/css/**", "/fonts/**", "/img/**", "/js/**", "/favicon.ico",
+            .antMatchers("/", "/oauth/**", "/login", "/css/**", "/fonts/**", "/img/**",
+                "/js/**", "/favicon.ico",
                 "/index.html", "/user-privacy.md", "/user-agreement.md")
             .permitAll()
             .antMatchers(HttpMethod.POST, "/v1/users", "/v1/users/action/uniqueness", "/v1/identity/sms")
@@ -97,12 +98,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    protected void configure(AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(authenticationProvider());
     }
 
     @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
+    DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(mecUserDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
