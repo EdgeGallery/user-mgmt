@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -64,7 +65,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .authenticationEntryPoint(new OAuthUnauthorizedEntryPoint("/#/", smsConfig.getEnabled()))
             .and()
             .authorizeRequests()
-            .antMatchers("/", "/oauth/**", "/login", "/css/**", "/fonts/**", "/img/**", "/js/**", "/favicon.ico",
+            .antMatchers("/", "/oauth/**", "/login", "/css/**", "/fonts/**", "/img/**",
+                "/js/**", "/favicon.ico",
                 "/index.html", "/user-privacy.md", "/user-agreement.md")
             .permitAll()
             .antMatchers(HttpMethod.POST, "/v1/users", "/v1/users/action/uniqueness", "/v1/identity/sms")
@@ -74,20 +76,39 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers(HttpMethod.GET, "/health")
             .permitAll()
             .antMatchers(HttpMethod.GET, "/v1/users")
-            .hasAnyRole(ADMIN_ROLES).antMatchers(HttpMethod.PUT, "/v1/users/**")
             .hasAnyRole(ADMIN_ROLES)
-            .antMatchers(HttpMethod.DELETE, "/v1/users/**").hasAnyRole(ADMIN_ROLES)
-            .antMatchers(HttpMethod.GET, "/auth/login-info").permitAll()
-            .anyRequest().authenticated().and().formLogin()
-            .loginPage("/#/").loginProcessingUrl("/login").successHandler(loginSuccessHandler)
-            .failureHandler(loginFailHandler).and().cors().and().csrf()
+            .antMatchers(HttpMethod.PUT, "/v1/users/**")
+            .hasAnyRole(ADMIN_ROLES)
+            .antMatchers(HttpMethod.DELETE, "/v1/users/**")
+            .hasAnyRole(ADMIN_ROLES)
+            .antMatchers(HttpMethod.GET, "/auth/login-info")
+            .permitAll()
+            .anyRequest()
+            .authenticated()
+            .and()
+            .formLogin()
+            .loginPage("/#/")
+            .loginProcessingUrl("/login")
+            .successHandler(loginSuccessHandler)
+            .failureHandler(loginFailHandler)
+            .and()
+            .cors().and().csrf()
             .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
         httpSecurity.addFilterAfter(guestAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(mecUserDetailsService).passwordEncoder(passwordEncoder());
+    protected void configure(AuthenticationManagerBuilder auth) {
+        auth.authenticationProvider(authenticationProvider());
+    }
+
+    @Bean
+    DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(mecUserDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        provider.setHideUserNotFoundExceptions(false);
+        return provider;
     }
 
     @Bean
