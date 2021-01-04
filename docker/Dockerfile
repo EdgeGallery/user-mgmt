@@ -41,8 +41,6 @@ RUN apk update &&\
 
 WORKDIR $APP_HOME
 
-COPY target/*.jar $APP_HOME/bin
-
 RUN chmod 750 $APP_HOME &&\
     chmod -R 550 $APP_HOME/bin &&\
     mkdir -p -m 750 $APP_HOME/config &&\
@@ -50,6 +48,8 @@ RUN chmod 750 $APP_HOME &&\
     mkdir -p -m 700 $APP_HOME/ssl &&\
     chown -R $USER_NAME:$GROUP_NAME $APP_HOME &&\
     chown -R $USER_NAME:$GROUP_NAME $APP_HOME/log
+
+COPY --chown=$USER_NAME:$GROUP_NAME target/*.jar $APP_HOME/bin
 
 EXPOSE 8067
 # Change to the app user.
