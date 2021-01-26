@@ -66,3 +66,7 @@ oauth2:
     - clientId: ${OAUTH_ATP_CLIENT_ID:atp-fe}
       clientSecret: ${OAUTH_ATP_CLIENT_SECRET:}
       clientUrl: ${OAUTH_ATP_CLIENT_URL:}
+    - clientId: ${OAUTH_LAB_CLIENT_ID:lab-fe}
+      clientSecret: ${OAUTH_LAB_CLIENT_SECRET:}
+      clientUrl: ${OAUTH_LAB_CLIENT_URL:}
+
