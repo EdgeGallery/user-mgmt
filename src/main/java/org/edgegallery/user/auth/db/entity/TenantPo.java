@@ -42,10 +42,16 @@ public class TenantPo {
 
     private String telephoneNumber;
 
+    private String mailAddress;
+
     private String gender;
 
     // default is true
     private boolean isAllowed = true;
+
+    private String createTime;
+
+    private String modifyTime;
 
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;

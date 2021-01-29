@@ -18,6 +18,7 @@ package org.edgegallery.user.auth.db.mapper;
 
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
+import org.edgegallery.user.auth.controller.dto.request.QueryUserReqDto;
 import org.edgegallery.user.auth.controller.dto.response.TenantRespDto;
 import org.edgegallery.user.auth.db.entity.RolePo;
 import org.edgegallery.user.auth.db.entity.TenantPo;
@@ -32,6 +33,8 @@ public interface TenantPoMapper {
     TenantPo getTenantBasicPoData(String tenantId);
 
     TenantPo getTenantByTelephone(String telephoneNumber);
+
+    TenantPo getTenantByMailAddress(String mailAddress);
 
     TenantPo getTenantByUsername(String username);
 
@@ -49,6 +52,6 @@ public interface TenantPoMapper {
 
     boolean deleteUser(String tenantId);
 
-    List<TenantRespDto> getAllUsers();
+    List<TenantRespDto> queryUsers(QueryUserReqDto queryReq);
 
 }

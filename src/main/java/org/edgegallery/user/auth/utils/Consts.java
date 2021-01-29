@@ -14,21 +14,13 @@
  *  limitations under the License.
  */
 
-package org.edgegallery.user.auth.config;
+package org.edgegallery.user.auth.utils;
 
-public class ServiceConfig {
+public class Consts {
 
-    private ServiceConfig() {
+    private Consts() {
     }
 
-    public static final String PATTERN_VERIFICATION_CODE = "^\\d{6,6}$";
-
-    public static final String PATTERN_USERNAME = "^[a-zA-Z][a-zA-Z0-9_]{5,29}$";
-
-    public static final String PATTERN_PASSWORD =
-        "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[~!@#$%^&*()_+\\-={}:\";<>?,./]).{6,18}$";
-
-    public static final String PATTERN_TELEPHONE = "^1[34578]\\d{9}$";
-
-    public static final String PATTERN_MAILADDRESS = "^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+$";
+    public static final String SUPER_ADMIN_NAME = "admin";
 }
+

@@ -46,10 +46,10 @@ public class TenantRespDto extends TenantBasicRespDto {
     public void setResponse(TenantPo tenantPo) {
         this.setUserId(tenantPo.getTenantId());
         this.setUsername(tenantPo.getUsername());
-        this.setCompany(tenantPo.getCompany());
-        this.setGender(tenantPo.getGender());
+        this.setMailAddress(tenantPo.getMailAddress());
         this.setTelephone(tenantPo.getTelephoneNumber());
         this.setAllowed(tenantPo.isAllowed());
+        this.setCreateTime(tenantPo.getCreateTime());
     }
 
     /**

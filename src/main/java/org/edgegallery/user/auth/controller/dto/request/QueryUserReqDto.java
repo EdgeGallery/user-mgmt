@@ -14,36 +14,54 @@
  *  limitations under the License.
  */
 
-package org.edgegallery.user.auth.controller.dto.response;
+package org.edgegallery.user.auth.controller.dto.request;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
+import org.edgegallery.user.auth.config.validate.CheckParamsGenericUtils;
+import org.edgegallery.user.auth.config.validate.IStringTrim;
 import org.springframework.util.StringUtils;
+
+import javax.validation.Valid;
+import javax.validation.constraints.*;
 
 @Setter
 @Getter
-public abstract class TenantBasicRespDto {
-
-    @ApiModelProperty(required = true, example = "TestUser1")
+public class QueryUserReqDto extends CheckParamsGenericUtils implements IStringTrim {
     private String username;
 
-    @ApiModelProperty(required = true, example = "test@edgegallery.org")
     private String mailAddress;
 
-    @ApiModelProperty(required = true, example = "15533449966")
     private String telephone;
 
-    private boolean isAllowed;
+    @ApiModelProperty(example = "ADMIN")
+    @Pattern(regexp = "ALL|ADMIN|TENANT|GUEST")
+    private String role;
 
-    private String createTime;
+    @Min(value = -1)
+    @Max(value = 1)
+    private int status;
+
+    @NotNull
+    @Valid
+    private QueryUserCtrlDto queryCtrl;
 
     /**
      * check basic data by trim.
      */
-    public void trim() {
+    public void stringTrim() {
         this.username = StringUtils.trimWhitespace(this.username);
         this.mailAddress =  StringUtils.trimWhitespace(this.mailAddress);
-        this.telephone = StringUtils.trimWhitespace(this.telephone);
+        this.telephone =  StringUtils.trimWhitespace(this.telephone);
+        this.role =  StringUtils.trimWhitespace(this.role);
+        this.queryCtrl.stringTrim();
+    }
+
+    /**
+     * correct req content
+     */
+    public void correct() {
+        queryCtrl.correct();
     }
 }

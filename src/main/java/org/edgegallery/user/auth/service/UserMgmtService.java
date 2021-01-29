@@ -18,12 +18,14 @@ package org.edgegallery.user.auth.service;
 
 import fj.data.Either;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import javax.ws.rs.core.Response.Status;
 import org.apache.commons.lang3.StringUtils;
 import org.edgegallery.user.auth.config.SmsConfig;
 import org.edgegallery.user.auth.config.validate.annotation.ParameterValidate;
+import org.edgegallery.user.auth.controller.dto.request.QueryUserReqDto;
 import org.edgegallery.user.auth.controller.dto.request.RetrievePasswordReqDto;
 import org.edgegallery.user.auth.controller.dto.request.TenantRegisterReqDto;
 import org.edgegallery.user.auth.controller.dto.request.UniqueReqDto;
@@ -74,16 +76,15 @@ public class UserMgmtService {
             return Either.right(new FormatRespDto(Status.FORBIDDEN, "Telephone has existed"));
         }
 
+        if (reqParam.getMailAddress() != null && mapper.getTenantByMailAddress(reqParam.getMailAddress()) != null) {
+            return Either.right(new FormatRespDto(Status.FORBIDDEN, "MailAddress has existed"));
+        }
+
         if (reqParam.getUsername() != null && mapper.getTenantByUsername(reqParam.getUsername()) != null) {
             return Either.right(new FormatRespDto(Status.FORBIDDEN, "Username has existed"));
         }
 
         TenantRegisterReqDto registerRequest = reqParam;
-        String verificationCode = registerRequest.getVerificationCode();
-        if (!verifySmsCode(verificationCode, registerRequest.getTelephone())) {
-            LOGGER.error("verification code is error ");
-            return Either.right(new FormatRespDto(Status.FORBIDDEN, "Verification code is error"));
-        }
 
         TenantPermissionVo tenantVo = new TenantPermissionVo();
         tenantVo.setTenantId(UUID.randomUUID().toString());
@@ -92,6 +93,7 @@ public class UserMgmtService {
         tenantVo.setCompany(registerRequest.getCompany());
         tenantVo.setGender(registerRequest.getGender());
         tenantVo.setTelephoneNumber(registerRequest.getTelephone());
+        tenantVo.setMailAddress(registerRequest.getMailAddress());
         tenantVo.setAllowed(registerRequest.isAllowed());
 
         List<RolePo> rolePoList = new ArrayList<>();
@@ -216,14 +218,19 @@ public class UserMgmtService {
     }
 
     /**
-     * get all user from db.
+     * query user from db.
+     *
+     * @param queryReq query request
+     * @return TenantRespDto List
      */
-    public List<TenantRespDto> getAllUsers() {
-        List<TenantRespDto> users = mapper.getAllUsers();
-        if (users == null) {
-            return new ArrayList<>();
-        } else {
-            return users;
+    @ParameterValidate
+    public Either<List<TenantRespDto>, FormatRespDto> queryUsers(QueryUserReqDto queryReq) {
+        queryReq.correct();
+        try {
+            return Either.left(mapper.queryUsers(queryReq));
+        } catch (Exception e) {
+            LOGGER.error("Database Operate Exception: {}", e.getMessage());
+            return Either.right(new FormatRespDto(Status.INTERNAL_SERVER_ERROR, "Database Exception"));
         }
     }
 

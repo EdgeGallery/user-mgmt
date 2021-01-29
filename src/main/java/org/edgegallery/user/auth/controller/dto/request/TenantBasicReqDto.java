@@ -39,8 +39,11 @@ public abstract class TenantBasicReqDto extends CheckParamsGenericUtils implemen
     @ApiModelProperty(required = true, example = "male")
     private String gender;
 
-    @ApiModelProperty(required = true, example = "15533449966")
+    @ApiModelProperty(example = "15533449966")
     private String telephone;
+
+    @ApiModelProperty(example = "test@edgegallery.org")
+    private String mailAddress;
 
     private boolean isAllowed = true;
 
@@ -52,5 +55,6 @@ public abstract class TenantBasicReqDto extends CheckParamsGenericUtils implemen
         this.company = StringUtils.trimWhitespace(this.company);
         this.gender = StringUtils.trimWhitespace(this.gender);
         this.telephone =  StringUtils.trimWhitespace(this.telephone);
+        this.mailAddress =  StringUtils.trimWhitespace(this.mailAddress);
     }
 }

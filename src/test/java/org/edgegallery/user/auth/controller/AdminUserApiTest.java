@@ -11,6 +11,7 @@ import com.google.gson.reflect.TypeToken;
 import java.util.List;
 import javax.servlet.http.Cookie;
 import org.edgegallery.user.auth.MainServer;
+import org.edgegallery.user.auth.controller.dto.request.QueryUserReqDto;
 import org.edgegallery.user.auth.controller.dto.request.TenantRegisterReqDto;
 import org.edgegallery.user.auth.controller.dto.response.TenantRespDto;
 import org.edgegallery.user.auth.service.UserMgmtService;
@@ -69,10 +70,11 @@ public class AdminUserApiTest {
     @WithMockUser(username = "admin",
         roles = {"APPSTORE_ADMIN", "DEVELOPER_ADMIN", "MECM_ADMIN", "LAB_ADMIN", "ATP_ADMIN"})
     @Test
-    public void should_return_200_when_get_all_users_by_admin() throws Exception {
+    public void should_return_200_when_query_users_by_admin() throws Exception {
+        QueryUserReqDto request = new QueryUserReqDto();
         MvcResult mvcResult = mvc.perform(
-            MockMvcRequestBuilders.get("/v1/users").contentType(MediaType.APPLICATION_JSON_VALUE)
-                .header("X-XSRF-TOKEN", xsrfToken).accept(MediaType.APPLICATION_JSON_VALUE))
+            MockMvcRequestBuilders.post("/v1/users/list").contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header("X-XSRF-TOKEN", xsrfToken).content(gson.toJson(request)).accept(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
         int result = mvcResult.getResponse().getStatus();
         String content = mvcResult.getResponse().getContentAsString();

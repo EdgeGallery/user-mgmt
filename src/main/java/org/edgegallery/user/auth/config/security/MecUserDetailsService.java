@@ -42,7 +42,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class MecUserDetailsService implements UserDetailsService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoginSuccessHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MecUserDetailsService.class);
 
     // when login failed 5 times, account will be locked.
     private static final Set<RequestLimitRule> rules =
