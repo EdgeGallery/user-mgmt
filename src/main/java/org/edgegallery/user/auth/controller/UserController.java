@@ -130,7 +130,6 @@ public class UserController extends BeGenericServlet {
             return ResponseEntity.status(formatRespDto.getErrStatus().getStatusCode()).body(formatRespDto.getErrorRespDto());
         }
 
-        // return users
         return buildResponse(userMgmtService.queryUsers(request));
     }
 
@@ -145,5 +144,43 @@ public class UserController extends BeGenericServlet {
         @ApiParam(value = "TenantRegisterReqDto", required = true) @RequestBody TenantRespDto request) {
         request.setUserId(userId);
         return buildResponse(userMgmtService.modifyUser(request));
+    }
+
+    @PutMapping(value = "/{userId}/status/disallow", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "disallow user.", response = Object.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = HttpStatus.SC_OK, message = "operate success", response = TenantRespDto.class),
+            @ApiResponse(code = HttpStatus.SC_INTERNAL_SERVER_ERROR, message = "INTERNAL ERROR", response = ErrorRespDto.class)
+    })
+    public ResponseEntity<Object> disallowUser(
+            @ApiParam(value = "user id") @PathVariable("userId") @Pattern(regexp = REG_UUID) String userId) {
+        // login user must be admin
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!Consts.SUPER_ADMIN_NAME.equalsIgnoreCase(authentication.getName())) {
+            FormatRespDto formatRespDto = new FormatRespDto(Response.Status.FORBIDDEN,
+                    "The user has no permission to query users.");
+            return ResponseEntity.status(formatRespDto.getErrStatus().getStatusCode()).body(formatRespDto.getErrorRespDto());
+        }
+
+        return buildResponse(userMgmtService.updateUserStatus(userId, false));
+    }
+
+    @PutMapping(value = "/{userId}/status/allow", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "allow user.", response = Object.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = HttpStatus.SC_OK, message = "operate success", response = TenantRespDto.class),
+            @ApiResponse(code = HttpStatus.SC_INTERNAL_SERVER_ERROR, message = "INTERNAL ERROR", response = ErrorRespDto.class)
+    })
+    public ResponseEntity<Object> allowUser(
+            @ApiParam(value = "user id") @PathVariable("userId") @Pattern(regexp = REG_UUID) String userId) {
+        // login user must be admin
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!Consts.SUPER_ADMIN_NAME.equalsIgnoreCase(authentication.getName())) {
+            FormatRespDto formatRespDto = new FormatRespDto(Response.Status.FORBIDDEN,
+                    "The user has no permission to query users.");
+            return ResponseEntity.status(formatRespDto.getErrStatus().getStatusCode()).body(formatRespDto.getErrorRespDto());
+        }
+
+        return buildResponse(userMgmtService.updateUserStatus(userId, true));
     }
 }

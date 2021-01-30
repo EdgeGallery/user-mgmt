@@ -229,7 +229,26 @@ public class UserMgmtService {
         try {
             return Either.left(mapper.queryUsers(queryReq));
         } catch (Exception e) {
-            LOGGER.error("Database Operate Exception: {}", e.getMessage());
+            LOGGER.error("Database Exception on Query Users: {}", e.getMessage());
+            return Either.right(new FormatRespDto(Status.INTERNAL_SERVER_ERROR, "Database Exception"));
+        }
+    }
+
+    /**
+     * update user status
+     *
+     * @param tenantId user id
+     * @param allowFlag allow flag
+     * @return String or FormatRespDto
+     */
+    public Either<String, FormatRespDto> updateUserStatus(String tenantId, boolean allowFlag) {
+        try {
+            if (mapper.updateStatus(tenantId, allowFlag)) {
+                return Either.left("");
+            }
+            return Either.right(new FormatRespDto(Status.BAD_REQUEST, "User not exist."));
+        } catch (Exception e) {
+            LOGGER.error("Database Exception on Update User Status: {}", e.getMessage());
             return Either.right(new FormatRespDto(Status.INTERNAL_SERVER_ERROR, "Database Exception"));
         }
     }

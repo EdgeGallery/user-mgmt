@@ -59,21 +59,23 @@ public class MecUserDetailsService implements UserDetailsService {
     private TenantPoMapper tenantPoMapper;
 
     @Override
-    public UserDetails loadUserByUsername(String userNameOrTelephoneNum) throws UsernameNotFoundException {
-        TenantPo tenant = tenantPoMapper.getTenantByUsername(userNameOrTelephoneNum);
+    public UserDetails loadUserByUsername(String uniqueUserFlag) throws UsernameNotFoundException {
+        TenantPo tenant = tenantPoMapper.getTenantByUniqueFlag(uniqueUserFlag);
         if (tenant == null) {
-            tenant = tenantPoMapper.getTenantByTelephone(userNameOrTelephoneNum);
-            if (tenant == null) {
-                throw new UsernameNotFoundException(
-                    "Can't find user by username or telephone:" + userNameOrTelephoneNum);
-            }
+            throw new UsernameNotFoundException(
+                    "User not found: " + uniqueUserFlag);
+        }
+
+        if (!tenant.isAllowed()) {
+            throw new UsernameNotFoundException(
+                    "User is not allowed to login.");
         }
 
         List<RolePo> rolePos = tenantPoMapper.getRolePoByTenantId(tenant.getTenantId());
         List<GrantedAuthority> authorities = new ArrayList<>();
         rolePos.forEach(rolePo -> authorities.add(new SimpleGrantedAuthority("ROLE_" + rolePo.toString())));
 
-        boolean isLocked = isLocked(userNameOrTelephoneNum);
+        boolean isLocked = isLocked(uniqueUserFlag);
         if (isLocked) {
             LOGGER.info("username:{} have been locked.", tenant.getUsername());
         }

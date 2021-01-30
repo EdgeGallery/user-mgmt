@@ -38,6 +38,8 @@ public interface TenantPoMapper {
 
     TenantPo getTenantByUsername(String username);
 
+    TenantPo getTenantByUniqueFlag(String uniqueFlag);
+
     int updateTenantById(TenantRespDto user);
 
     void deleteRolesByTenantId(String tenantId);
@@ -53,5 +55,7 @@ public interface TenantPoMapper {
     boolean deleteUser(String tenantId);
 
     List<TenantRespDto> queryUsers(QueryUserReqDto queryReq);
+
+    boolean updateStatus(String tenantId, boolean allowFlag);
 
 }

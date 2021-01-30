@@ -35,10 +35,10 @@ public class QueryUserCtrlDto extends CheckParamsGenericUtils implements IString
 
     private static final String DEFAULT_SORTORDER = "ASC";
 
-    @Min(value = 0)
+    @Min(value = -1)
     private int offset;
 
-    @Min(value = 1)
+    @Min(value = 0)
     @Max(value = 100)
     private int limit;
 

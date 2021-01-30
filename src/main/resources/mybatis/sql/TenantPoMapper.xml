@@ -71,6 +71,15 @@
         USERNAME=#{username}
     </select>
 
+    <select id="getTenantByUniqueFlag" resultType="org.edgegallery.user.auth.db.entity.TenantPo">
+        SELECT
+        *
+        FROM
+        tbl_tenant
+        WHERE
+        USERNAME=#{uniqueFlag} or TELEPHONENUMBER=#{uniqueFlag} or MAILADDRESS=#{uniqueFlag}
+    </select>
+
     <insert id="addTenantPo" parameterType="org.edgegallery.user.auth.db.entity.TenantPo">
         INSERT INTO
         tbl_tenant
@@ -134,7 +143,9 @@
                 <if test="queryCtrl.sortBy != null and queryCtrl.sortBy != '' and queryCtrl.sortOrder != null and queryCtrl.sortOrder != ''">
                     order by ${queryCtrl.sortBy} ${queryCtrl.sortOrder}
                 </if>
-                offset #{queryCtrl.offset} limit #{queryCtrl.limit}
+                <if test="queryCtrl.offset >=0 and queryCtrl.limit > 0">
+                    offset #{queryCtrl.offset} limit #{queryCtrl.limit}
+                </if>
             </if>
         ) a left join
         (select tenantid, platform, role from tbl_tenant_role left join tbl_role on tbl_tenant_role.roleid = tbl_role.id ) b
@@ -146,11 +157,19 @@
 
     <update id="updateTenantById" parameterType="org.edgegallery.user.auth.controller.dto.response.TenantRespDto">
         update tbl_tenant
-        set username = #{username}, company = #{company}, telephonenumber = #{telephone}, gender = #{gender}, isallowed = #{isAllowed}
+        set username = #{username}, telephonenumber = #{telephone}, isallowed = #{isAllowed}
         where tenantid = #{userId}
     </update>
 
     <delete id="deleteRolesByTenantId">
         delete from tbl_tenant_role where tenantid = #{tenantId}
     </delete>
+
+    <update id="updateStatus">
+        UPDATE
+        tbl_tenant
+        SET ISALLOWED = #{param2}
+        WHERE
+        TENANTID = #{param1};
+    </update>
 </mapper>
