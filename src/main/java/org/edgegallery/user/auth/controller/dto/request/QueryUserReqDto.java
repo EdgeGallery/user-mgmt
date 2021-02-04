@@ -16,15 +16,18 @@
 
 package org.edgegallery.user.auth.controller.dto.request;
 
+import fj.data.Either;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 import org.edgegallery.user.auth.config.validate.CheckParamsGenericUtils;
 import org.edgegallery.user.auth.config.validate.IStringTrim;
+import org.edgegallery.user.auth.controller.dto.response.FormatRespDto;
 import org.springframework.util.StringUtils;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
+import java.util.List;
 
 @Setter
 @Getter
@@ -43,6 +46,10 @@ public class QueryUserReqDto extends CheckParamsGenericUtils implements IStringT
     @Max(value = 1)
     private int status;
 
+    private String createTimeBegin;
+
+    private String createTimeEnd;
+
     @NotNull
     @Valid
     private QueryUserCtrlDto queryCtrl;
@@ -58,10 +65,8 @@ public class QueryUserReqDto extends CheckParamsGenericUtils implements IStringT
         this.queryCtrl.stringTrim();
     }
 
-    /**
-     * correct req content
-     */
-    public void correct() {
-        queryCtrl.correct();
+    @Override
+    protected Either<Boolean, FormatRespDto> checkDataFormat() {
+        return Either.left(true);
     }
 }

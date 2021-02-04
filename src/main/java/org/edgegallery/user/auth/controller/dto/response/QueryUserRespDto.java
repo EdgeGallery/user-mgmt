@@ -19,16 +19,21 @@ package org.edgegallery.user.auth.controller.dto.response;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
+import org.edgegallery.user.auth.db.entity.RolePo;
+import org.edgegallery.user.auth.db.entity.TenantPo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@ToString
 @Setter
 @Getter
-public class UniquenessRespDto {
-    @ApiModelProperty(required = true, example = "false")
-    private boolean username;
+public class QueryUserRespDto {
 
-    @ApiModelProperty(required = true, example = "false")
-    private boolean telephone;
+    private int totalCount;
 
-    @ApiModelProperty(required = true, example = "false")
-    private boolean mailAddress;
+    private List<TenantRespDto> userList;
 }

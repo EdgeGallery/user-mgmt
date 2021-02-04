@@ -31,7 +31,7 @@ import javax.validation.constraints.Pattern;
 @Setter
 @Getter
 public class QueryUserCtrlDto extends CheckParamsGenericUtils implements IStringTrim {
-    private static final String DEFAULT_SORTBY = "CREATETIME";
+    private static final String DEFAULT_SORTBY = "createTime";
 
     private static final String DEFAULT_SORTORDER = "ASC";
 
@@ -42,12 +42,12 @@ public class QueryUserCtrlDto extends CheckParamsGenericUtils implements IString
     @Max(value = 100)
     private int limit;
 
-    @ApiModelProperty(example = "USERNAME")
-    @Pattern(regexp = "|USERNAME|CREATETIME")
+    @ApiModelProperty(example = "userName")
+    @Pattern(regexp = "(?i)userName|(?i)createTime")
     private String sortBy;
 
     @ApiModelProperty(example = "ASC")
-    @Pattern(regexp = "|ASC|DESC")
+    @Pattern(regexp = "(?i)ASC|(?i)DESC")
     private String sortOrder;
 
     /**
@@ -55,22 +55,13 @@ public class QueryUserCtrlDto extends CheckParamsGenericUtils implements IString
      */
     public void stringTrim() {
         this.sortBy = StringUtils.trimWhitespace(this.sortBy);
-        this.sortOrder =  StringUtils.trimWhitespace(this.sortOrder);
-    }
-
-    /**
-     * correct req content
-     */
-    public void correct() {
-        if (validSort()) {
-            return;
+        if (StringUtils.isEmpty(this.sortBy)) {
+            this.sortBy = DEFAULT_SORTBY;
         }
 
-        this.sortBy = DEFAULT_SORTBY;
-        this.sortOrder = DEFAULT_SORTORDER;
-    }
-
-    private boolean validSort() {
-        return !StringUtils.isEmpty(this.sortBy) && !StringUtils.isEmpty(this.sortOrder);
+        this.sortOrder =  StringUtils.trimWhitespace(this.sortOrder);
+        if (StringUtils.isEmpty(this.sortOrder)) {
+            this.sortOrder = DEFAULT_SORTORDER;
+        }
     }
 }

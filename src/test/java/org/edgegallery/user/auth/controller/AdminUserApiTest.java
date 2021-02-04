@@ -14,6 +14,7 @@ import org.edgegallery.user.auth.MainServer;
 import org.edgegallery.user.auth.controller.dto.request.QueryUserCtrlDto;
 import org.edgegallery.user.auth.controller.dto.request.QueryUserReqDto;
 import org.edgegallery.user.auth.controller.dto.request.TenantRegisterReqDto;
+import org.edgegallery.user.auth.controller.dto.response.QueryUserRespDto;
 import org.edgegallery.user.auth.controller.dto.response.TenantRespDto;
 import org.edgegallery.user.auth.service.UserMgmtService;
 import org.junit.Before;
@@ -85,8 +86,9 @@ public class AdminUserApiTest {
             .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
         int result = mvcResult.getResponse().getStatus();
         String content = mvcResult.getResponse().getContentAsString();
-        List<TenantRespDto> users = gson.fromJson(content, new TypeToken<List<TenantRespDto>>() { }.getType());
-        assertFalse(users.isEmpty());
+        QueryUserRespDto users = gson.fromJson(content, new TypeToken<QueryUserRespDto>() { }.getType());
+        assertFalse(users.getUserList().isEmpty());
+        assertEquals(users.getTotalCount(), users.getUserList().size());
     }
 
     @WithMockUser(username = "admin",

@@ -30,6 +30,7 @@ import org.edgegallery.user.auth.controller.dto.request.RetrievePasswordReqDto;
 import org.edgegallery.user.auth.controller.dto.request.TenantRegisterReqDto;
 import org.edgegallery.user.auth.controller.dto.request.UniqueReqDto;
 import org.edgegallery.user.auth.controller.dto.response.FormatRespDto;
+import org.edgegallery.user.auth.controller.dto.response.QueryUserRespDto;
 import org.edgegallery.user.auth.controller.dto.response.TenantRespDto;
 import org.edgegallery.user.auth.controller.dto.response.UniquenessRespDto;
 import org.edgegallery.user.auth.db.EnumPlatform;
@@ -187,15 +188,20 @@ public class UserMgmtService {
     }
 
     /**
-     * Verify that the username and telephone number exist.
+     * Verify that the username and telephone number and mail address exist.
      *
      * @param uniqueRequest UniqueReqDto
      * @return
      */
     public Either<UniquenessRespDto, FormatRespDto> uniqueness(UniqueReqDto uniqueRequest) {
+        String mailAddress = uniqueRequest.getMailAddress();
         String telephone = uniqueRequest.getTelephone();
         String username = uniqueRequest.getUsername();
         UniquenessRespDto uniquenessResponse = new UniquenessRespDto();
+
+        if (mailAddress != null && mailAddress.length() > 1 && mapper.getTenantByMailAddress(mailAddress) != null) {
+            uniquenessResponse.setMailAddress(true);
+        }
 
         if (telephone != null && telephone.length() > 1 && mapper.getTenantByTelephone(telephone) != null) {
             uniquenessResponse.setTelephone(true);
@@ -204,6 +210,7 @@ public class UserMgmtService {
         if (username != null && username.length() > 1 && mapper.getTenantByUsername(username) != null) {
             uniquenessResponse.setUsername(true);
         }
+
         return Either.left(uniquenessResponse);
     }
 
@@ -224,10 +231,12 @@ public class UserMgmtService {
      * @return TenantRespDto List
      */
     @ParameterValidate
-    public Either<List<TenantRespDto>, FormatRespDto> queryUsers(QueryUserReqDto queryReq) {
-        queryReq.correct();
+    public Either<QueryUserRespDto, FormatRespDto> queryUsers(QueryUserReqDto queryReq) {
         try {
-            return Either.left(mapper.queryUsers(queryReq));
+            QueryUserRespDto queryResp = new QueryUserRespDto();
+            queryResp.setUserList(mapper.queryUsers(queryReq));
+            queryResp.setTotalCount(mapper.queryUserCount(queryReq));
+            return Either.left(queryResp);
         } catch (Exception e) {
             LOGGER.error("Database Exception on Query Users: {}", e.getMessage());
             return Either.right(new FormatRespDto(Status.INTERNAL_SERVER_ERROR, "Database Exception"));
@@ -265,12 +274,18 @@ public class UserMgmtService {
         if (!oldUserPo.getUsername().equals(user.getUsername())) {
             uniqueReqDto.setUsername(user.getUsername());
         }
-        if (!oldUserPo.getTelephoneNumber().equals(user.getTelephone())) {
+        if (user.getTelephone() != null && !user.getTelephone().equals(oldUserPo.getTelephoneNumber())) {
             uniqueReqDto.setTelephone(user.getTelephone());
+        }
+        if (user.getMailAddress() != null && !user.getMailAddress().equals(oldUserPo.getMailAddress())) {
+            uniqueReqDto.setMailAddress(user.getMailAddress());
         }
         String msg = "";
         Either<UniquenessRespDto, FormatRespDto> uniqueness = uniqueness(uniqueReqDto);
         if (uniqueness.isLeft()) {
+            if (uniqueness.left().value().isMailAddress()) {
+                msg = "repeat of mail address.";
+            }
             if (uniqueness.left().value().isTelephone()) {
                 msg = "repeat of telephone.";
             }
@@ -284,7 +299,22 @@ public class UserMgmtService {
         tenantTransaction.updateTenant(user);
         TenantRespDto tenantRespDto = new TenantRespDto();
         tenantRespDto.setResponse(mapper.getTenantBasicPoData(user.getUserId()));
-        tenantRespDto.setPermission(mapper.getRolePoByTenantId(user.getUserId()));
         return Either.left(tenantRespDto);
+    }
+
+    /**
+     * modify the user settings.
+     *
+     * @param modifyReq modify request
+     * @return String or FormatRespDto
+     */
+    public Either<String, FormatRespDto> modifyUserSetting(TenantRespDto modifyReq) {
+        try {
+            tenantTransaction.updateTenantSetting(modifyReq);
+            return Either.left("");
+        } catch (Exception e) {
+            LOGGER.error("Database Exception on Modify User Settings: {}", e.getMessage());
+            return Either.right(new FormatRespDto(Status.INTERNAL_SERVER_ERROR, "Database Exception"));
+        }
     }
 }

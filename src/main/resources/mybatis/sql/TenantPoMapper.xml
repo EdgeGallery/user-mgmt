@@ -109,44 +109,65 @@
         </foreach>
     </insert>
 
+    <select id="queryUserCount" resultType="java.lang.Integer" parameterType="org.edgegallery.user.auth.controller.dto.request.QueryUserReqDto">
+        select count(1) from tbl_tenant
+        <where>
+            <if test="username != null and username != ''">
+                and lower(username) like lower(CONCAT('%', #{username}, '%'))
+            </if>
+            <if test="telephone != null and telephone != ''">
+                and lower(telephonenumber) like lower(CONCAT('%', #{telephone}, '%'))
+            </if>
+            <if test="mailAddress != null and mailAddress != ''">
+                and lower(mailaddress) like lower(CONCAT('%', #{mailAddress}, '%'))
+            </if>
+            <if test="status != -1">
+                and isallowed = (#{status}=1)
+            </if>
+            <if test="role != null and role != 'ALL'">
+                and tenantid in (select distinct tenantid from tbl_tenant_role left join tbl_role on tbl_tenant_role.roleid = tbl_role.id where role=#{role})
+            </if>
+        </where>
+    </select>
+
     <select id="queryUsers" resultMap="TenantRespDto" parameterType="org.edgegallery.user.auth.controller.dto.request.QueryUserReqDto">
         select
-            a.tenantid,
-            a.username,
-            a.telephonenumber,
-            a.mailaddress,
-            a.isallowed,
-            a.createtime,
-            b.platform as permissions_platform,
-            b.role as permissions_role
+        a.tenantid,
+        a.username,
+        a.telephonenumber,
+        a.mailaddress,
+        a.isallowed,
+        a.createtime,
+        b.platform as permissions_platform,
+        b.role as permissions_role
         from (
-            select tenantid, username, telephonenumber, mailaddress, isallowed, createtime
-            from tbl_tenant
-            <where>
-                <if test="username != null and username != ''">
-                    and lower(username) like lower(CONCAT('%', #{username}, '%'))
-                </if>
-                <if test="telephone != null and telephone != ''">
-                    and lower(telephonenumber) like lower(CONCAT('%', #{telephone}, '%'))
-                </if>
-                <if test="mailAddress != null and mailAddress != ''">
-                    and lower(mailaddress) like lower(CONCAT('%', #{mailAddress}, '%'))
-                </if>
-                <if test="status != -1">
-                    and isallowed = (#{status}=1)
-                </if>
-                <if test="role != null and role != 'ALL'">
-                    and tenantid in (select distinct tenantid from tbl_tenant_role left join tbl_role on tbl_tenant_role.roleid = tbl_role.id where role=#{role})
-                </if>
-            </where>
-            <if test="queryCtrl != null">
-                <if test="queryCtrl.sortBy != null and queryCtrl.sortBy != '' and queryCtrl.sortOrder != null and queryCtrl.sortOrder != ''">
-                    order by ${queryCtrl.sortBy} ${queryCtrl.sortOrder}
-                </if>
-                <if test="queryCtrl.offset >=0 and queryCtrl.limit > 0">
-                    offset #{queryCtrl.offset} limit #{queryCtrl.limit}
-                </if>
+        select tenantid, username, telephonenumber, mailaddress, isallowed, createtime
+        from tbl_tenant
+        <where>
+            <if test="username != null and username != ''">
+                and lower(username) like lower(CONCAT('%', #{username}, '%'))
             </if>
+            <if test="telephone != null and telephone != ''">
+                and lower(telephonenumber) like lower(CONCAT('%', #{telephone}, '%'))
+            </if>
+            <if test="mailAddress != null and mailAddress != ''">
+                and lower(mailaddress) like lower(CONCAT('%', #{mailAddress}, '%'))
+            </if>
+            <if test="status != -1">
+                and isallowed = (#{status}=1)
+            </if>
+            <if test="role != null and role != 'ALL'">
+                and tenantid in (select distinct tenantid from tbl_tenant_role left join tbl_role on tbl_tenant_role.roleid = tbl_role.id where role=#{role})
+            </if>
+        </where>
+        <if test="queryCtrl != null">
+            <if test="queryCtrl.sortBy != null and queryCtrl.sortBy != '' and queryCtrl.sortOrder != null and queryCtrl.sortOrder != ''">
+                order by ${queryCtrl.sortBy} ${queryCtrl.sortOrder}
+            </if>
+            <if test="queryCtrl.offset >=0 and queryCtrl.limit > 0">
+                offset #{queryCtrl.offset} limit #{queryCtrl.limit}
+            </if>
+        </if>
         ) a left join
         (select tenantid, platform, role from tbl_tenant_role left join tbl_role on tbl_tenant_role.roleid = tbl_role.id ) b
         on a.tenantid = b.tenantid
@@ -157,7 +178,7 @@
 
     <update id="updateTenantById" parameterType="org.edgegallery.user.auth.controller.dto.response.TenantRespDto">
         update tbl_tenant
-        set username = #{username}, telephonenumber = #{telephone}, isallowed = #{isAllowed}
+        set username = #{username}, telephonenumber = #{telephone}, mailaddress = #{mailAddress}
         where tenantid = #{userId}
     </update>
 

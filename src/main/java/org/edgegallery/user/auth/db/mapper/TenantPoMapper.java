@@ -54,6 +54,8 @@ public interface TenantPoMapper {
 
     boolean deleteUser(String tenantId);
 
+    Integer queryUserCount(QueryUserReqDto queryReq);
+
     List<TenantRespDto> queryUsers(QueryUserReqDto queryReq);
 
     boolean updateStatus(String tenantId, boolean allowFlag);

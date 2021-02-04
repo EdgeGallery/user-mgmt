@@ -35,7 +35,7 @@ public class DescriptionConfig {
         + "verification code success, it will return status 200. If send verification code error, it will return "
         + "status 417.";
 
-    public static final String UNIQUENESS_MSG = "The API can receive the unique verify request for telephone or "
+    public static final String UNIQUENESS_MSG = "The API can receive the unique verify request for mailAddress or telephone or "
         + "username. If the request param is unique, it will return status 200, otherwise it will return status "
         + "400.";
 

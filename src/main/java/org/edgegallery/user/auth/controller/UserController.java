@@ -34,6 +34,7 @@ import org.edgegallery.user.auth.controller.dto.request.TenantRegisterReqDto;
 import org.edgegallery.user.auth.controller.dto.request.UniqueReqDto;
 import org.edgegallery.user.auth.controller.dto.response.ErrorRespDto;
 import org.edgegallery.user.auth.controller.dto.response.FormatRespDto;
+import org.edgegallery.user.auth.controller.dto.response.QueryUserRespDto;
 import org.edgegallery.user.auth.controller.dto.response.TenantRespDto;
 import org.edgegallery.user.auth.service.UserMgmtService;
 import org.edgegallery.user.auth.utils.Consts;
@@ -115,7 +116,7 @@ public class UserController extends BeGenericServlet {
     @PostMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "query users.", response = Object.class)
     @ApiResponses(value = {
-        @ApiResponse(code = HttpStatus.SC_OK, message = "query success", response = List.class),
+        @ApiResponse(code = HttpStatus.SC_OK, message = "query success", response = QueryUserRespDto.class),
         @ApiResponse(code = HttpStatus.SC_BAD_REQUEST, message = "Bad Request", response = ErrorRespDto.class),
         @ApiResponse(code = HttpStatus.SC_FORBIDDEN, message = "FORBIDDEN", response = ErrorRespDto.class),
         @ApiResponse(code = HttpStatus.SC_INTERNAL_SERVER_ERROR, message = "INTERNAL ERROR", response = ErrorRespDto.class)
@@ -141,15 +142,36 @@ public class UserController extends BeGenericServlet {
     })
     public ResponseEntity<Object> modifyUser(
         @ApiParam(value = "user id") @PathVariable("userId") @Pattern(regexp = REG_UUID) String userId,
-        @ApiParam(value = "TenantRegisterReqDto", required = true) @RequestBody TenantRespDto request) {
+        @ApiParam(value = "ModifyUserReqDto", required = true) @RequestBody TenantRespDto request) {
         request.setUserId(userId);
         return buildResponse(userMgmtService.modifyUser(request));
     }
 
-    @PutMapping(value = "/{userId}/status/disallow", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/settings/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "modify user settings.", response = Object.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = HttpStatus.SC_OK, message = "modify success"),
+            @ApiResponse(code = HttpStatus.SC_BAD_REQUEST, message = "Bad Request", response = ErrorRespDto.class)
+    })
+    public ResponseEntity<Object> modifyUserSetting(
+            @ApiParam(value = "user id") @PathVariable("userId") @Pattern(regexp = REG_UUID) String userId,
+            @ApiParam(value = "ModifyUserSettingReqDto", required = true) @RequestBody TenantRespDto request) {
+        // login user must be admin
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!Consts.SUPER_ADMIN_NAME.equalsIgnoreCase(authentication.getName())) {
+            FormatRespDto formatRespDto = new FormatRespDto(Response.Status.FORBIDDEN,
+                    "The user has no permission to modify user settings.");
+            return ResponseEntity.status(formatRespDto.getErrStatus().getStatusCode()).body(formatRespDto.getErrorRespDto());
+        }
+
+        request.setUserId(userId);
+        return buildResponse(userMgmtService.modifyUserSetting(request));
+    }
+
+    @PutMapping(value = "/status/{userId}/disallow", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "disallow user.", response = Object.class)
     @ApiResponses(value = {
-            @ApiResponse(code = HttpStatus.SC_OK, message = "operate success", response = TenantRespDto.class),
+            @ApiResponse(code = HttpStatus.SC_OK, message = "operate success"),
             @ApiResponse(code = HttpStatus.SC_INTERNAL_SERVER_ERROR, message = "INTERNAL ERROR", response = ErrorRespDto.class)
     })
     public ResponseEntity<Object> disallowUser(
@@ -158,17 +180,17 @@ public class UserController extends BeGenericServlet {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!Consts.SUPER_ADMIN_NAME.equalsIgnoreCase(authentication.getName())) {
             FormatRespDto formatRespDto = new FormatRespDto(Response.Status.FORBIDDEN,
-                    "The user has no permission to query users.");
+                    "The user has no permission to disallow user.");
             return ResponseEntity.status(formatRespDto.getErrStatus().getStatusCode()).body(formatRespDto.getErrorRespDto());
         }
 
         return buildResponse(userMgmtService.updateUserStatus(userId, false));
     }
 
-    @PutMapping(value = "/{userId}/status/allow", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/status/{userId}/allow", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "allow user.", response = Object.class)
     @ApiResponses(value = {
-            @ApiResponse(code = HttpStatus.SC_OK, message = "operate success", response = TenantRespDto.class),
+            @ApiResponse(code = HttpStatus.SC_OK, message = "operate success"),
             @ApiResponse(code = HttpStatus.SC_INTERNAL_SERVER_ERROR, message = "INTERNAL ERROR", response = ErrorRespDto.class)
     })
     public ResponseEntity<Object> allowUser(
@@ -177,7 +199,7 @@ public class UserController extends BeGenericServlet {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!Consts.SUPER_ADMIN_NAME.equalsIgnoreCase(authentication.getName())) {
             FormatRespDto formatRespDto = new FormatRespDto(Response.Status.FORBIDDEN,
-                    "The user has no permission to query users.");
+                    "The user has no permission to allow user.");
             return ResponseEntity.status(formatRespDto.getErrStatus().getStatusCode()).body(formatRespDto.getErrorRespDto());
         }
 
