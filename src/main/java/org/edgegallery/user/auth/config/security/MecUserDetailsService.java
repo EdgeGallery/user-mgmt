@@ -68,7 +68,7 @@ public class MecUserDetailsService implements UserDetailsService {
 
         if (!tenant.isAllowed()) {
             throw new UsernameNotFoundException(
-                    "User is not allowed to login.");
+                    "User is not allowed to login");
         }
 
         List<RolePo> rolePos = tenantPoMapper.getRolePoByTenantId(tenant.getTenantId());
