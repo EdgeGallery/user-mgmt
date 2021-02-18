@@ -28,4 +28,7 @@ public class UniquenessRespDto {
 
     @ApiModelProperty(required = true, example = "false")
     private boolean telephone;
+
+    @ApiModelProperty(required = true, example = "false")
+    private boolean mailAddress;
 }

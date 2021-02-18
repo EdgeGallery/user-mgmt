@@ -56,6 +56,16 @@ public class TenantTransactionRepository {
     public int updateTenant(TenantRespDto tenantDto) {
         int result = 0;
         result += tenantPoMapper.updateTenantById(tenantDto);
+        return result;
+    }
+
+    /**
+     * update tenant setting data.
+     *
+     * @param tenantDto tenant setting data
+     */
+    public int updateTenantSetting(TenantRespDto tenantDto) {
+        int result = 0;
         List<RoleDto> roles = tenantDto.getPermissions();
         tenantPoMapper.deleteRolesByTenantId(tenantDto.getUserId());
         List<RolePo> rolePos = new ArrayList<>();
@@ -64,6 +74,11 @@ public class TenantTransactionRepository {
         return result;
     }
 
+    /**
+     * delete user.
+     *
+     * @param tenantId Tenant ID
+     */
     public void deleteUser(String tenantId) {
         tenantPoMapper.deleteUser(tenantId);
         tenantPoMapper.deleteRolesByTenantId(tenantId);

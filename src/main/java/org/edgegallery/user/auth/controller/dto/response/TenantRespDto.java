@@ -32,8 +32,6 @@ import org.slf4j.LoggerFactory;
 @Getter
 public class TenantRespDto extends TenantBasicRespDto {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TenantRespDto.class);
-
     @ApiModelProperty(required = true, example = "37423702-051a-46b4-bf2b-f190759cc0b8")
     private String userId;
 
@@ -46,10 +44,10 @@ public class TenantRespDto extends TenantBasicRespDto {
     public void setResponse(TenantPo tenantPo) {
         this.setUserId(tenantPo.getTenantId());
         this.setUsername(tenantPo.getUsername());
-        this.setCompany(tenantPo.getCompany());
-        this.setGender(tenantPo.getGender());
+        this.setMailAddress(tenantPo.getMailAddress());
         this.setTelephone(tenantPo.getTelephoneNumber());
         this.setAllowed(tenantPo.isAllowed());
+        this.setCreateTime(tenantPo.getCreateTime());
     }
 
     /**

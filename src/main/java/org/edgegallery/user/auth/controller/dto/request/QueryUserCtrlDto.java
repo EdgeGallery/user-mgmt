@@ -17,44 +17,49 @@
 package org.edgegallery.user.auth.controller.dto.request;
 
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
-import org.edgegallery.user.auth.config.ServiceConfig;
 import org.edgegallery.user.auth.config.validate.CheckParamsGenericUtils;
 import org.edgegallery.user.auth.config.validate.IStringTrim;
 import org.springframework.util.StringUtils;
 
 @Setter
 @Getter
-public abstract class TenantBasicReqDto extends CheckParamsGenericUtils implements IStringTrim {
+public class QueryUserCtrlDto extends CheckParamsGenericUtils implements IStringTrim {
+    private static final String DEFAULT_SORTBY = "createTime";
 
-    @ApiModelProperty(required = true, example = "TestUser1")
-    @Pattern(regexp = ServiceConfig.PATTERN_USERNAME)
-    private String username;
+    private static final String DEFAULT_SORTORDER = "ASC";
 
-    @ApiModelProperty(required = true, example = "huawei")
-    private String company;
+    @Min(value = -1)
+    private int offset;
 
-    @ApiModelProperty(required = true, example = "male")
-    private String gender;
+    @Min(value = 0)
+    @Max(value = 100)
+    private int limit;
 
-    @ApiModelProperty(example = "15533449966")
-    private String telephone;
+    @ApiModelProperty(example = "userName")
+    @Pattern(regexp = "(?i)userName|(?i)createTime")
+    private String sortBy;
 
-    @ApiModelProperty(example = "test@edgegallery.org")
-    private String mailAddress;
-
-    private boolean isAllowed = true;
+    @ApiModelProperty(example = "ASC")
+    @Pattern(regexp = "(?i)ASC|(?i)DESC")
+    private String sortOrder;
 
     /**
      * check basic data by trim.
      */
     public void stringTrim() {
-        this.username = StringUtils.trimWhitespace(this.username);
-        this.company = StringUtils.trimWhitespace(this.company);
-        this.gender = StringUtils.trimWhitespace(this.gender);
-        this.telephone =  StringUtils.trimWhitespace(this.telephone);
-        this.mailAddress =  StringUtils.trimWhitespace(this.mailAddress);
+        this.sortBy = StringUtils.trimWhitespace(this.sortBy);
+        if (StringUtils.isEmpty(this.sortBy)) {
+            this.sortBy = DEFAULT_SORTBY;
+        }
+
+        this.sortOrder =  StringUtils.trimWhitespace(this.sortOrder);
+        if (StringUtils.isEmpty(this.sortOrder)) {
+            this.sortOrder = DEFAULT_SORTORDER;
+        }
     }
 }

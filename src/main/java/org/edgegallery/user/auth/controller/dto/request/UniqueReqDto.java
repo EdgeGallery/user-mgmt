@@ -34,13 +34,18 @@ public class UniqueReqDto extends CheckParamsGenericUtils implements IStringTrim
     @Pattern(regexp = ServiceConfig.PATTERN_USERNAME)
     private String username;
 
-    @ApiModelProperty(required = true, example = "15191881203")
+    @ApiModelProperty(example = "15191881203")
     @Pattern(regexp = ServiceConfig.PATTERN_TELEPHONE)
     private String telephone;
+
+    @ApiModelProperty(example = "test@edgegallery.org")
+    @Pattern(regexp = ServiceConfig.PATTERN_MAILADDRESS)
+    private String mailAddress;
 
     @Override
     public void stringTrim() {
         this.username = StringUtils.trimWhitespace(username);
         this.telephone = StringUtils.trimWhitespace(telephone);
+        this.mailAddress = StringUtils.trimWhitespace(mailAddress);
     }
 }

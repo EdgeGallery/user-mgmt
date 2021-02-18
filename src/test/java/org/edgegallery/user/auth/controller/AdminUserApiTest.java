@@ -11,7 +11,10 @@ import com.google.gson.reflect.TypeToken;
 import java.util.List;
 import javax.servlet.http.Cookie;
 import org.edgegallery.user.auth.MainServer;
+import org.edgegallery.user.auth.controller.dto.request.QueryUserCtrlDto;
+import org.edgegallery.user.auth.controller.dto.request.QueryUserReqDto;
 import org.edgegallery.user.auth.controller.dto.request.TenantRegisterReqDto;
+import org.edgegallery.user.auth.controller.dto.response.QueryUserRespDto;
 import org.edgegallery.user.auth.controller.dto.response.TenantRespDto;
 import org.edgegallery.user.auth.service.UserMgmtService;
 import org.junit.Before;
@@ -69,15 +72,23 @@ public class AdminUserApiTest {
     @WithMockUser(username = "admin",
         roles = {"APPSTORE_ADMIN", "DEVELOPER_ADMIN", "MECM_ADMIN", "LAB_ADMIN", "ATP_ADMIN"})
     @Test
-    public void should_return_200_when_get_all_users_by_admin() throws Exception {
+    public void should_return_200_when_query_users_by_admin() throws Exception {
+        QueryUserReqDto request = new QueryUserReqDto();
+        request.setStatus(-1);
+        QueryUserCtrlDto queryCtrl = new QueryUserCtrlDto();
+        queryCtrl.setOffset(-1);
+        queryCtrl.setLimit(0);
+        request.setQueryCtrl(queryCtrl);
         MvcResult mvcResult = mvc.perform(
-            MockMvcRequestBuilders.get("/v1/users").contentType(MediaType.APPLICATION_JSON_VALUE)
-                .header("X-XSRF-TOKEN", xsrfToken).accept(MediaType.APPLICATION_JSON_VALUE))
+            MockMvcRequestBuilders.post("/v1/users/list").contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header("X-XSRF-TOKEN", xsrfToken).content(gson.toJson(request)).cookie(cookies)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
         int result = mvcResult.getResponse().getStatus();
         String content = mvcResult.getResponse().getContentAsString();
-        List<TenantRespDto> users = gson.fromJson(content, new TypeToken<List<TenantRespDto>>() { }.getType());
-        assertFalse(users.isEmpty());
+        QueryUserRespDto users = gson.fromJson(content, new TypeToken<QueryUserRespDto>() { }.getType());
+        assertFalse(users.getUserList().isEmpty());
+        assertEquals(users.getTotalCount(), users.getUserList().size());
     }
 
     @WithMockUser(username = "admin",
@@ -142,18 +153,18 @@ public class AdminUserApiTest {
     @Test
     @WithMockUser(username = "guest",
         roles = {"APPSTORE_GUEST", "DEVELOPER_GUEST", "MECM_GUEST", "LAB_GUEST", "ATP_GUEST"})
-    public void should_return_403_when_get_all_users_by_guest() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/v1/users").contentType(MediaType.APPLICATION_JSON_VALUE)
-            .header("X-XSRF-TOKEN", xsrfToken).accept(MediaType.APPLICATION_JSON_VALUE))
+    public void should_return_403_when_query_users_by_guest() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/v1/users/list").contentType(MediaType.APPLICATION_JSON_VALUE)
+            .header("X-XSRF-TOKEN", xsrfToken).cookie(cookies).accept(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 
     @Test
     @WithMockUser(username = "tenant",
         roles = {"APPSTORE_TENANT", "DEVELOPER_TENANT", "MECM_TENANT", "LAB_TENANT", "ATP_TENANT"})
-    public void should_return_403_when_get_all_users_by_tenant() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/v1/users").contentType(MediaType.APPLICATION_JSON_VALUE)
-            .header("X-XSRF-TOKEN", xsrfToken).accept(MediaType.APPLICATION_JSON_VALUE))
+    public void should_return_403_when_query_users_by_tenant() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/v1/users/list").contentType(MediaType.APPLICATION_JSON_VALUE)
+            .header("X-XSRF-TOKEN", xsrfToken).cookie(cookies).accept(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 

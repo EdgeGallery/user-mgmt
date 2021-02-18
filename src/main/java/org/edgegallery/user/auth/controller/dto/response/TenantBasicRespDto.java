@@ -28,24 +28,22 @@ public abstract class TenantBasicRespDto {
     @ApiModelProperty(required = true, example = "TestUser1")
     private String username;
 
-    @ApiModelProperty(required = true, example = "hauwei")
-    private String company;
-
-    @ApiModelProperty(required = true, example = "male")
-    private String gender;
+    @ApiModelProperty(required = true, example = "test@edgegallery.org")
+    private String mailAddress;
 
     @ApiModelProperty(required = true, example = "15533449966")
     private String telephone;
 
     private boolean isAllowed;
 
+    private String createTime;
+
     /**
      * check basic data by trim.
      */
     public void trim() {
         this.username = StringUtils.trimWhitespace(this.username);
-        this.company = StringUtils.trimWhitespace(this.company);
-        this.gender =  StringUtils.trimWhitespace(this.gender);
+        this.mailAddress =  StringUtils.trimWhitespace(this.mailAddress);
         this.telephone = StringUtils.trimWhitespace(this.telephone);
     }
 }

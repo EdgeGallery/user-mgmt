@@ -14,21 +14,19 @@
  *  limitations under the License.
  */
 
-package org.edgegallery.user.auth.config;
+package org.edgegallery.user.auth.controller.dto.response;
 
-public class ServiceConfig {
+import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
-    private ServiceConfig() {
-    }
+@ToString
+@Setter
+@Getter
+public class QueryUserRespDto {
 
-    public static final String PATTERN_VERIFICATION_CODE = "^\\d{6,6}$";
+    private int totalCount;
 
-    public static final String PATTERN_USERNAME = "^[a-zA-Z][a-zA-Z0-9_]{5,29}$";
-
-    public static final String PATTERN_PASSWORD =
-        "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[~!@#$%^&*()_+\\-={}:\";<>?,./]).{6,18}$";
-
-    public static final String PATTERN_TELEPHONE = "^1[34578]\\d{9}$";
-
-    public static final String PATTERN_MAILADDRESS = "^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+$";
+    private List<TenantRespDto> userList;
 }
