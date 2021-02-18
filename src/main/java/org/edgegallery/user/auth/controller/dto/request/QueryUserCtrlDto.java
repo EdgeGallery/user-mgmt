@@ -57,7 +57,7 @@ public class QueryUserCtrlDto extends CheckParamsGenericUtils implements IString
             this.sortBy = DEFAULT_SORTBY;
         }
 
-        this.sortOrder =  StringUtils.trimWhitespace(this.sortOrder);
+        this.sortOrder = StringUtils.trimWhitespace(this.sortOrder);
         if (StringUtils.isEmpty(this.sortOrder)) {
             this.sortOrder = DEFAULT_SORTORDER;
         }
