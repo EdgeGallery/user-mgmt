@@ -127,6 +127,12 @@
             <if test="role != null and role != 'ALL'">
                 and tenantid in (select distinct tenantid from tbl_tenant_role left join tbl_role on tbl_tenant_role.roleid = tbl_role.id where role=#{role})
             </if>
+            <if test="createTimeBegin != null and createTimeBegin != ''">
+                <![CDATA[ and createtime >= to_timestamp(#{createTimeBegin}, 'YYYY-MM-DD') ]]>
+            </if>
+            <if test="createTimeEnd != null and createTimeEnd != ''">
+                <![CDATA[ and createtime <= to_timestamp(#{createTimeEnd}, 'YYYY-MM-DD') ]]>
+            </if>
         </where>
     </select>
 
@@ -137,7 +143,7 @@
         a.telephonenumber,
         a.mailaddress,
         a.isallowed,
-        a.createtime,
+        to_char(a.createtime, 'YYYY-MM-DD HH24:MI:SS') as createtime,
         b.platform as permissions_platform,
         b.role as permissions_role
         from (
@@ -158,6 +164,12 @@
             </if>
             <if test="role != null and role != 'ALL'">
                 and tenantid in (select distinct tenantid from tbl_tenant_role left join tbl_role on tbl_tenant_role.roleid = tbl_role.id where role=#{role})
+            </if>
+            <if test="createTimeBegin != null and createTimeBegin != ''">
+                <![CDATA[ and createtime >= to_timestamp(#{createTimeBegin}, 'YYYY-MM-DD') ]]>
+            </if>
+            <if test="createTimeEnd != null and createTimeEnd != ''">
+                <![CDATA[ and createtime <= to_timestamp(#{createTimeEnd}, 'YYYY-MM-DD') ]]>
             </if>
         </where>
         <if test="queryCtrl != null">

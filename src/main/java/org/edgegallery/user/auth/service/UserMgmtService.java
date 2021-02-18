@@ -73,15 +73,18 @@ public class UserMgmtService {
     @ParameterValidate
     public Either<TenantRespDto, FormatRespDto> register(TenantRegisterReqDto reqParam) {
         LOGGER.info("Begin register user");
-        if (!StringUtils.isEmpty(reqParam.getTelephone()) && mapper.getTenantByTelephone(reqParam.getTelephone()) != null) {
+        if (!StringUtils.isEmpty(reqParam.getTelephone())
+            && mapper.getTenantByTelephone(reqParam.getTelephone()) != null) {
             return Either.right(new FormatRespDto(Status.FORBIDDEN, "Telephone has existed"));
         }
 
-        if (!StringUtils.isEmpty(reqParam.getMailAddress()) && mapper.getTenantByMailAddress(reqParam.getMailAddress()) != null) {
+        if (!StringUtils.isEmpty(reqParam.getMailAddress())
+            && mapper.getTenantByMailAddress(reqParam.getMailAddress()) != null) {
             return Either.right(new FormatRespDto(Status.FORBIDDEN, "MailAddress has existed"));
         }
 
-        if (!StringUtils.isEmpty(reqParam.getUsername()) && mapper.getTenantByUsername(reqParam.getUsername()) != null) {
+        if (!StringUtils.isEmpty(reqParam.getUsername())
+            && mapper.getTenantByUsername(reqParam.getUsername()) != null) {
             return Either.right(new FormatRespDto(Status.FORBIDDEN, "Username has existed"));
         }
 
@@ -248,7 +251,7 @@ public class UserMgmtService {
     }
 
     /**
-     * update user status
+     * update user status.
      *
      * @param tenantId user id
      * @param allowFlag allow flag

@@ -60,7 +60,7 @@ public class TenantTransactionRepository {
     }
 
     /**
-     * update tenant setting data
+     * update tenant setting data.
      *
      * @param tenantDto tenant setting data
      */
@@ -74,6 +74,11 @@ public class TenantTransactionRepository {
         return result;
     }
 
+    /**
+     * delete user.
+     *
+     * @param tenantId Tenant ID
+     */
     public void deleteUser(String tenantId) {
         tenantPoMapper.deleteUser(tenantId);
         tenantPoMapper.deleteRolesByTenantId(tenantId);

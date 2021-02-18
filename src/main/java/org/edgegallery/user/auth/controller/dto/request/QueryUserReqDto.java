@@ -23,11 +23,19 @@ import lombok.Setter;
 import org.edgegallery.user.auth.config.validate.CheckParamsGenericUtils;
 import org.edgegallery.user.auth.config.validate.IStringTrim;
 import org.edgegallery.user.auth.controller.dto.response.FormatRespDto;
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.core.Response;
+
+import org.edgegallery.user.auth.utils.Consts;
 import org.springframework.util.StringUtils;
 
-import javax.validation.Valid;
-import javax.validation.constraints.*;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeParseException;
 
 @Setter
 @Getter
@@ -62,11 +70,40 @@ public class QueryUserReqDto extends CheckParamsGenericUtils implements IStringT
         this.mailAddress =  StringUtils.trimWhitespace(this.mailAddress);
         this.telephone =  StringUtils.trimWhitespace(this.telephone);
         this.role =  StringUtils.trimWhitespace(this.role);
+        this.createTimeBegin =  StringUtils.trimWhitespace(this.createTimeBegin);
+        this.createTimeEnd =  StringUtils.trimWhitespace(this.createTimeEnd);
         this.queryCtrl.stringTrim();
     }
 
     @Override
     protected Either<Boolean, FormatRespDto> checkDataFormat() {
+        LocalDate beginDate = null;
+        if (!StringUtils.isEmpty(createTimeBegin)) {
+            try {
+                beginDate = LocalDate.parse(createTimeBegin, Consts.DATE_TIME_FORMATTER);
+            } catch (DateTimeParseException dtpe) {
+                return Either.right(new FormatRespDto(Response.Status.BAD_REQUEST, "begin time is invalid."));
+            }
+        }
+
+        LocalDate endDate = null;
+        if (!StringUtils.isEmpty(createTimeEnd)) {
+            try {
+                endDate = LocalDate.parse(createTimeEnd, Consts.DATE_TIME_FORMATTER);
+            } catch (DateTimeParseException dtpe) {
+                return Either.right(new FormatRespDto(Response.Status.BAD_REQUEST, "end time is invalid."));
+            }
+        }
+
+        if (beginDate != null && endDate != null && beginDate.isAfter(endDate)) {
+            return Either.right(new FormatRespDto(Response.Status.BAD_REQUEST, "begin time is after end time."));
+        }
+
+        if (endDate != null) {
+            endDate = endDate.plus(Period.ofDays(1));
+            this.createTimeEnd = endDate.format(Consts.DATE_TIME_FORMATTER);
+        }
+
         return Either.left(true);
     }
 }
