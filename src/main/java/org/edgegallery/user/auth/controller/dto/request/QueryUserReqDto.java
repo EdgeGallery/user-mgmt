@@ -16,26 +16,24 @@
 
 package org.edgegallery.user.auth.controller.dto.request;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeParseException;
 import fj.data.Either;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
-import org.edgegallery.user.auth.config.validate.CheckParamsGenericUtils;
-import org.edgegallery.user.auth.config.validate.IStringTrim;
-import org.edgegallery.user.auth.controller.dto.response.FormatRespDto;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.Response;
-
+import org.edgegallery.user.auth.config.validate.CheckParamsGenericUtils;
+import org.edgegallery.user.auth.config.validate.IStringTrim;
+import org.edgegallery.user.auth.controller.dto.response.FormatRespDto;
 import org.edgegallery.user.auth.utils.Consts;
 import org.springframework.util.StringUtils;
-
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.format.DateTimeParseException;
 
 @Setter
 @Getter

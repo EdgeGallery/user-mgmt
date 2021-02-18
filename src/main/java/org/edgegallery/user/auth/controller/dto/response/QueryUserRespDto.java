@@ -16,10 +16,10 @@
 
 package org.edgegallery.user.auth.controller.dto.response;
 
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import java.util.List;
 
 @ToString
 @Setter

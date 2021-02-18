@@ -19,11 +19,11 @@ package org.edgegallery.user.auth.controller.dto.request;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
-import org.edgegallery.user.auth.config.validate.CheckParamsGenericUtils;
-import org.edgegallery.user.auth.config.validate.IStringTrim;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
+import org.edgegallery.user.auth.config.validate.CheckParamsGenericUtils;
+import org.edgegallery.user.auth.config.validate.IStringTrim;
 import org.springframework.util.StringUtils;
 
 @Setter
