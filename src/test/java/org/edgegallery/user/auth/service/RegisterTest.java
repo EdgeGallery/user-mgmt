@@ -53,7 +53,7 @@ public class RegisterTest {
         request.setGender("male");
         new MockUp<UserMgmtService>() {
             @Mock
-            private boolean verifySmsCode(String verificationCode, String telephone) {
+            private boolean verifyCode(String verificationCode, String keyOfVerifyCode) {
                 return true;
             }
         };
@@ -169,7 +169,7 @@ public class RegisterTest {
 
         new MockUp<UserMgmtService>() {
             @Mock
-            private boolean verifySmsCode(String verificationCode, String telephone) {
+            private boolean verifyCode(String verificationCode, String keyOfVerifyCode) {
                 return false;
             }
         };

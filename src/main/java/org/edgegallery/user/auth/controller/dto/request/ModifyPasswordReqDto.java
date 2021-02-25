@@ -19,6 +19,8 @@ package org.edgegallery.user.auth.controller.dto.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.SerializedName;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,13 +31,12 @@ import org.springframework.util.StringUtils;
 
 @Getter
 @Setter
-public class RetrievePasswordReqDto extends CheckParamsGenericUtils implements IStringTrim {
-
-    @SerializedName("telephone")
-    @JsonProperty("telephone")
-    @ApiModelProperty(required = true, example = "15191881309")
-    @Pattern(regexp = ServiceConfig.PATTERN_TELEPHONE)
-    private String telephone;
+public class ModifyPasswordReqDto extends CheckParamsGenericUtils implements IStringTrim {
+    @SerializedName("type")
+    @JsonProperty("type")
+    @Min(value = 1)
+    @Max(value = 2)
+    private int type = 2;
 
     @SerializedName("newPassword")
     @JsonProperty("newPassword")
@@ -43,19 +44,53 @@ public class RetrievePasswordReqDto extends CheckParamsGenericUtils implements I
     @Pattern(regexp = ServiceConfig.PATTERN_PASSWORD)
     private String newPassword;
 
+    @SerializedName("userId")
+    @JsonProperty("userId")
+    private String userId;
+
+    @SerializedName("oldPassword")
+    @JsonProperty("oldPassword")
+    @ApiModelProperty(example = "TestOldPassword#321")
+    private String oldPassword;
+
+    @SerializedName("telephone")
+    @JsonProperty("telephone")
+    @ApiModelProperty(example = "15191881309")
+    @Pattern(regexp = ServiceConfig.PATTERN_TELEPHONE)
+    private String telephone;
+
+    @SerializedName("mailAddress")
+    @JsonProperty("mailAddress")
+    @ApiModelProperty(example = "test@edgegallery.org")
+    @Pattern(regexp = ServiceConfig.PATTERN_MAILADDRESS)
+    private String mailAddress;
+
     @SerializedName("verificationCode")
     @JsonProperty("verificationCode")
     @ApiModelProperty(required = true, example = "123456")
     @Pattern(regexp = ServiceConfig.PATTERN_VERIFICATION_CODE)
     private String verificationCode;
 
-
     /**
      * check basic data by trim.
      */
     public void stringTrim() {
-        this.telephone = StringUtils.trimWhitespace(this.telephone);
         this.newPassword = StringUtils.trimWhitespace(this.newPassword);
+
+        this.userId = StringUtils.trimWhitespace(this.userId);
+        this.oldPassword = StringUtils.trimWhitespace(this.oldPassword);
+
+        this.telephone = StringUtils.trimWhitespace(this.telephone);
+        this.mailAddress = StringUtils.trimWhitespace(this.mailAddress);
         this.verificationCode = StringUtils.trimWhitespace(this.verificationCode);
+    }
+
+    /**
+     * judge if the request is retrieve password type
+     *
+     * @return true if the request is retrieve password type, otherwise false
+     */
+    public boolean isRetrieveType() {
+        return this.type == 2;
     }
 }

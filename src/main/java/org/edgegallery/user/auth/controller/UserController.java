@@ -27,7 +27,7 @@ import org.apache.servicecomb.provider.rest.common.RestSchema;
 import org.edgegallery.user.auth.config.DescriptionConfig;
 import org.edgegallery.user.auth.controller.base.BeGenericServlet;
 import org.edgegallery.user.auth.controller.dto.request.QueryUserReqDto;
-import org.edgegallery.user.auth.controller.dto.request.RetrievePasswordReqDto;
+import org.edgegallery.user.auth.controller.dto.request.ModifyPasswordReqDto;
 import org.edgegallery.user.auth.controller.dto.request.TenantRegisterReqDto;
 import org.edgegallery.user.auth.controller.dto.request.UniqueReqDto;
 import org.edgegallery.user.auth.controller.dto.response.ErrorRespDto;
@@ -74,16 +74,16 @@ public class UserController extends BeGenericServlet {
     }
 
     @PutMapping(value = "/password", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "forget password", response = Object.class, notes = DescriptionConfig.RETRIEVE_PASSWORD_MSG)
+    @ApiOperation(value = "modify password", response = Object.class, notes = DescriptionConfig.MODIFY_PASSWORD_MSG)
     @ApiResponses(value = {
         @ApiResponse(code = HttpStatus.SC_BAD_REQUEST, message = "Bad Request", response = ErrorRespDto.class),
         @ApiResponse(code = HttpStatus.SC_FORBIDDEN, message = "Forbidden", response = ErrorRespDto.class),
         @ApiResponse(code = HttpStatus.SC_INTERNAL_SERVER_ERROR, message = "INTERNAL ERROR",
             response = ErrorRespDto.class)
     })
-    public ResponseEntity<Object> retrievePassword(
-        @ApiParam(value = "RetrievePasswordReqDto", required = true) @RequestBody RetrievePasswordReqDto request) {
-        return buildResponse(userMgmtService.retrievePassword(request));
+    public ResponseEntity<Object> modifyPassword(
+        @ApiParam(value = "RetrievePasswordReqDto", required = true) @RequestBody ModifyPasswordReqDto request) {
+        return buildResponse(userMgmtService.modifyPassword(request));
     }
 
     @PostMapping(value = "/action/uniqueness", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -61,14 +61,9 @@ public class MecUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String uniqueUserFlag) throws UsernameNotFoundException {
         TenantPo tenant = tenantPoMapper.getTenantByUniqueFlag(uniqueUserFlag);
-        if (tenant == null) {
+        if (tenant == null || !tenant.isAllowed()) {
             throw new UsernameNotFoundException(
                     "User not found: " + uniqueUserFlag);
-        }
-
-        if (!tenant.isAllowed()) {
-            throw new UsernameNotFoundException(
-                    "User is not allowed to login");
         }
 
         List<RolePo> rolePos = tenantPoMapper.getRolePoByTenantId(tenant.getTenantId());

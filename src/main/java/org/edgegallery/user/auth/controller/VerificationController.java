@@ -24,6 +24,7 @@ import org.apache.http.HttpStatus;
 import org.apache.servicecomb.provider.rest.common.RestSchema;
 import org.edgegallery.user.auth.config.DescriptionConfig;
 import org.edgegallery.user.auth.controller.base.BeGenericServlet;
+import org.edgegallery.user.auth.controller.dto.request.VerificationReqByMailDto;
 import org.edgegallery.user.auth.controller.dto.request.VerificationReqDto;
 import org.edgegallery.user.auth.controller.dto.response.ErrorRespDto;
 import org.edgegallery.user.auth.service.IdentityService;
@@ -44,13 +45,24 @@ public class VerificationController extends BeGenericServlet {
     private IdentityService identityService;
 
     @PostMapping(value = "/sms", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "verification", response = Object.class, notes =
-            DescriptionConfig.VERIFICATION_MSG)
+    @ApiOperation(value = "send verification code by sms", response = Object.class, notes =
+            DescriptionConfig.VERIFICATION_SMS_MSG)
     @ApiResponses(value = {
             @ApiResponse(code = HttpStatus.SC_EXPECTATION_FAILED, message = "Expectation Failed",
                 response = ErrorRespDto.class)})
-    public ResponseEntity<Object> verification(
+    public ResponseEntity<Object> sendVerificationCodeBySms(
             @ApiParam(value = "verificationRequest", required = true) @RequestBody VerificationReqDto request) {
-        return buildCreatedResponse(identityService.verifyTelParam(request));
+        return buildCreatedResponse(identityService.sendVerificationCodeBySms(request));
+    }
+
+    @PostMapping(value = "/mail", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "send verification code by mail", response = Object.class, notes =
+        DescriptionConfig.VERIFICATION_MAIL_MSG)
+    @ApiResponses(value = {
+        @ApiResponse(code = HttpStatus.SC_EXPECTATION_FAILED, message = "Expectation Failed",
+            response = ErrorRespDto.class)})
+    public ResponseEntity<Object> sendVerificationCodeByMail(
+        @ApiParam(value = "verificationRequest", required = true) @RequestBody VerificationReqByMailDto request) {
+        return buildCreatedResponse(identityService.sendVerificationCodeByMail(request));
     }
 }

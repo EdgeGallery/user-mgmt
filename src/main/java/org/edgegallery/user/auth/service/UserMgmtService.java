@@ -18,7 +18,6 @@ package org.edgegallery.user.auth.service;
 
 import fj.data.Either;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import javax.ws.rs.core.Response.Status;
@@ -26,7 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.edgegallery.user.auth.config.SmsConfig;
 import org.edgegallery.user.auth.config.validate.annotation.ParameterValidate;
 import org.edgegallery.user.auth.controller.dto.request.QueryUserReqDto;
-import org.edgegallery.user.auth.controller.dto.request.RetrievePasswordReqDto;
+import org.edgegallery.user.auth.controller.dto.request.ModifyPasswordReqDto;
 import org.edgegallery.user.auth.controller.dto.request.TenantRegisterReqDto;
 import org.edgegallery.user.auth.controller.dto.request.UniqueReqDto;
 import org.edgegallery.user.auth.controller.dto.response.FormatRespDto;
@@ -44,6 +43,7 @@ import org.edgegallery.user.auth.utils.redis.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -63,6 +63,9 @@ public class UserMgmtService {
 
     @Autowired
     private SmsConfig smsConfig;
+
+    @Value("${mail.enabled}")
+    private String mailEnabled;
 
     /**
      * register user info by telephone, verification code and so on.
@@ -136,50 +139,51 @@ public class UserMgmtService {
      * whether the verification code is correct.
      *
      * @param verificationCode verificationCode
-     * @param telephone telephone
+     * @param keyOfVerifyCode key of verify code
      * @return
      */
-    private boolean verifySmsCode(String verificationCode, String telephone) {
-        if (!Boolean.parseBoolean(smsConfig.getEnabled())) {
-            LOGGER.info("Sms is not enabled,no need to verify sms code");
-            return true;
-        }
+    private boolean verifyCode(String verificationCode, String keyOfVerifyCode) {
         if (StringUtils.isEmpty(verificationCode) || !verificationCode
-            .equals(RedisUtil.get(RedisUtil.RedisKeyType.verificationCode, telephone))) {
+            .equals(RedisUtil.get(RedisUtil.RedisKeyType.verificationCode, keyOfVerifyCode))) {
             return false;
         }
-        RedisUtil.delete(RedisUtil.RedisKeyType.verificationCode, telephone);
+        RedisUtil.delete(RedisUtil.RedisKeyType.verificationCode, keyOfVerifyCode);
         return true;
     }
 
     /**
-     * forget and modify pw by telephone and verification code.
+     * modify password.
      *
-     * @param retireveRequest retireveRequest
-     * @return
+     * @param modifyRequest modify request dto
+     * @return modify result
      */
     @ParameterValidate
-    public Either<Boolean, FormatRespDto> retrievePassword(RetrievePasswordReqDto retireveRequest) {
-        LOGGER.info("Begin retrieve password");
-        String telephone = retireveRequest.getTelephone();
-        String verificationCode = retireveRequest.getVerificationCode();
-        //username is not exit
-        TenantPo tenantPo = mapper.getTenantByTelephone(telephone);
-
+    public Either<Boolean, FormatRespDto> modifyPassword(ModifyPasswordReqDto modifyRequest) {
+        LOGGER.info("Begin modify password");
+        //User not exit
+        TenantPo tenantPo = findTenantToModifyPw(modifyRequest);
         if (tenantPo == null) {
-            LOGGER.error("Telephone not exist");
-            return Either.right(new FormatRespDto(Status.FORBIDDEN, "Telephone not exist"));
+            LOGGER.error("User not exist");
+            return Either.right(new FormatRespDto(Status.FORBIDDEN, "User not exist"));
         }
 
-        if (!verifySmsCode(verificationCode, telephone)) {
-            LOGGER.error("verification code is error ");
-            return Either.right(new FormatRespDto(Status.FORBIDDEN, "Verification code is error"));
+        //check verify code
+        if (modifyRequest.isRetrieveType()) {
+            LOGGER.info("check verification code");
+            String keyOfVerifyCode = StringUtils.isEmpty(modifyRequest.getTelephone())
+                ? modifyRequest.getMailAddress()
+                : modifyRequest.getTelephone();
+            String verificationCode = modifyRequest.getVerificationCode();
+            if (!verifyCode(verificationCode, keyOfVerifyCode)) {
+                LOGGER.error("verification code is error ");
+                return Either.right(new FormatRespDto(Status.FORBIDDEN, "Verification code is error"));
+            }
         }
 
         int result = 0;
         try {
             result += mapper
-                .modifyPassword(tenantPo.getTenantId(), passwordEncoder.encode(retireveRequest.getNewPassword()));
+                .modifyPassword(tenantPo.getTenantId(), passwordEncoder.encode(modifyRequest.getNewPassword()));
         } catch (Exception e) {
             LOGGER.error("Database Operate Exception: {}", e.getMessage());
             return Either.right(new FormatRespDto(Status.INTERNAL_SERVER_ERROR, "Database Exception."));
@@ -191,6 +195,16 @@ public class UserMgmtService {
         } else {
             LOGGER.error("Modify password failed");
             return Either.right(new FormatRespDto(Status.BAD_REQUEST, "Modify password fail"));
+        }
+    }
+
+    private TenantPo findTenantToModifyPw(ModifyPasswordReqDto modifyRequest) {
+        if (!modifyRequest.isRetrieveType()) {
+            return mapper.getTenantBasicPoData(modifyRequest.getUserId());
+        } else {
+            return StringUtils.isEmpty(modifyRequest.getTelephone())
+                ? mapper.getTenantByMailAddress(modifyRequest.getMailAddress())
+                : mapper.getTenantByTelephone(modifyRequest.getTelephone());
         }
     }
 
