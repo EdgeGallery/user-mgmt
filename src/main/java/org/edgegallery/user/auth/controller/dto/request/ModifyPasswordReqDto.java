@@ -56,19 +56,19 @@ public class ModifyPasswordReqDto extends CheckParamsGenericUtils implements ISt
     @SerializedName("telephone")
     @JsonProperty("telephone")
     @ApiModelProperty(example = "15191881309")
-    @Pattern(regexp = ServiceConfig.PATTERN_TELEPHONE)
+    @Pattern(regexp = "|" + ServiceConfig.PATTERN_TELEPHONE)
     private String telephone;
 
     @SerializedName("mailAddress")
     @JsonProperty("mailAddress")
     @ApiModelProperty(example = "test@edgegallery.org")
-    @Pattern(regexp = ServiceConfig.PATTERN_MAILADDRESS)
+    @Pattern(regexp = "|" + ServiceConfig.PATTERN_MAILADDRESS)
     private String mailAddress;
 
     @SerializedName("verificationCode")
     @JsonProperty("verificationCode")
     @ApiModelProperty(required = true, example = "123456")
-    @Pattern(regexp = ServiceConfig.PATTERN_VERIFICATION_CODE)
+    @Pattern(regexp = "|" + ServiceConfig.PATTERN_VERIFICATION_CODE)
     private String verificationCode;
 
     /**

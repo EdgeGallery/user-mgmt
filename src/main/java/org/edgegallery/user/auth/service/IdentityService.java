@@ -19,6 +19,7 @@ package org.edgegallery.user.auth.service;
 import fj.data.Either;
 import java.security.SecureRandom;
 import javax.ws.rs.core.Response;
+import org.edgegallery.user.auth.config.RedisConfig;
 import org.edgegallery.user.auth.config.SmsConfig;
 import org.edgegallery.user.auth.config.validate.annotation.ParameterValidate;
 import org.edgegallery.user.auth.controller.dto.request.VerificationReqByMailDto;
@@ -35,6 +36,11 @@ import org.springframework.stereotype.Service;
 public class IdentityService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IdentityService.class);
+
+    private static final String MAIL_SUBJECT_VERIFYCODE = "[EdgeGallery] Please receive your verification code";
+
+    private static final String MAIL_CONTENT_VERIFYCODE = "Hello!\r\n"
+        + "The edgegallery platform is verifing your email, the verification code is: %s.";
 
     @Autowired
     private HwCloudVerification verification;
@@ -100,8 +106,8 @@ public class IdentityService {
         }
         String mailAddress = verifyRequest.getMailAddress();
         String verificationCode = randomCode();
-        String subject = "Test";
-        String content = verificationCode;
+        String subject = MAIL_SUBJECT_VERIFYCODE;
+        String content = String.format(MAIL_CONTENT_VERIFYCODE, verificationCode);
         if (!mailService.sendSimpleMail(mailAddress, subject, content)) {
             LOGGER.error("send verification code by mail fail");
             return Either.right(new FormatRespDto(Response.Status.EXPECTATION_FAILED,
