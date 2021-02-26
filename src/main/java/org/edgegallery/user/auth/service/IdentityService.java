@@ -39,7 +39,7 @@ public class IdentityService {
 
     private static final String MAIL_SUBJECT_VERIFYCODE = "[EdgeGallery] Please receive your verification code";
 
-    private static final String MAIL_CONTENT_VERIFYCODE = "Hello!\r\n"
+    private static final String MAIL_CONTENT_VERIFYCODE = "Hello!%n"
         + "The edgegallery platform is verifing your email, the verification code is: %s.";
 
     @Autowired
