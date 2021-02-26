@@ -86,7 +86,7 @@ public class ModifyPasswordReqDto extends CheckParamsGenericUtils implements ISt
     }
 
     /**
-     * judge if the request is retrieve password type
+     * judge if the request is retrieve password type.
      *
      * @return true if the request is retrieve password type, otherwise false
      */

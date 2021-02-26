@@ -69,7 +69,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/js/**", "/favicon.ico",
                 "/index.html", "/user-privacy.md", "/user-agreement.md")
             .permitAll()
-            .antMatchers(HttpMethod.POST, "/v1/users", "/v1/users/action/uniqueness", "/v1/identity/sms", "/v1/identity/mail")
+            .antMatchers(HttpMethod.POST, "/v1/users", "/v1/users/action/uniqueness", "/v1/identity/sms",
+                "/v1/identity/mail")
             .permitAll()
             .antMatchers(HttpMethod.PUT, "/v1/users/password")
             .permitAll()
