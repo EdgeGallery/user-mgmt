@@ -31,7 +31,7 @@ public class OAuthUnauthorizedEntryPoint extends LoginUrlAuthenticationEntryPoin
     /**
      * constructor.
      *
-     * @param loginFormUrl login url
+     * @param loginFormUrl login form url
      * @param enableSmsStr enable sms flag
      * @param enableMailStr enable mail flag
      */
