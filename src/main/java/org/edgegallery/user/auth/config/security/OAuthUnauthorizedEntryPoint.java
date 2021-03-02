@@ -28,6 +28,13 @@ public class OAuthUnauthorizedEntryPoint extends LoginUrlAuthenticationEntryPoin
 
     private String enableMailStr;
 
+    /**
+     * constructor.
+     *
+     * @param loginFormUrl login url
+     * @param enableSmsStr enable sms flag
+     * @param enableMailStr enable mail flag
+     */
     public OAuthUnauthorizedEntryPoint(String loginFormUrl, String enableSmsStr, String enableMailStr) {
         super(loginFormUrl);
         this.enableSmsStr = enableSmsStr;
