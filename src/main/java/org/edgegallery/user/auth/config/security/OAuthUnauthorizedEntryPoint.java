@@ -26,9 +26,12 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 public class OAuthUnauthorizedEntryPoint extends LoginUrlAuthenticationEntryPoint {
     private String enableSmsStr;
 
-    public OAuthUnauthorizedEntryPoint(String loginFormUrl, String enableSmsStr) {
+    private String enableMailStr;
+
+    public OAuthUnauthorizedEntryPoint(String loginFormUrl, String enableSmsStr, String enableMailStr) {
         super(loginFormUrl);
         this.enableSmsStr = enableSmsStr;
+        this.enableMailStr = enableMailStr;
     }
 
     @Override
@@ -42,6 +45,7 @@ public class OAuthUnauthorizedEntryPoint extends LoginUrlAuthenticationEntryPoin
                     String returnToUrl = param.replace("redirect_uri=", "").replace("/login", "");
                     request.getSession().setAttribute("return_to", returnToUrl);
                     request.getSession().setAttribute("enableSms", enableSmsStr);
+                    request.getSession().setAttribute("enableMail", enableMailStr);
                     break;
                 }
             }

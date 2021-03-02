@@ -23,6 +23,7 @@ import org.edgegallery.user.auth.config.SmsConfig;
 import org.edgegallery.user.auth.db.entity.TenantPo;
 import org.edgegallery.user.auth.db.mapper.TenantPoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -37,6 +38,8 @@ public class AuthServerTokenEnhancer implements TokenEnhancer {
     private HttpServletRequest request;
     @Autowired
     private SmsConfig smsConfig;
+    @Value("${mail.enabled}")
+    private String mailEnabled;
 
     @Override
     public OAuth2AccessToken enhance(OAuth2AccessToken oauth2AccessToken,
@@ -50,6 +53,7 @@ public class AuthServerTokenEnhancer implements TokenEnhancer {
         Map<String, Object> additionalMap = new HashMap<>();
         additionalMap.put("userId", tenant.getTenantId());
         additionalMap.put("enableSms", smsConfig.getEnabled());
+        additionalMap.put("enableMail", mailEnabled);
         additionalMap.put("ssoSessionId", request.getServletContext().getAttribute(code));
         additionalMap.put("userName", tenant.getUsername());
         ((DefaultOAuth2AccessToken) oauth2AccessToken).setAdditionalInformation(additionalMap);

@@ -27,9 +27,11 @@ public class OAuthRedirectStrategy extends DefaultRedirectStrategy {
         String redirectUrl = calculateRedirectUrl(request.getContextPath(), url);
         Object returnToAttr = request.getSession().getAttribute("return_to");
         Object enableSms = request.getSession().getAttribute("enableSms");
-        if (returnToAttr != null && enableSms != null) {
+        Object enableMail = request.getSession().getAttribute("enableMail");
+        if (returnToAttr != null && enableSms != null && enableMail != null) {
             redirectUrl += "?return_to=" + returnToAttr.toString();
             redirectUrl += "&enable_sms=" + enableSms.toString();
+            redirectUrl += "&enable_mail=" + enableMail.toString();
         }
         response.sendRedirect(redirectUrl);
     }
