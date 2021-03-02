@@ -61,7 +61,7 @@ public class VerficationApiTest {
         request.setTelephone("15194251243");
 
         Either<Boolean, FormatRespDto> response = Either.left(true);
-        Mockito.when(identityService.verifyTelParam(Mockito.any(VerificationReqDto.class))).thenReturn(response);
+        Mockito.when(identityService.sendVerificationCodeBySms(Mockito.any(VerificationReqDto.class))).thenReturn(response);
 
         mvc.perform(MockMvcRequestBuilders.post("/v1/identity/sms").contentType(MediaType.APPLICATION_JSON_VALUE)
             .content(gson.toJson(request)).accept(MediaType.APPLICATION_JSON_VALUE))
@@ -75,7 +75,7 @@ public class VerficationApiTest {
 
         Either<Boolean, FormatRespDto> response = Either
             .right(new FormatRespDto(Response.Status.BAD_REQUEST, "Can not send verification code."));
-        Mockito.when(identityService.verifyTelParam(Mockito.any(VerificationReqDto.class))).thenReturn(response);
+        Mockito.when(identityService.sendVerificationCodeBySms(Mockito.any(VerificationReqDto.class))).thenReturn(response);
 
         mvc.perform(MockMvcRequestBuilders.post("/v1/identity/sms").contentType(MediaType.APPLICATION_JSON_VALUE)
             .content(gson.toJson(request)).accept(MediaType.APPLICATION_JSON_VALUE))

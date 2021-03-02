@@ -26,14 +26,20 @@ public class DescriptionConfig {
         + "status 403. If database connection has exception, it will return status 500. If register failed, it "
         + "will return status 400.";
 
-    public static final String RETRIEVE_PASSWORD_MSG = "The API can receive the retrieve password request. If retrieve "
-        + "success, it will return status 200. If telephone do not exist or the verification code is error, it "
-        + "will return status 403. If database connection has exception, it will return status 500. If retrieve "
+    public static final String MODIFY_PASSWORD_MSG = "The API can receive the modify password request. If modify "
+        + "success, it will return status 200. If the user do not exist or the verification code is error, it "
+        + "will return status 403. If database connection has exception, it will return status 500. If modify "
         + "failed, it will return status 400.";
 
-    public static final String VERIFICATION_MSG = "The API can receive the send verification code request. If send "
-        + "verification code success, it will return status 200. If send verification code error, it will return "
-        + "status 417.";
+    public static final String VERIFICATION_SMS_MSG =
+        "The API can receive the send verification code by sms request. If send "
+            + "verification code success, it will return status 200. If send verification code error, it will return "
+            + "status 417.";
+
+    public static final String VERIFICATION_MAIL_MSG =
+        "The API can receive the send verification code by mail request. If send "
+            + "verification code success, it will return status 200. If send verification code error, it will return "
+            + "status 417.";
 
     public static final String UNIQUENESS_MSG = "The API can receive the unique verify request for mailAddress or "
         + "telephone or username. If the request param is unique, it will return status 200, "

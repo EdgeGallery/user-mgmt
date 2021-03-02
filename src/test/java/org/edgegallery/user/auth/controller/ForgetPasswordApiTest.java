@@ -20,7 +20,7 @@ import fj.data.Either;
 import javax.ws.rs.core.Response;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.edgegallery.user.auth.controller.dto.request.RetrievePasswordReqDto;
+import org.edgegallery.user.auth.controller.dto.request.ModifyPasswordReqDto;
 import org.edgegallery.user.auth.controller.dto.response.FormatRespDto;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -33,13 +33,13 @@ public class ForgetPasswordApiTest extends UserControllerTest {
 
     @Test
     public void should_successfully_when_retrieve_pw_right() throws Exception {
-        RetrievePasswordReqDto request = new RetrievePasswordReqDto();
+        ModifyPasswordReqDto request = new ModifyPasswordReqDto();
         request.setVerificationCode("123456");
         request.setNewPassword("pw12#$W");
         request.setTelephone("18012345678");
 
         Either<Boolean, FormatRespDto> response = Either.left(true);
-        Mockito.when(userMgmtService.retrievePassword(Mockito.any(RetrievePasswordReqDto.class))).thenReturn(response);
+        Mockito.when(userMgmtService.modifyPassword(Mockito.any(ModifyPasswordReqDto.class))).thenReturn(response);
 
         mvc.perform(MockMvcRequestBuilders.put("/v1/users/password").contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(gson.toJson(request)).accept(MediaType.APPLICATION_JSON_VALUE)).andExpect(MockMvcResultMatchers.status().isOk());
@@ -47,13 +47,13 @@ public class ForgetPasswordApiTest extends UserControllerTest {
 
     @Test
     public void should_failed_when_retrieve_pw_error() throws Exception {
-        RetrievePasswordReqDto request = new RetrievePasswordReqDto();
+        ModifyPasswordReqDto request = new ModifyPasswordReqDto();
         request.setVerificationCode("123456");
         request.setNewPassword("password");
         request.setTelephone("18012345678");
 
         Either<Boolean, FormatRespDto> response = Either.right(new FormatRespDto(Response.Status.FORBIDDEN, "Forbidden or No Permission to Access."));
-        Mockito.when(userMgmtService.retrievePassword(Mockito.any(RetrievePasswordReqDto.class))).thenReturn(response);
+        Mockito.when(userMgmtService.modifyPassword(Mockito.any(ModifyPasswordReqDto.class))).thenReturn(response);
 
         mvc.perform(MockMvcRequestBuilders.put("/v1/users/password").contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(gson.toJson(request)).accept(MediaType.APPLICATION_JSON_VALUE)).andExpect(MockMvcResultMatchers.status().isForbidden());

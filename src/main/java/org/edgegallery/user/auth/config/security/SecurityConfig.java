@@ -50,6 +50,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private SmsConfig smsConfig;
 
+    @Value("${mail.enabled}")
+    private String mailEnabled;
+
     @Autowired
     private MecUserDetailsService mecUserDetailsService;
 
@@ -62,14 +65,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.exceptionHandling()
-            .authenticationEntryPoint(new OAuthUnauthorizedEntryPoint("/#/", smsConfig.getEnabled()))
+            .authenticationEntryPoint(new OAuthUnauthorizedEntryPoint("/#/", smsConfig.getEnabled(), mailEnabled))
             .and()
             .authorizeRequests()
             .antMatchers("/", "/oauth/**", "/login", "/css/**", "/fonts/**", "/img/**",
                 "/js/**", "/favicon.ico",
                 "/index.html", "/user-privacy.md", "/user-agreement.md")
             .permitAll()
-            .antMatchers(HttpMethod.POST, "/v1/users", "/v1/users/action/uniqueness", "/v1/identity/sms")
+            .antMatchers(HttpMethod.POST, "/v1/users", "/v1/users/action/uniqueness", "/v1/identity/sms",
+                "/v1/identity/mail")
             .permitAll()
             .antMatchers(HttpMethod.PUT, "/v1/users/password")
             .permitAll()

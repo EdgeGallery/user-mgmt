@@ -26,4 +26,6 @@ public class LogoutRespDto {
     private String status;
 
     private Boolean enableSms;
+
+    private Boolean enableMail;
 }

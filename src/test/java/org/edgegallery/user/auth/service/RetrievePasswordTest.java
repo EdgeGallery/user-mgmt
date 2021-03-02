@@ -26,7 +26,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.edgegallery.user.auth.MainServer;
-import org.edgegallery.user.auth.controller.dto.request.RetrievePasswordReqDto;
+import org.edgegallery.user.auth.controller.dto.request.ModifyPasswordReqDto;
 import org.edgegallery.user.auth.controller.dto.request.TenantRegisterReqDto;
 import org.edgegallery.user.auth.controller.dto.response.FormatRespDto;
 import org.edgegallery.user.auth.controller.dto.response.TenantRespDto;
@@ -75,36 +75,36 @@ public class RetrievePasswordTest {
     public void should_successfully_when_modify_password() {
         new MockUp<UserMgmtService>() {
             @Mock
-            private boolean verifySmsCode(String verificationCode, String telephone) {
+            private boolean verifyCode(String verificationCode, String keyOfVerifyCode) {
                 return true;
             }
         };
 
-        RetrievePasswordReqDto retrieveRequest = new RetrievePasswordReqDto();
+        ModifyPasswordReqDto retrieveRequest = new ModifyPasswordReqDto();
         retrieveRequest.setTelephone(telephone);
         retrieveRequest.setNewPassword("newPassword1234.");
         retrieveRequest.setVerificationCode("123456");
-        Either<Boolean, FormatRespDto> retrieveEither = userMgmtService.retrievePassword(retrieveRequest);
+        Either<Boolean, FormatRespDto> retrieveEither = userMgmtService.modifyPassword(retrieveRequest);
         Assert.assertTrue(retrieveEither.isLeft());
     }
 
     @Test
     public void should_failed_when_wrong_verify_code() {
-        RetrievePasswordReqDto request = new RetrievePasswordReqDto();
+        ModifyPasswordReqDto request = new ModifyPasswordReqDto();
         request.setTelephone(telephone);
         request.setNewPassword("newPassword1234.");
         request.setVerificationCode("123456");
 
         new MockUp<UserMgmtService>() {
             @Mock
-            private boolean verifySmsCode(String verificationCode, String telephone) {
+            private boolean verifyCode(String verificationCode, String keyOfVerifyCode) {
                 return false;
             }
         };
-        Either<Boolean, FormatRespDto> either = userMgmtService.retrievePassword(request);
+        Either<Boolean, FormatRespDto> either = userMgmtService.modifyPassword(request);
         new MockUp<UserMgmtService>() {
             @Mock
-            private boolean verifySmsCode(String verificationCode, String telephone) {
+            private boolean verifyCode(String verificationCode, String keyOfVerifyCode) {
                 return true;
             }
         };
@@ -113,35 +113,35 @@ public class RetrievePasswordTest {
 
     @Test
     public void should_failed_when_telephone_not_exit() {
-        RetrievePasswordReqDto request = new RetrievePasswordReqDto();
+        ModifyPasswordReqDto request = new ModifyPasswordReqDto();
         request.setTelephone("15945678912");
         request.setNewPassword("newPassword1234.");
         request.setVerificationCode("123456");
 
         new MockUp<UserMgmtService>() {
             @Mock
-            private boolean verifySmsCode(String verificationCode, String telephone) {
+            private boolean verifyCode(String verificationCode, String keyOfVerifyCode) {
                 return true;
             }
         };
-        Either<Boolean, FormatRespDto> either = userMgmtService.retrievePassword(request);
+        Either<Boolean, FormatRespDto> either = userMgmtService.modifyPassword(request);
         Assert.assertTrue(either.isRight());
     }
 
     @Test
     public void should_failed_when_password_less_6(){
-        RetrievePasswordReqDto request = new RetrievePasswordReqDto();
+        ModifyPasswordReqDto request = new ModifyPasswordReqDto();
         request.setTelephone(telephone);
         request.setNewPassword("ne9%$");
         request.setVerificationCode("123456");
 
         new MockUp<UserMgmtService>() {
             @Mock
-            private boolean verifySmsCode(String verificationCode, String telephone) {
+            private boolean verifyCode(String verificationCode, String keyOfVerifyCode) {
                 return true;
             }
         };
-        Either<Boolean, FormatRespDto> either = userMgmtService.retrievePassword(request);
+        Either<Boolean, FormatRespDto> either = userMgmtService.modifyPassword(request);
         Assert.assertTrue(either.isRight());
     }
 }

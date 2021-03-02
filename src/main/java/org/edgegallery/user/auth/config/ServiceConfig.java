@@ -30,5 +30,6 @@ public class ServiceConfig {
 
     public static final String PATTERN_TELEPHONE = "^1[34578]\\d{9}$";
 
-    public static final String PATTERN_MAILADDRESS = "^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+$";
+    public static final String PATTERN_MAILADDRESS
+        = "^[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)*@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+$";
 }

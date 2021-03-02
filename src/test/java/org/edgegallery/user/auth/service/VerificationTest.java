@@ -88,7 +88,7 @@ public class VerificationTest {
             }
         };
         Map<String, String> anyMap = new HashMap<>();
-        Either<Boolean, FormatRespDto> either = identityService.verifyTelParam(request);
+        Either<Boolean, FormatRespDto> either = identityService.sendVerificationCodeBySms(request);
         Assert.assertTrue(either.isLeft());
     }
 
@@ -109,7 +109,7 @@ public class VerificationTest {
             }
         };
         Map<String, String> anyMap = new HashMap<>();
-        Either<Boolean, FormatRespDto> either = identityService.verifyTelParam(request);
+        Either<Boolean, FormatRespDto> either = identityService.sendVerificationCodeBySms(request);
         Assert.assertTrue(either.isRight());
         Assert.assertEquals(either.right().value().getErrStatus(), Response.Status.EXPECTATION_FAILED);
     }
