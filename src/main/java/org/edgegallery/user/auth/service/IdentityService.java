@@ -40,7 +40,8 @@ public class IdentityService {
     private static final String MAIL_SUBJECT_VERIFYCODE = "[EdgeGallery] Please receive your verification code";
 
     private static final String MAIL_CONTENT_VERIFYCODE = "Hello!%n"
-        + "The edgegallery platform is verifing your email, the verification code is: %s.";
+        + "The edgegallery platform is verifing your email, the verification code is: %s.%n"
+        + "It will expire in %d minutes.";
 
     @Autowired
     private HwCloudVerification verification;
@@ -50,6 +51,9 @@ public class IdentityService {
 
     @Autowired
     private SmsConfig smsConfig;
+
+    @Autowired
+    private RedisConfig redisConfig;
 
     @Value("${mail.enabled}")
     private String mailEnabled;
@@ -107,7 +111,8 @@ public class IdentityService {
         String mailAddress = verifyRequest.getMailAddress();
         String verificationCode = randomCode();
         String subject = MAIL_SUBJECT_VERIFYCODE;
-        String content = String.format(MAIL_CONTENT_VERIFYCODE, verificationCode);
+        String content = String.format(MAIL_CONTENT_VERIFYCODE,
+            verificationCode, redisConfig.getVerificationTimeOut() / 60);
         if (!mailService.sendSimpleMail(mailAddress, subject, content)) {
             LOGGER.error("send verification code by mail fail");
             return Either.right(new FormatRespDto(Response.Status.EXPECTATION_FAILED,
