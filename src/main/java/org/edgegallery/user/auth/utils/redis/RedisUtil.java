@@ -57,7 +57,7 @@ public class RedisUtil {
         try (StatefulRedisConnection<String, String> connection = RedisPoolUtil.getConnection()) {
             RedisCommands<String, String> commands = connection.sync();
             commands.set(type + "-" + key, value);
-            commands.expire(key, type.timeOut);
+            commands.expire(type + "-" + key, type.timeOut);
         } catch (UserAuthException e) {
             LOGGER.error("failed to connect redis.");
         }
