@@ -39,7 +39,7 @@ public class ForgetPasswordApiTest extends UserControllerTest {
         request.setTelephone("18012345678");
 
         Either<Boolean, FormatRespDto> response = Either.left(true);
-        Mockito.when(userMgmtService.modifyPassword(Mockito.any(ModifyPasswordReqDto.class))).thenReturn(response);
+        Mockito.when(userMgmtService.modifyPassword(Mockito.any(ModifyPasswordReqDto.class), Mockito.any(String.class))).thenReturn(response);
 
         mvc.perform(MockMvcRequestBuilders.put("/v1/users/password").contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(gson.toJson(request)).accept(MediaType.APPLICATION_JSON_VALUE)).andExpect(MockMvcResultMatchers.status().isOk());
@@ -53,7 +53,7 @@ public class ForgetPasswordApiTest extends UserControllerTest {
         request.setTelephone("18012345678");
 
         Either<Boolean, FormatRespDto> response = Either.right(new FormatRespDto(Response.Status.FORBIDDEN, "Forbidden or No Permission to Access."));
-        Mockito.when(userMgmtService.modifyPassword(Mockito.any(ModifyPasswordReqDto.class))).thenReturn(response);
+        Mockito.when(userMgmtService.modifyPassword(Mockito.any(ModifyPasswordReqDto.class), Mockito.any(String.class))).thenReturn(response);
 
         mvc.perform(MockMvcRequestBuilders.put("/v1/users/password").contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(gson.toJson(request)).accept(MediaType.APPLICATION_JSON_VALUE)).andExpect(MockMvcResultMatchers.status().isForbidden());

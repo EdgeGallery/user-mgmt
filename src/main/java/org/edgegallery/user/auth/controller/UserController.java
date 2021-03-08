@@ -83,7 +83,9 @@ public class UserController extends BeGenericServlet {
     })
     public ResponseEntity<Object> modifyPassword(
         @ApiParam(value = "RetrievePasswordReqDto", required = true) @RequestBody ModifyPasswordReqDto request) {
-        return buildResponse(userMgmtService.modifyPassword(request));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return buildResponse(userMgmtService.modifyPassword(request,
+            authentication != null ? authentication.getName() : ""));
     }
 
     @PostMapping(value = "/action/uniqueness", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -103,6 +105,15 @@ public class UserController extends BeGenericServlet {
     })
     public ResponseEntity<String> deleteUser(
         @ApiParam(value = "user id") @PathVariable("userId") @Pattern(regexp = REG_UUID) String userId) {
+        // login user must be admin
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!Consts.SUPER_ADMIN_NAME.equalsIgnoreCase(authentication.getName())) {
+            FormatRespDto formatRespDto = new FormatRespDto(Response.Status.FORBIDDEN,
+                "The user has no permission to delete user.");
+            return ResponseEntity.status(formatRespDto.getErrStatus().getStatusCode())
+                .body(formatRespDto.getErrorRespDto().getDetail());
+        }
+
         userMgmtService.deleteUser(userId);
         return ResponseEntity.ok("");
     }

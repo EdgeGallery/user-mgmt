@@ -155,13 +155,14 @@ public class UserMgmtService {
      * modify password.
      *
      * @param modifyRequest modify request dto
+     * @param currUserName current user name
      * @return modify result
      */
     @ParameterValidate
-    public Either<Boolean, FormatRespDto> modifyPassword(ModifyPasswordReqDto modifyRequest) {
+    public Either<Boolean, FormatRespDto> modifyPassword(ModifyPasswordReqDto modifyRequest, String currUserName) {
         LOGGER.info("Begin modify password");
         //User not exit
-        TenantPo tenantPo = findTenantToModifyPw(modifyRequest);
+        TenantPo tenantPo = findTenantToModifyPw(modifyRequest, currUserName);
         if (tenantPo == null) {
             LOGGER.error("User not exist");
             return Either.right(new FormatRespDto(Status.FORBIDDEN, "User not exist"));
@@ -175,8 +176,15 @@ public class UserMgmtService {
                 : modifyRequest.getTelephone();
             String verificationCode = modifyRequest.getVerificationCode();
             if (!verifyCode(verificationCode, keyOfVerifyCode)) {
-                LOGGER.error("verification code is error ");
+                LOGGER.error("verification code is error");
                 return Either.right(new FormatRespDto(Status.FORBIDDEN, "Verification code is error"));
+            }
+        } else {
+            // check old pw
+            LOGGER.info("check password");
+            if (!passwordEncoder.matches(modifyRequest.getOldPassword(), tenantPo.getPassword())) {
+                LOGGER.error("password incorrect");
+                return Either.right(new FormatRespDto(Status.FORBIDDEN, "password incorrect"));
             }
         }
 
@@ -198,9 +206,9 @@ public class UserMgmtService {
         }
     }
 
-    private TenantPo findTenantToModifyPw(ModifyPasswordReqDto modifyRequest) {
+    private TenantPo findTenantToModifyPw(ModifyPasswordReqDto modifyRequest, String currUserName) {
         if (!modifyRequest.isRetrieveType()) {
-            return mapper.getTenantBasicPoData(modifyRequest.getUserId());
+            return mapper.getTenantByUsername(currUserName);
         } else {
             return StringUtils.isEmpty(modifyRequest.getTelephone())
                 ? mapper.getTenantByMailAddress(modifyRequest.getMailAddress())
