@@ -157,7 +157,9 @@ public class UserController extends BeGenericServlet {
         @ApiParam(value = "user id") @PathVariable("userId") @Pattern(regexp = REG_UUID) String userId,
         @ApiParam(value = "ModifyUserReqDto", required = true) @RequestBody TenantRespDto request) {
         request.setUserId(userId);
-        return buildResponse(userMgmtService.modifyUser(request));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return buildResponse(userMgmtService.modifyUser(request,
+            authentication != null ? authentication.getName() : ""));
     }
 
     /**

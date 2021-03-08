@@ -190,7 +190,7 @@
 
     <update id="updateTenantById" parameterType="org.edgegallery.user.auth.controller.dto.response.TenantRespDto">
         update tbl_tenant
-        set username = #{username}, telephonenumber = #{telephone}, mailaddress = #{mailAddress}
+        set username = #{username}, telephonenumber = #{telephone}, mailaddress = #{mailAddress}, MODIFYTIME = now()
         where tenantid = #{userId}
     </update>
 
