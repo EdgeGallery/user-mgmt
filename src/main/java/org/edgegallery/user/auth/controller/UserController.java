@@ -73,6 +73,12 @@ public class UserController extends BeGenericServlet {
         return buildCreatedResponse(userMgmtService.register(request));
     }
 
+    /**
+     * modify password.
+     *
+     * @param request request data
+     * @return modify result
+     */
     @PutMapping(value = "/password", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "modify password", response = Object.class, notes = DescriptionConfig.MODIFY_PASSWORD_MSG)
     @ApiResponses(value = {
@@ -98,6 +104,12 @@ public class UserController extends BeGenericServlet {
         return buildResponse(userMgmtService.uniqueness(request));
     }
 
+    /**
+     * delete user.
+     *
+     * @param userId userId
+     * @return delete result
+     */
     @DeleteMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "delete user by userId", response = Object.class)
     @ApiResponses(value = {
@@ -147,6 +159,13 @@ public class UserController extends BeGenericServlet {
         return buildResponse(userMgmtService.queryUsers(request));
     }
 
+    /**
+     * modify user info.
+     *
+     * @param userId userId
+     * @param request request data
+     * @return modify result
+     */
     @PutMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "modify user, not include password.", response = Object.class)
     @ApiResponses(value = {

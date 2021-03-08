@@ -315,10 +315,12 @@ public class UserMgmtService {
 
         UniqueReqDto uniqueReqDto = new UniqueReqDto();
         uniqueReqDto.setUsername(oldUserPo.getUsername().equals(user.getUsername()) ? null : user.getUsername());
-        uniqueReqDto.setTelephone(user.getTelephone() == null || user.getTelephone().equals(oldUserPo.getTelephoneNumber())
+        uniqueReqDto.setTelephone(
+            user.getTelephone() == null || user.getTelephone().equals(oldUserPo.getTelephoneNumber())
                 ? null : user.getTelephone());
-        uniqueReqDto.setMailAddress(user.getMailAddress() == null || user.getMailAddress().equals(oldUserPo.getMailAddress())
-            ? null : user.getMailAddress());
+        uniqueReqDto.setMailAddress(
+            user.getMailAddress() == null || user.getMailAddress().equals(oldUserPo.getMailAddress())
+                ? null : user.getMailAddress());
         String msg = "";
         Either<UniquenessRespDto, FormatRespDto> uniqueness = uniqueness(uniqueReqDto);
         if (uniqueness.isLeft()) {
