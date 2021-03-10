@@ -44,10 +44,6 @@ public class ModifyPasswordReqDto extends CheckParamsGenericUtils implements ISt
     @Pattern(regexp = ServiceConfig.PATTERN_PASSWORD)
     private String newPassword;
 
-    @SerializedName("userId")
-    @JsonProperty("userId")
-    private String userId;
-
     @SerializedName("oldPassword")
     @JsonProperty("oldPassword")
     @ApiModelProperty(example = "TestOldPassword#321")
@@ -77,7 +73,6 @@ public class ModifyPasswordReqDto extends CheckParamsGenericUtils implements ISt
     public void stringTrim() {
         this.newPassword = StringUtils.trimWhitespace(this.newPassword);
 
-        this.userId = StringUtils.trimWhitespace(this.userId);
         this.oldPassword = StringUtils.trimWhitespace(this.oldPassword);
 
         this.telephone = StringUtils.trimWhitespace(this.telephone);

@@ -39,6 +39,7 @@ import org.edgegallery.user.auth.db.entity.RolePo;
 import org.edgegallery.user.auth.db.entity.TenantPermissionVo;
 import org.edgegallery.user.auth.db.entity.TenantPo;
 import org.edgegallery.user.auth.db.mapper.TenantPoMapper;
+import org.edgegallery.user.auth.utils.Consts;
 import org.edgegallery.user.auth.utils.redis.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -155,13 +156,14 @@ public class UserMgmtService {
      * modify password.
      *
      * @param modifyRequest modify request dto
+     * @param currUserName current user name
      * @return modify result
      */
     @ParameterValidate
-    public Either<Boolean, FormatRespDto> modifyPassword(ModifyPasswordReqDto modifyRequest) {
+    public Either<Boolean, FormatRespDto> modifyPassword(ModifyPasswordReqDto modifyRequest, String currUserName) {
         LOGGER.info("Begin modify password");
         //User not exit
-        TenantPo tenantPo = findTenantToModifyPw(modifyRequest);
+        TenantPo tenantPo = findTenantToModifyPw(modifyRequest, currUserName);
         if (tenantPo == null) {
             LOGGER.error("User not exist");
             return Either.right(new FormatRespDto(Status.FORBIDDEN, "User not exist"));
@@ -175,8 +177,15 @@ public class UserMgmtService {
                 : modifyRequest.getTelephone();
             String verificationCode = modifyRequest.getVerificationCode();
             if (!verifyCode(verificationCode, keyOfVerifyCode)) {
-                LOGGER.error("verification code is error ");
+                LOGGER.error("verification code is error");
                 return Either.right(new FormatRespDto(Status.FORBIDDEN, "Verification code is error"));
+            }
+        } else {
+            // check old pw
+            LOGGER.info("check password");
+            if (!passwordEncoder.matches(modifyRequest.getOldPassword(), tenantPo.getPassword())) {
+                LOGGER.error("password incorrect");
+                return Either.right(new FormatRespDto(Status.FORBIDDEN, "password incorrect"));
             }
         }
 
@@ -198,9 +207,9 @@ public class UserMgmtService {
         }
     }
 
-    private TenantPo findTenantToModifyPw(ModifyPasswordReqDto modifyRequest) {
+    private TenantPo findTenantToModifyPw(ModifyPasswordReqDto modifyRequest, String currUserName) {
         if (!modifyRequest.isRetrieveType()) {
-            return mapper.getTenantBasicPoData(modifyRequest.getUserId());
+            return mapper.getTenantByUsername(currUserName);
         } else {
             return StringUtils.isEmpty(modifyRequest.getTelephone())
                 ? mapper.getTenantByMailAddress(modifyRequest.getMailAddress())
@@ -287,20 +296,31 @@ public class UserMgmtService {
      * modify the user info.
      *
      * @param user new user info
+     * @param currUserName current user name
      * @return TenantRespDto
      */
-    public Either<TenantRespDto, FormatRespDto> modifyUser(TenantRespDto user) {
+    public Either<TenantRespDto, FormatRespDto> modifyUser(TenantRespDto user, String currUserName) {
+        LOGGER.info("Begin modify user.");
         TenantPo oldUserPo = mapper.getTenantBasicPoData(user.getUserId());
+        if (oldUserPo == null) {
+            LOGGER.error("User not exist");
+            return Either.right(new FormatRespDto(Status.FORBIDDEN, "User not exist"));
+        }
+
+        if (!oldUserPo.getUsername().equalsIgnoreCase(currUserName)
+            && !Consts.SUPER_ADMIN_NAME.equalsIgnoreCase(currUserName)) {
+            LOGGER.error("The user has no permission to modify user.");
+            return Either.right(new FormatRespDto(Status.FORBIDDEN, "The user has no permission to modify user."));
+        }
+
         UniqueReqDto uniqueReqDto = new UniqueReqDto();
-        if (!oldUserPo.getUsername().equals(user.getUsername())) {
-            uniqueReqDto.setUsername(user.getUsername());
-        }
-        if (user.getTelephone() != null && !user.getTelephone().equals(oldUserPo.getTelephoneNumber())) {
-            uniqueReqDto.setTelephone(user.getTelephone());
-        }
-        if (user.getMailAddress() != null && !user.getMailAddress().equals(oldUserPo.getMailAddress())) {
-            uniqueReqDto.setMailAddress(user.getMailAddress());
-        }
+        uniqueReqDto.setUsername(oldUserPo.getUsername().equals(user.getUsername()) ? null : user.getUsername());
+        uniqueReqDto.setTelephone(
+            user.getTelephone() == null || user.getTelephone().equals(oldUserPo.getTelephoneNumber())
+                ? null : user.getTelephone());
+        uniqueReqDto.setMailAddress(
+            user.getMailAddress() == null || user.getMailAddress().equals(oldUserPo.getMailAddress())
+                ? null : user.getMailAddress());
         String msg = "";
         Either<UniquenessRespDto, FormatRespDto> uniqueness = uniqueness(uniqueReqDto);
         if (uniqueness.isLeft()) {
@@ -317,6 +337,7 @@ public class UserMgmtService {
                 return Either.right(new FormatRespDto(Status.BAD_REQUEST, msg));
             }
         }
+
         tenantTransaction.updateTenant(user);
         TenantRespDto tenantRespDto = new TenantRespDto();
         tenantRespDto.setResponse(mapper.getTenantBasicPoData(user.getUserId()));

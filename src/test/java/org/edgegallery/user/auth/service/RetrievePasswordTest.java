@@ -84,7 +84,7 @@ public class RetrievePasswordTest {
         retrieveRequest.setTelephone(telephone);
         retrieveRequest.setNewPassword("newPassword1234.");
         retrieveRequest.setVerificationCode("123456");
-        Either<Boolean, FormatRespDto> retrieveEither = userMgmtService.modifyPassword(retrieveRequest);
+        Either<Boolean, FormatRespDto> retrieveEither = userMgmtService.modifyPassword(retrieveRequest, "");
         Assert.assertTrue(retrieveEither.isLeft());
     }
 
@@ -101,7 +101,7 @@ public class RetrievePasswordTest {
                 return false;
             }
         };
-        Either<Boolean, FormatRespDto> either = userMgmtService.modifyPassword(request);
+        Either<Boolean, FormatRespDto> either = userMgmtService.modifyPassword(request, "");
         new MockUp<UserMgmtService>() {
             @Mock
             private boolean verifyCode(String verificationCode, String keyOfVerifyCode) {
@@ -124,7 +124,7 @@ public class RetrievePasswordTest {
                 return true;
             }
         };
-        Either<Boolean, FormatRespDto> either = userMgmtService.modifyPassword(request);
+        Either<Boolean, FormatRespDto> either = userMgmtService.modifyPassword(request, "");
         Assert.assertTrue(either.isRight());
     }
 
@@ -141,7 +141,7 @@ public class RetrievePasswordTest {
                 return true;
             }
         };
-        Either<Boolean, FormatRespDto> either = userMgmtService.modifyPassword(request);
+        Either<Boolean, FormatRespDto> either = userMgmtService.modifyPassword(request, "");
         Assert.assertTrue(either.isRight());
     }
 }
