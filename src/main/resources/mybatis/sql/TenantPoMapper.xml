@@ -64,7 +64,12 @@
 
     <select id="getTenantByUsername" resultType="org.edgegallery.user.auth.db.entity.TenantPo">
         SELECT
-        *
+        tenantid,
+        username,
+        telephonenumber,
+        mailaddress,
+        isallowed,
+        to_char(createtime, 'YYYY-MM-DD HH24:MI:SS') as createtime
         FROM
         tbl_tenant
         WHERE
