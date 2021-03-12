@@ -66,6 +66,7 @@
         SELECT
         tenantid,
         username,
+        password,
         telephonenumber,
         mailaddress,
         isallowed,

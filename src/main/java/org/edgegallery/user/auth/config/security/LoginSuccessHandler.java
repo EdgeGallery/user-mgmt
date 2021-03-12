@@ -21,6 +21,7 @@ import java.net.URL;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.edgegallery.user.auth.utils.Consts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +51,7 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
         String userName = authentication.getName();
         mecUserDetailsService.clearFailedCount(userName);
 
-        if (userName.equalsIgnoreCase("guest")) {
+        if (userName.equalsIgnoreCase(Consts.GUEST_USER_NAME)) {
             String redirectUrl = getRedirectUrl(request, response);
             if (redirectUrl != null) {
                 URL url = new URL(redirectUrl);

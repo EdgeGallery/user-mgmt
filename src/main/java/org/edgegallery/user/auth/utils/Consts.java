@@ -25,6 +25,10 @@ public class Consts {
 
     public static final String SUPER_ADMIN_NAME = "admin";
 
+    public static final String GUEST_USER_NAME = "guest";
+
+    public static final String GUEST_USER_PW = "guest";
+
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 }
 

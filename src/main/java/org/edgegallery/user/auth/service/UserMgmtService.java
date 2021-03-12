@@ -169,24 +169,9 @@ public class UserMgmtService {
             return Either.right(new FormatRespDto(Status.FORBIDDEN, "User not exist"));
         }
 
-        //check verify code
-        if (modifyRequest.isRetrieveType()) {
-            LOGGER.info("check verification code");
-            String keyOfVerifyCode = StringUtils.isEmpty(modifyRequest.getTelephone())
-                ? modifyRequest.getMailAddress()
-                : modifyRequest.getTelephone();
-            String verificationCode = modifyRequest.getVerificationCode();
-            if (!verifyCode(verificationCode, keyOfVerifyCode)) {
-                LOGGER.error("verification code is error");
-                return Either.right(new FormatRespDto(Status.FORBIDDEN, "Verification code is error"));
-            }
-        } else {
-            // check old pw
-            LOGGER.info("check password");
-            if (!passwordEncoder.matches(modifyRequest.getOldPassword(), tenantPo.getPassword())) {
-                LOGGER.error("password incorrect");
-                return Either.right(new FormatRespDto(Status.FORBIDDEN, "password incorrect"));
-            }
+        Either<Boolean, FormatRespDto> checkResult = checkOnModifyPw(modifyRequest, tenantPo);
+        if (checkResult != null) {
+            return checkResult;
         }
 
         int result = 0;
@@ -205,6 +190,35 @@ public class UserMgmtService {
             LOGGER.error("Modify password failed");
             return Either.right(new FormatRespDto(Status.BAD_REQUEST, "Modify password fail"));
         }
+    }
+
+    private Either<Boolean, FormatRespDto> checkOnModifyPw(ModifyPasswordReqDto modifyRequest,
+        TenantPo tenantPo) {
+        //check verify code
+        if (modifyRequest.isRetrieveType()) {
+            LOGGER.info("check verification code");
+            String keyOfVerifyCode = StringUtils.isEmpty(modifyRequest.getTelephone())
+                ? modifyRequest.getMailAddress()
+                : modifyRequest.getTelephone();
+            String verificationCode = modifyRequest.getVerificationCode();
+            if (!verifyCode(verificationCode, keyOfVerifyCode)) {
+                LOGGER.error("verification code is error");
+                return Either.right(new FormatRespDto(Status.FORBIDDEN, "Verification code is error"));
+            }
+        } else {
+            // check old pw
+            LOGGER.info("check password");
+            try {
+                if (!passwordEncoder.matches(modifyRequest.getOldPassword(), tenantPo.getPassword())) {
+                    LOGGER.error("password incorrect");
+                    return Either.right(new FormatRespDto(Status.FORBIDDEN, "password incorrect"));
+                }
+            } catch (Exception e) {
+                LOGGER.error("failed for password match.");
+                return Either.right(new FormatRespDto(Status.FORBIDDEN, "password incorrect"));
+            }
+        }
+        return null;
     }
 
     private TenantPo findTenantToModifyPw(ModifyPasswordReqDto modifyRequest, String currUserName) {
