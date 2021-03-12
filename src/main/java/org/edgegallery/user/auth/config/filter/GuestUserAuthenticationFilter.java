@@ -35,8 +35,8 @@ public class GuestUserAuthenticationFilter extends AbstractAuthenticationProcess
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
         throws AuthenticationException {
-        UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(Consts.GUEST_USER_NAME,
-            Consts.GUEST_USER_PW);
+        UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(
+            Consts.GUEST_USER_NAME, Consts.GUEST_USER_PW);
         this.setDetails(request, authRequest);
         return this.getAuthenticationManager().authenticate(authRequest);
     }
