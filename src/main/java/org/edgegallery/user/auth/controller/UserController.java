@@ -90,8 +90,14 @@ public class UserController extends BeGenericServlet {
     public ResponseEntity<Object> modifyPassword(
         @ApiParam(value = "RetrievePasswordReqDto", required = true) @RequestBody ModifyPasswordReqDto request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return buildResponse(userMgmtService.modifyPassword(request,
-            authentication != null ? authentication.getName() : ""));
+        String currUserName = authentication != null ? authentication.getName() : "";
+        if (Consts.GUEST_USER_NAME.equalsIgnoreCase(currUserName)) {
+            FormatRespDto formatRespDto = new FormatRespDto(Response.Status.FORBIDDEN,
+                "The guest user can not modify password.");
+            return ResponseEntity.status(formatRespDto.getErrStatus().getStatusCode())
+                .body(formatRespDto.getErrorRespDto());
+        }
+        return buildResponse(userMgmtService.modifyPassword(request, currUserName));
     }
 
     @PostMapping(value = "/action/uniqueness", produces = MediaType.APPLICATION_JSON_VALUE)
