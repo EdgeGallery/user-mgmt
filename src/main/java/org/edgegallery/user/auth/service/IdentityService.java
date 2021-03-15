@@ -92,7 +92,7 @@ public class IdentityService {
                     "connection out, please again try."));
         }
 
-        RedisUtil.save(RedisUtil.RedisKeyType.verificationCode, telephone, verificationCode);
+        RedisUtil.save(RedisUtil.RedisKeyType.VERIFICATION_CODE, telephone, verificationCode);
         LOGGER.info("send verification code by sms success");
         return Either.left(true);
     }
@@ -119,7 +119,7 @@ public class IdentityService {
                 "send verification code by mail fail"));
         }
 
-        RedisUtil.save(RedisUtil.RedisKeyType.verificationCode, mailAddress, verificationCode);
+        RedisUtil.save(RedisUtil.RedisKeyType.VERIFICATION_CODE, mailAddress, verificationCode);
         LOGGER.info("send verification code by mail success");
         return Either.left(true);
     }

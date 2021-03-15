@@ -40,6 +40,7 @@ import org.edgegallery.user.auth.db.entity.TenantPermissionVo;
 import org.edgegallery.user.auth.db.entity.TenantPo;
 import org.edgegallery.user.auth.db.mapper.TenantPoMapper;
 import org.edgegallery.user.auth.utils.Consts;
+import org.edgegallery.user.auth.utils.ErrorEnum;
 import org.edgegallery.user.auth.utils.redis.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,7 +122,8 @@ public class UserMgmtService {
             result += tenantTransaction.registerTenant(tenantVo);
         } catch (Exception e) {
             LOGGER.error("Database Operate Exception: {}", e.getMessage());
-            return Either.right(new FormatRespDto(Status.INTERNAL_SERVER_ERROR, "Database Exception"));
+            return Either.right(new FormatRespDto(Status.INTERNAL_SERVER_ERROR,
+                ErrorEnum.DATABASE_EXCEPTION.detail()));
         }
 
         if (result > 0) {
@@ -145,10 +147,10 @@ public class UserMgmtService {
      */
     private boolean verifyCode(String verificationCode, String keyOfVerifyCode) {
         if (StringUtils.isEmpty(verificationCode) || !verificationCode
-            .equals(RedisUtil.get(RedisUtil.RedisKeyType.verificationCode, keyOfVerifyCode))) {
+            .equals(RedisUtil.get(RedisUtil.RedisKeyType.VERIFICATION_CODE, keyOfVerifyCode))) {
             return false;
         }
-        RedisUtil.delete(RedisUtil.RedisKeyType.verificationCode, keyOfVerifyCode);
+        RedisUtil.delete(RedisUtil.RedisKeyType.VERIFICATION_CODE, keyOfVerifyCode);
         return true;
     }
 
@@ -165,8 +167,8 @@ public class UserMgmtService {
         //User not exit
         TenantPo tenantPo = findTenantToModifyPw(modifyRequest, currUserName);
         if (tenantPo == null) {
-            LOGGER.error("User not exist");
-            return Either.right(new FormatRespDto(Status.FORBIDDEN, "User not exist"));
+            LOGGER.error(ErrorEnum.USER_NOT_FOUND.detail());
+            return Either.right(new FormatRespDto(Status.FORBIDDEN, ErrorEnum.USER_NOT_FOUND.detail()));
         }
 
         Either<Boolean, FormatRespDto> checkResult = checkOnModifyPw(modifyRequest, tenantPo);
@@ -180,7 +182,8 @@ public class UserMgmtService {
                 .modifyPassword(tenantPo.getTenantId(), passwordEncoder.encode(modifyRequest.getNewPassword()));
         } catch (Exception e) {
             LOGGER.error("Database Operate Exception: {}", e.getMessage());
-            return Either.right(new FormatRespDto(Status.INTERNAL_SERVER_ERROR, "Database Exception."));
+            return Either.right(new FormatRespDto(Status.INTERNAL_SERVER_ERROR,
+                ErrorEnum.DATABASE_EXCEPTION.detail()));
         }
 
         if (result > 0) {
@@ -210,12 +213,12 @@ public class UserMgmtService {
             LOGGER.info("check password");
             try {
                 if (!passwordEncoder.matches(modifyRequest.getOldPassword(), tenantPo.getPassword())) {
-                    LOGGER.error("password incorrect");
-                    return Either.right(new FormatRespDto(Status.FORBIDDEN, "password incorrect"));
+                    LOGGER.error(ErrorEnum.PASSWORD_INCORRECT.detail());
+                    return Either.right(new FormatRespDto(Status.FORBIDDEN, ErrorEnum.PASSWORD_INCORRECT.detail()));
                 }
             } catch (Exception e) {
                 LOGGER.error("failed for password match.");
-                return Either.right(new FormatRespDto(Status.FORBIDDEN, "password incorrect"));
+                return Either.right(new FormatRespDto(Status.FORBIDDEN, ErrorEnum.PASSWORD_INCORRECT.detail()));
             }
         }
         return null;
@@ -283,7 +286,8 @@ public class UserMgmtService {
             return Either.left(queryResp);
         } catch (Exception e) {
             LOGGER.error("Database Exception on Query Users: {}", e.getMessage());
-            return Either.right(new FormatRespDto(Status.INTERNAL_SERVER_ERROR, "Database Exception"));
+            return Either.right(new FormatRespDto(Status.INTERNAL_SERVER_ERROR,
+                ErrorEnum.DATABASE_EXCEPTION.detail()));
         }
     }
 
@@ -299,10 +303,11 @@ public class UserMgmtService {
             if (mapper.updateStatus(tenantId, allowFlag)) {
                 return Either.left("");
             }
-            return Either.right(new FormatRespDto(Status.BAD_REQUEST, "User not exist."));
+            return Either.right(new FormatRespDto(Status.BAD_REQUEST, ErrorEnum.USER_NOT_FOUND.detail()));
         } catch (Exception e) {
             LOGGER.error("Database Exception on Update User Status: {}", e.getMessage());
-            return Either.right(new FormatRespDto(Status.INTERNAL_SERVER_ERROR, "Database Exception"));
+            return Either.right(new FormatRespDto(Status.INTERNAL_SERVER_ERROR,
+                ErrorEnum.DATABASE_EXCEPTION.detail()));
         }
     }
 
@@ -317,8 +322,8 @@ public class UserMgmtService {
         LOGGER.info("Begin modify user.");
         TenantPo oldUserPo = mapper.getTenantBasicPoData(user.getUserId());
         if (oldUserPo == null) {
-            LOGGER.error("User not exist");
-            return Either.right(new FormatRespDto(Status.FORBIDDEN, "User not exist"));
+            LOGGER.error(ErrorEnum.USER_NOT_FOUND.detail());
+            return Either.right(new FormatRespDto(Status.FORBIDDEN, ErrorEnum.USER_NOT_FOUND.detail()));
         }
 
         if (!oldUserPo.getUsername().equalsIgnoreCase(currUserName)
@@ -327,6 +332,21 @@ public class UserMgmtService {
             return Either.right(new FormatRespDto(Status.FORBIDDEN, "The user has no permission to modify user."));
         }
 
+        LOGGER.info("check unique for user information.");
+        Either<TenantRespDto, FormatRespDto> checkResult = checkUniqueOnModifyUser(user, oldUserPo);
+        if (checkResult != null) {
+            return checkResult;
+        }
+
+        LOGGER.info("save user information to database.");
+        tenantTransaction.updateTenant(user);
+        TenantRespDto tenantRespDto = new TenantRespDto();
+        tenantRespDto.setResponse(mapper.getTenantBasicPoData(user.getUserId()));
+        return Either.left(tenantRespDto);
+    }
+
+    private Either<TenantRespDto, FormatRespDto> checkUniqueOnModifyUser(TenantRespDto user,
+        TenantPo oldUserPo) {
         UniqueReqDto uniqueReqDto = new UniqueReqDto();
         uniqueReqDto.setUsername(oldUserPo.getUsername().equals(user.getUsername()) ? null : user.getUsername());
         uniqueReqDto.setTelephone(
@@ -351,11 +371,7 @@ public class UserMgmtService {
                 return Either.right(new FormatRespDto(Status.BAD_REQUEST, msg));
             }
         }
-
-        tenantTransaction.updateTenant(user);
-        TenantRespDto tenantRespDto = new TenantRespDto();
-        tenantRespDto.setResponse(mapper.getTenantBasicPoData(user.getUserId()));
-        return Either.left(tenantRespDto);
+        return null;
     }
 
     /**
@@ -370,7 +386,8 @@ public class UserMgmtService {
             return Either.left("");
         } catch (Exception e) {
             LOGGER.error("Database Exception on Modify User Settings: {}", e.getMessage());
-            return Either.right(new FormatRespDto(Status.INTERNAL_SERVER_ERROR, "Database Exception"));
+            return Either.right(new FormatRespDto(Status.INTERNAL_SERVER_ERROR,
+                ErrorEnum.DATABASE_EXCEPTION.detail()));
         }
     }
 }

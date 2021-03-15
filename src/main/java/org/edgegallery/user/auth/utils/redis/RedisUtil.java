@@ -31,6 +31,8 @@ public class RedisUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RedisUtil.class);
 
+    private static final String ERROR_CONNECT_REDIS_FAILED = "failed to connect redis.";
+
     private RedisUtil() {
     }
 
@@ -59,7 +61,7 @@ public class RedisUtil {
             commands.set(type + "-" + key, value);
             commands.expire(type + "-" + key, type.timeOut);
         } catch (UserAuthException e) {
-            LOGGER.error("failed to connect redis.");
+            LOGGER.error(ERROR_CONNECT_REDIS_FAILED);
         }
     }
 
@@ -72,7 +74,7 @@ public class RedisUtil {
         try (StatefulRedisConnection<String, String> connection = RedisPoolUtil.getConnection()) {
             return connection.sync().get(type + "-" + key);
         } catch (UserAuthException e) {
-            LOGGER.error("failed to connect redis.");
+            LOGGER.error(ERROR_CONNECT_REDIS_FAILED);
         }
         return null;
     }
@@ -84,12 +86,12 @@ public class RedisUtil {
         try (StatefulRedisConnection<String, String> connection = RedisPoolUtil.getConnection()) {
             connection.sync().del(type + "-" + key);
         } catch (UserAuthException e) {
-            LOGGER.error("failed to connect redis.");
+            LOGGER.error(ERROR_CONNECT_REDIS_FAILED);
         }
     }
 
     public enum RedisKeyType {
-        verificationCode(redisConfig.getVerificationTimeOut());
+        VERIFICATION_CODE(redisConfig.getVerificationTimeOut());
 
         private int timeOut;
 

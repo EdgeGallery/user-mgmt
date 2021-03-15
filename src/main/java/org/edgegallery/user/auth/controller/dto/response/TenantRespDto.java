@@ -24,8 +24,6 @@ import lombok.Setter;
 import lombok.ToString;
 import org.edgegallery.user.auth.db.entity.RolePo;
 import org.edgegallery.user.auth.db.entity.TenantPo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @ToString
 @Setter
