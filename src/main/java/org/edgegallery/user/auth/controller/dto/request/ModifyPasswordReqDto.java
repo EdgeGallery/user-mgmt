@@ -41,7 +41,7 @@ public class ModifyPasswordReqDto extends CheckParamsGenericUtils implements ISt
     @SerializedName("newPassword")
     @JsonProperty("newPassword")
     @ApiModelProperty(required = true, example = "TestPassword1")
-    @Pattern(regexp = ServiceConfig.PATTERN_PASSWORD)
+    @Pattern(regexp = ServiceConfig.PATTERN_USERPW)
     private String newPassword;
 
     @SerializedName("oldPassword")

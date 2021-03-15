@@ -33,7 +33,7 @@ import org.springframework.util.StringUtils;
 public class TenantRegisterReqDto extends TenantBasicReqDto implements IStringTrim {
 
     @ApiModelProperty(required = true, example = "TestPassword1")
-    @Pattern(regexp = ServiceConfig.PATTERN_PASSWORD)
+    @Pattern(regexp = ServiceConfig.PATTERN_USERPW)
     private String password;
 
     @SerializedName("verificationCode")
