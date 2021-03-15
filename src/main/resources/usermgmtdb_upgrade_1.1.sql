@@ -7,3 +7,5 @@
 	update tbl_tenant set MAILADDRESS = '13800000000@edgegallery.org' where USERNAME = 'guest';
 	update tbl_tenant set MAILADDRESS = '13800000001@edgegallery.org' where USERNAME = 'admin';
 	update tbl_tenant set CREATETIME = now(), MODIFYTIME = now();
+
+	update tbl_tenant set password='45709693f38464c0c0fbf525ec7a740ddf63e28ef39e56836601dc43b00ed20c86713bbcd73bb215' where username='admin'
