@@ -97,7 +97,6 @@ public class LoginTest {
                 .header("X-XSRF-TOKEN", xsrfToken).cookie(cookies).accept(MediaType.APPLICATION_JSON_VALUE)
                 .param("username", "tenant1").param("password", "wrong-password"))
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized());
-            Thread.sleep(1000);
             i++;
         }
         mvc.perform(MockMvcRequestBuilders.post("/login").contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -114,7 +113,6 @@ public class LoginTest {
                 .header("X-XSRF-TOKEN", xsrfToken).cookie(cookies).accept(MediaType.APPLICATION_JSON_VALUE)
                 .param("username", "tenant2").param("password", "wrong-password"))
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized());
-            Thread.sleep(1000);
             i++;
         }
         mvc.perform(MockMvcRequestBuilders.post("/login").contentType(MediaType.APPLICATION_FORM_URLENCODED)

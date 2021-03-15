@@ -22,7 +22,7 @@ import es.moki.ratelimitj.inmemory.request.InMemorySlidingWindowRequestRateLimit
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,11 +49,11 @@ public class MecUserDetailsService implements UserDetailsService {
         Collections.singleton(RequestLimitRule.of(Duration.ofMinutes(5), 4));
 
     // locked overtime
-    private static final long OVERTIME = 5 * 60 * 1000;
+    private static final long OVERTIME = 5 * 60 * 1000L;
 
     private static final RequestRateLimiter LIMITER = new InMemorySlidingWindowRequestRateLimiter(rules);
 
-    private static final Map<String, Long> LOCKED_USERS_MAP = new Hashtable<>();
+    private static final Map<String, Long> LOCKED_USERS_MAP = new HashMap<>();
 
     @Autowired
     private TenantPoMapper tenantPoMapper;
