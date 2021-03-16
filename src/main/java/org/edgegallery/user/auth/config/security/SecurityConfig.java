@@ -19,6 +19,8 @@ package org.edgegallery.user.auth.config.security;
 import java.util.Arrays;
 import org.edgegallery.user.auth.config.SmsConfig;
 import org.edgegallery.user.auth.config.filter.GuestUserAuthenticationFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -39,6 +41,8 @@ import org.springframework.web.filter.CorsFilter;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SecurityConfig.class);
 
     private static final String[] ADMIN_ROLES = {
         "APPSTORE_ADMIN", "DEVELOPER_ADMIN", "MECM_ADMIN", "ATP_ADMIN", "LAB_ADMIN"
@@ -100,7 +104,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
             .cors().and().csrf()
             .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
-        httpSecurity.addFilterAfter(guestAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+
+        GuestUserAuthenticationFilter guestAuthFilter = guestAuthenticationFilter();
+        if (guestAuthFilter != null) {
+            httpSecurity.addFilterAfter(guestAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        }
     }
 
     @Override
@@ -118,9 +126,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    GuestUserAuthenticationFilter guestAuthenticationFilter() throws Exception {
+    GuestUserAuthenticationFilter guestAuthenticationFilter() {
         GuestUserAuthenticationFilter filter = new GuestUserAuthenticationFilter();
-        filter.setAuthenticationManager(authenticationManagerBean());
+        try {
+            filter.setAuthenticationManager(authenticationManagerBean());
+        } catch (Exception ex) {
+            LOGGER.error("get authentication manager bean failed: {}", ex.getMessage());
+            return null;
+        }
         filter.setAuthenticationSuccessHandler(loginSuccessHandler);
         filter.setAuthenticationFailureHandler(loginFailHandler);
         return filter;
