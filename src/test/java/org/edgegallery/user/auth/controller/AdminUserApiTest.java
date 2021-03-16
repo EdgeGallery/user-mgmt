@@ -8,7 +8,6 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import java.util.List;
 import javax.servlet.http.Cookie;
 import org.edgegallery.user.auth.MainServer;
 import org.edgegallery.user.auth.controller.dto.request.QueryUserCtrlDto;

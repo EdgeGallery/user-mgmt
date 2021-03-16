@@ -16,18 +16,12 @@
 
 package org.edgegallery.user.auth.service;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-
-
 import fj.data.Either;
 import java.util.HashMap;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 import mockit.Mock;
 import mockit.MockUp;
-import org.apache.http.client.methods.HttpRequestBase;
 import org.edgegallery.user.auth.MainServer;
 import org.edgegallery.user.auth.config.SmsConfig;
 import org.edgegallery.user.auth.controller.dto.request.VerificationReqDto;
@@ -74,7 +68,7 @@ public class VerificationTest {
     @Test
     public void should_successfully_when_right_verify_code() {
         VerificationReqDto request = new VerificationReqDto();
-        request.setTelephone("15191881235");
+        request.setTelephone("13800000003");
         new MockUp<RedisUtil>() {
             @Mock
             public void save(RedisUtil.RedisKeyType type, String key, String value) {
@@ -95,7 +89,7 @@ public class VerificationTest {
     @Test
     public void should_failed_when_wrong_verify_code() {
         VerificationReqDto request = new VerificationReqDto();
-        request.setTelephone("15191881235");
+        request.setTelephone("13800000003");
         new MockUp<RedisUtil>() {
             @Mock
             public void save(RedisUtil.RedisKeyType type, String key, String value) {

@@ -25,6 +25,7 @@ import org.edgegallery.user.auth.config.validate.annotation.ParameterValidate;
 import org.edgegallery.user.auth.controller.dto.request.VerificationReqByMailDto;
 import org.edgegallery.user.auth.controller.dto.request.VerificationReqDto;
 import org.edgegallery.user.auth.controller.dto.response.FormatRespDto;
+import org.edgegallery.user.auth.db.mapper.TenantPoMapper;
 import org.edgegallery.user.auth.utils.redis.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,9 @@ public class IdentityService {
     private static final String MAIL_CONTENT_VERIFYCODE = "Hello!%n"
         + "The edgegallery platform is verifing your email, the verification code is: %s.%n"
         + "It will expire in %d minutes.";
+
+    @Autowired
+    private TenantPoMapper mapper;
 
     @Autowired
     private HwCloudVerification verification;
@@ -75,10 +79,16 @@ public class IdentityService {
     @ParameterValidate
     public Either<Boolean, FormatRespDto> sendVerificationCodeBySms(VerificationReqDto verifyRequest) {
         if (!Boolean.parseBoolean(smsConfig.getEnabled())) {
-            LOGGER.info("Sms is not enabled,no need to verify telephone param");
+            LOGGER.info("Sms is not enabled,no need to verify telephone.");
             return Either.left(true);
         }
+
         String telephone = verifyRequest.getTelephone();
+        if (mapper.getTenantByTelephone(telephone) == null) {
+            LOGGER.info("telephone not exist,no need to verify telephone.");
+            return Either.left(true);
+        }
+
         String verificationCode = randomCode();
         try {
             if (!verification.sendVerificationCode(telephone, verificationCode)) {
@@ -105,10 +115,16 @@ public class IdentityService {
     @ParameterValidate
     public Either<Boolean, FormatRespDto> sendVerificationCodeByMail(VerificationReqByMailDto verifyRequest) {
         if (!Boolean.parseBoolean(mailEnabled)) {
-            LOGGER.info("Mail is not enabled,no need to verify mailAddress param");
+            LOGGER.info("Mail is not enabled,no need to verify mailAddress.");
             return Either.left(true);
         }
+
         String mailAddress = verifyRequest.getMailAddress();
+        if (mapper.getTenantByMailAddress(mailAddress) == null) {
+            LOGGER.info("mailAddress not exist,no need to verify mailAddress.");
+            return Either.left(true);
+        }
+
         String verificationCode = randomCode();
         String subject = MAIL_SUBJECT_VERIFYCODE;
         String content = String.format(MAIL_CONTENT_VERIFYCODE,
