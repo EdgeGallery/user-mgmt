@@ -46,8 +46,12 @@ public class RedisUtil {
      */
     @PostConstruct
     public void init() {
+        setRedisConfig(redisConfigWrapper);
+    }
+
+    private static synchronized void setRedisConfig(RedisConfig redisConfigWrapper) {
         if (redisConfig == null) {
-            redisConfig = this.redisConfigWrapper;
+            redisConfig = redisConfigWrapper;
         }
     }
 

@@ -63,12 +63,6 @@ public class UserMgmtService {
     @Autowired
     private Pbkdf2PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private SmsConfig smsConfig;
-
-    @Value("${mail.enabled}")
-    private String mailEnabled;
-
     /**
      * register user info by telephone, verification code and so on.
      *
