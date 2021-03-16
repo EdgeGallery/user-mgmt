@@ -26,6 +26,8 @@ import javax.net.ssl.X509TrustManager;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.servicecomb.springboot2.starter.EnableServiceComb;
 import org.mybatis.spring.annotation.MapperScan;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -36,6 +38,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @EnableServiceComb
 public class MainServer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MainServer.class);
 
     /**
      * Main.
@@ -50,11 +53,11 @@ public class MainServer {
                 }
 
                 public void checkClientTrusted(X509Certificate[] certs, String authType) {
-                    // truct any client
+                    LOGGER.info("checks client trusted");
                 }
 
                 public void checkServerTrusted(X509Certificate[] certs, String authType) {
-                    // truct any server
+                    LOGGER.info("checks server trusted");
                 }
             }
         };
