@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.UUID;
 import javax.ws.rs.core.Response.Status;
 import org.apache.commons.lang3.StringUtils;
-import org.edgegallery.user.auth.config.SmsConfig;
 import org.edgegallery.user.auth.config.validate.annotation.ParameterValidate;
 import org.edgegallery.user.auth.controller.dto.request.ModifyPasswordReqDto;
 import org.edgegallery.user.auth.controller.dto.request.QueryUserReqDto;
@@ -45,7 +44,6 @@ import org.edgegallery.user.auth.utils.redis.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.stereotype.Service;
 
