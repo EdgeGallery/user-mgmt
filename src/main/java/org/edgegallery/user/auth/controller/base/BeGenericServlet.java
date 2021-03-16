@@ -24,26 +24,17 @@ import org.springframework.http.ResponseEntity;
 public abstract class BeGenericServlet {
 
     protected <T> ResponseEntity<Object> buildResponse(Either<T, FormatRespDto> either) {
-        return either.isRight() ? buildErrorResponse(either.right().value()) : buildOkResponse(either.left().value());
+        return either.isRight() ? buildErrorResponse(either.right().value()) : ResponseEntity.ok(either.left().value());
     }
 
     protected <T> ResponseEntity<Object> buildCreatedResponse(Either<T, FormatRespDto> either) {
         return either.isRight() ? buildErrorResponse(either.right().value())
-            : buildCreatedResponse(either.left().value());
-    }
-
-    private <T> ResponseEntity<Object> buildCreatedResponse(T entity) {
-        return ResponseEntity.status(Status.CREATED.getStatusCode()).body(entity);
+            : ResponseEntity.status(Status.CREATED.getStatusCode()).body(either.left().value());
     }
 
     private ResponseEntity<Object> buildErrorResponse(FormatRespDto formatRespDto) {
         return ResponseEntity.status(formatRespDto.getErrStatus().getStatusCode())
             .body(formatRespDto.getErrorRespDto());
     }
-
-    private <T> ResponseEntity<Object> buildOkResponse(T entity) {
-        return ResponseEntity.ok(entity);
-    }
-
 
 }

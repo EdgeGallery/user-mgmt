@@ -50,9 +50,11 @@ public class MainServer {
                 }
 
                 public void checkClientTrusted(X509Certificate[] certs, String authType) {
+                    // truct any client
                 }
 
                 public void checkServerTrusted(X509Certificate[] certs, String authType) {
+                    // truct any server
                 }
             }
         };
