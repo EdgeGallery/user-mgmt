@@ -24,8 +24,10 @@ import org.edgegallery.user.auth.config.SmsConfig;
 import org.edgegallery.user.auth.config.validate.annotation.ParameterValidate;
 import org.edgegallery.user.auth.controller.dto.request.VerificationReqByMailDto;
 import org.edgegallery.user.auth.controller.dto.request.VerificationReqDto;
+import org.edgegallery.user.auth.controller.dto.response.ErrorRespDto;
 import org.edgegallery.user.auth.controller.dto.response.FormatRespDto;
 import org.edgegallery.user.auth.db.mapper.TenantPoMapper;
+import org.edgegallery.user.auth.utils.ErrorEnum;
 import org.edgegallery.user.auth.utils.redis.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,8 +87,9 @@ public class IdentityService {
 
         String telephone = verifyRequest.getTelephone();
         if (mapper.getTenantByTelephone(telephone) == null) {
-            LOGGER.info("telephone not exist,no need to verify telephone.");
-            return Either.left(true);
+            LOGGER.error("telephone not exist,no need to verify telephone.");
+            return Either.right(new FormatRespDto(Response.Status.BAD_REQUEST,
+                ErrorRespDto.build(ErrorEnum.MOBILEPHONE_NOT_FOUND)));
         }
 
         String verificationCode = randomCode();
@@ -122,7 +125,8 @@ public class IdentityService {
         String mailAddress = verifyRequest.getMailAddress();
         if (mapper.getTenantByMailAddress(mailAddress) == null) {
             LOGGER.info("mailAddress not exist,no need to verify mailAddress.");
-            return Either.left(true);
+            return Either.right(new FormatRespDto(Response.Status.BAD_REQUEST,
+                ErrorRespDto.build(ErrorEnum.MAILADDR_NOT_FOUND)));
         }
 
         String verificationCode = randomCode();

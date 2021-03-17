@@ -17,6 +17,7 @@
 package org.edgegallery.user.auth.controller.dto.response;
 
 import javax.ws.rs.core.Response;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -24,6 +25,7 @@ import lombok.ToString;
 @Setter
 @Getter
 @ToString
+@AllArgsConstructor
 public class FormatRespDto {
 
     private Response.Status errStatus;
