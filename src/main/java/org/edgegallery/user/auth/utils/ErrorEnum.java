@@ -19,7 +19,9 @@ package org.edgegallery.user.auth.utils;
 public enum ErrorEnum {
     DATABASE_EXCEPTION(100000001, "Database Exception", "Database Exception"),
     USER_NOT_FOUND(100000002, "User not exist", "User not exist"),
-    PASSWORD_INCORRECT(100000003, "password incorrect", "password incorrect");
+    MOBILEPHONE_NOT_FOUND(100000003, "mobile phone not exist", "mobile phone not exist"),
+    MAILADDR_NOT_FOUND(100000004, "email address not exist", "email address not exist"),
+    PASSWORD_INCORRECT(100000005, "password incorrect", "password incorrect");
 
     private int code;
     private String message;

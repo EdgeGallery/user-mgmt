@@ -19,6 +19,7 @@ package org.edgegallery.user.auth.controller.dto.response;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.edgegallery.user.auth.utils.ErrorEnum;
 
 @Setter
 @Getter
@@ -39,5 +40,15 @@ public class ErrorRespDto {
         this.code = returnCode;
         this.message = message;
         this.detail = detail;
+    }
+
+    /**
+     * build from error enum define.
+     *
+     * @param errorEnum error define
+     * @return ErrorRespDto
+     */
+    public static ErrorRespDto build(ErrorEnum errorEnum) {
+        return new ErrorRespDto(errorEnum.code(), errorEnum.message(), errorEnum.detail());
     }
 }
