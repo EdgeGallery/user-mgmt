@@ -29,6 +29,7 @@ import org.edgegallery.user.auth.controller.dto.request.TenantRegisterReqDto;
 import org.edgegallery.user.auth.controller.dto.request.UniqueReqDto;
 import org.edgegallery.user.auth.controller.dto.response.FormatRespDto;
 import org.edgegallery.user.auth.controller.dto.response.QueryUserRespDto;
+import org.edgegallery.user.auth.controller.dto.response.TenantBasicRespDto;
 import org.edgegallery.user.auth.controller.dto.response.TenantRespDto;
 import org.edgegallery.user.auth.controller.dto.response.UniquenessRespDto;
 import org.edgegallery.user.auth.db.EnumPlatform;
@@ -275,6 +276,7 @@ public class UserMgmtService {
             QueryUserRespDto queryResp = new QueryUserRespDto();
             queryResp.setUserList(mapper.queryUsers(queryReq));
             queryResp.setTotalCount(mapper.queryUserCount(queryReq));
+            queryResp.getUserList().forEach(TenantBasicRespDto::anonymize);
             return Either.left(queryResp);
         } catch (Exception e) {
             LOGGER.error("Database Exception on Query Users: {}", e.getMessage());
@@ -323,6 +325,9 @@ public class UserMgmtService {
             LOGGER.error("The user has no permission to modify user.");
             return Either.right(new FormatRespDto(Status.FORBIDDEN, "The user has no permission to modify user."));
         }
+
+        LOGGER.info("correct modify information.");
+        user.assignAnonymizedValue(oldUserPo);
 
         LOGGER.info("check unique for user information.");
         Either<TenantRespDto, FormatRespDto> checkResult = checkUniqueOnModifyUser(user, oldUserPo);

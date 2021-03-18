@@ -26,7 +26,7 @@ public class ServiceConfig {
     public static final String PATTERN_USERNAME = "^[a-zA-Z][a-zA-Z0-9_]{5,29}$";
 
     public static final String PATTERN_USERPW =
-        "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[~!@#$%^&*()_+\\-={}:\";<>?,./]).{6,18}$";
+        "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[~!@#$%^&*()_+`\\-={}:\";'<>?,./]).{6,18}$";
 
     public static final String PATTERN_TELEPHONE = "^1[34578]\\d{9}$";
 

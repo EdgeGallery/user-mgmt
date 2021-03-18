@@ -19,6 +19,8 @@ package org.edgegallery.user.auth.controller.dto.response;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
+import org.edgegallery.user.auth.db.entity.TenantPo;
+import org.edgegallery.user.auth.utils.AnomymizeUtil;
 import org.springframework.util.StringUtils;
 
 @Setter
@@ -45,5 +47,27 @@ public abstract class TenantBasicRespDto {
         this.username = StringUtils.trimWhitespace(this.username);
         this.mailAddress =  StringUtils.trimWhitespace(this.mailAddress);
         this.telephone = StringUtils.trimWhitespace(this.telephone);
+    }
+
+    /**
+     * anonymize some sensitive information.
+     */
+    public void anonymize() {
+        this.telephone = AnomymizeUtil.anomymizePhoneNum(this.telephone);
+        this.mailAddress = AnomymizeUtil.anomymizeMail(this.mailAddress);
+    }
+
+    /**
+     * assign anonymized value.
+     *
+     * @param oldUserPo old user po object
+     */
+    public void assignAnonymizedValue(TenantPo oldUserPo) {
+        if (AnomymizeUtil.isAnomymized(this.telephone)) {
+            setTelephone(oldUserPo.getTelephoneNumber());
+        }
+        if (AnomymizeUtil.isAnomymized(this.mailAddress)) {
+            setMailAddress(oldUserPo.getMailAddress());
+        }
     }
 }
