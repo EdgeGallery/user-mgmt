@@ -46,6 +46,8 @@ public class TenantRespDto extends TenantBasicRespDto {
         this.setTelephone(tenantPo.getTelephoneNumber());
         this.setAllowed(tenantPo.isAllowed());
         this.setCreateTime(tenantPo.getCreateTime());
+
+        this.anonymize();
     }
 
     /**
