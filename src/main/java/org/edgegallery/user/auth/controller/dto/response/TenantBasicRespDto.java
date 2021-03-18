@@ -58,7 +58,7 @@ public abstract class TenantBasicRespDto {
     }
 
     /**
-     * assign anonymized value
+     * assign anonymized value.
      *
      * @param oldUserPo old user po object
      */
