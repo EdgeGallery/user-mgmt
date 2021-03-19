@@ -69,6 +69,6 @@ public final class AnomymizeUtil {
             return false;
         }
 
-        return strValue.indexOf(MASK_SIGN) > 0;
+        return strValue.indexOf(MASK_SIGN) >= 0;
     }
 }
