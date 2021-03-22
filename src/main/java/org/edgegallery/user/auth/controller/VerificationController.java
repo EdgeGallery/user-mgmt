@@ -64,6 +64,7 @@ public class VerificationController extends BeGenericServlet {
     public ResponseEntity<Object> sendVerificationCodeBySms(
             HttpServletRequest httpServletRequest,
             @ApiParam(value = "verificationRequest", required = true) @RequestBody VerificationReqDto request) {
+        LOGGER.info("X-FORWARDED-FOR={}", httpServletRequest.getHeader("X-FORWARDED-FOR"));
         LOGGER.info("remote info, addr={}, host={}, uri={}, url={}, user={}", httpServletRequest.getRemoteAddr(),
             httpServletRequest.getRemoteHost(), httpServletRequest.getRequestURI(), httpServletRequest.getRequestURL(),
             httpServletRequest.getRemoteUser(), httpServletRequest.getRemotePort());
