@@ -48,6 +48,13 @@ public class VerificationController extends BeGenericServlet {
     @Autowired
     private IdentityService identityService;
 
+    /**
+     * send verification code by sms.
+     *
+     * @param httpServletRequest HTTP Servlet Request
+     * @param request Request Content Body
+     * @return send result
+     */
     @PostMapping(value = "/sms", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "send verification code by sms", response = Object.class, notes =
             DescriptionConfig.VERIFICATION_SMS_MSG)
@@ -57,8 +64,8 @@ public class VerificationController extends BeGenericServlet {
     public ResponseEntity<Object> sendVerificationCodeBySms(
             HttpServletRequest httpServletRequest,
             @ApiParam(value = "verificationRequest", required = true) @RequestBody VerificationReqDto request) {
-        LOGGER.info("remote info, addr={}, host={}, uri={}, url={}, user={}", httpServletRequest.getRemoteAddr(), httpServletRequest.getRemoteHost(),
-            httpServletRequest.getRequestURI(), httpServletRequest.getRequestURL(),
+        LOGGER.info("remote info, addr={}, host={}, uri={}, url={}, user={}", httpServletRequest.getRemoteAddr(),
+            httpServletRequest.getRemoteHost(), httpServletRequest.getRequestURI(), httpServletRequest.getRequestURL(),
             httpServletRequest.getRemoteUser(), httpServletRequest.getRemotePort());
         return buildCreatedResponse(identityService.sendVerificationCodeBySms(request));
     }
