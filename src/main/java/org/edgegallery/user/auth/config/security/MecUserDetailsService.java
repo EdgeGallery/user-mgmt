@@ -45,8 +45,8 @@ public class MecUserDetailsService implements UserDetailsService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MecUserDetailsService.class);
 
     // when login failed 5 times, account will be locked.
-    private static final Set<RequestLimitRule> rules =
-        Collections.singleton(RequestLimitRule.of(Duration.ofMinutes(5), 4));
+    private static final Set<RequestLimitRule> rules = Collections
+        .singleton(RequestLimitRule.of(Duration.ofMinutes(5), 4));
 
     // locked overtime
     private static final long OVERTIME = 5 * 60 * 1000L;
@@ -58,18 +58,25 @@ public class MecUserDetailsService implements UserDetailsService {
     @Autowired
     private TenantPoMapper tenantPoMapper;
 
+    @Autowired
+    private ClientUserBean clientUserBean;
+
+
     @Override
     public UserDetails loadUserByUsername(String uniqueUserFlag) throws UsernameNotFoundException {
         TenantPo tenant = tenantPoMapper.getTenantByUniqueFlag(uniqueUserFlag);
         if (tenant == null || !tenant.isAllowed()) {
-            throw new UsernameNotFoundException(
-                    "User not found: " + uniqueUserFlag);
+            // to check client user
+            User user = clientUserBean.parserClientUser(uniqueUserFlag);
+            if (user == null) {
+                throw new UsernameNotFoundException("User not found: " + uniqueUserFlag);
+            } else {
+                return user;
+            }
         }
-
         List<RolePo> rolePos = tenantPoMapper.getRolePoByTenantId(tenant.getTenantId());
         List<GrantedAuthority> authorities = new ArrayList<>();
         rolePos.forEach(rolePo -> authorities.add(new SimpleGrantedAuthority("ROLE_" + rolePo.toString())));
-
         boolean isLocked = isLocked(uniqueUserFlag);
         if (isLocked) {
             LOGGER.info("username:{} have been locked.", tenant.getUsername());
