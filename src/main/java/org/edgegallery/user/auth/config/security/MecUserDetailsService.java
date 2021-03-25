@@ -22,10 +22,14 @@ import es.moki.ratelimitj.inmemory.request.InMemorySlidingWindowRequestRateLimit
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.edgegallery.user.auth.config.OAuthClientDetailsConfig;
+import org.edgegallery.user.auth.db.EnumPlatform;
+import org.edgegallery.user.auth.db.EnumRole;
 import org.edgegallery.user.auth.db.entity.RolePo;
 import org.edgegallery.user.auth.db.entity.TenantPo;
 import org.edgegallery.user.auth.db.mapper.TenantPoMapper;
@@ -38,6 +42,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -51,6 +56,8 @@ public class MecUserDetailsService implements UserDetailsService {
     // locked overtime
     private static final long OVERTIME = 5 * 60 * 1000L;
 
+    private static final int CLIENT_LOGIN_TIMEOUT = 5000;
+
     private static final RequestRateLimiter LIMITER = new InMemorySlidingWindowRequestRateLimiter(rules);
 
     private static final Map<String, Long> LOCKED_USERS_MAP = new HashMap<>();
@@ -59,15 +66,17 @@ public class MecUserDetailsService implements UserDetailsService {
     private TenantPoMapper tenantPoMapper;
 
     @Autowired
-    private ClientUserBean clientUserBean;
+    private OAuthClientDetailsConfig oauthClientDetailsConfig;
 
+    @Autowired
+    private Pbkdf2PasswordEncoder passwordEncoder;
 
     @Override
     public UserDetails loadUserByUsername(String uniqueUserFlag) throws UsernameNotFoundException {
         TenantPo tenant = tenantPoMapper.getTenantByUniqueFlag(uniqueUserFlag);
         if (tenant == null || !tenant.isAllowed()) {
             // to check client user
-            User user = clientUserBean.parserClientUser(uniqueUserFlag);
+            User user = parserClientUser(uniqueUserFlag);
             if (user == null) {
                 throw new UsernameNotFoundException("User not found: " + uniqueUserFlag);
             } else {
@@ -82,6 +91,40 @@ public class MecUserDetailsService implements UserDetailsService {
             LOGGER.info("username:{} have been locked.", tenant.getUsername());
         }
         return new User(tenant.getUsername(), tenant.getPassword(), true, true, true, !isLocked, authorities);
+    }
+
+    private List<RolePo> clientDefaultRoles() {
+        List<RolePo> roles = new ArrayList<>();
+        for (EnumPlatform plat : EnumPlatform.values()) {
+            roles.add(new RolePo(plat, EnumRole.TENANT));
+        }
+        return roles;
+    }
+
+    public User parserClientUser(String userName) {
+        final TenantPo clientUser = new TenantPo();
+        String[] userNameArr = userName.split(":");
+        if (userNameArr.length != 2) {
+            return null;
+        }
+        final String inClientId = userNameArr[0];
+        String inTime = userNameArr[1];
+        if (new Date().getTime() - Long.valueOf(inTime) > CLIENT_LOGIN_TIMEOUT) {
+            return null;
+        }
+        oauthClientDetailsConfig.getClients().forEach(clientDetail -> {
+            String clientId = clientDetail.getClientId();
+            if (inClientId.equalsIgnoreCase(clientId)) {
+                String secret = clientDetail.getClientSecret();
+                clientUser.setUsername(clientId);
+                clientUser.setPassword(passwordEncoder.encode(secret));
+                return;
+            }
+        });
+        List<RolePo> rolePos = clientDefaultRoles();
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        rolePos.forEach(rolePo -> authorities.add(new SimpleGrantedAuthority("ROLE_" + rolePo.toString())));
+        return new User(clientUser.getUsername(), clientUser.getPassword(), true, true, true, true, authorities);
     }
 
     private boolean isLocked(String userId) {

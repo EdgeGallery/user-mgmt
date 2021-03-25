@@ -44,9 +44,6 @@ public class AuthServerTokenEnhancer implements TokenEnhancer {
     @Value("${mail.enabled}")
     private String mailEnabled;
 
-    @Autowired
-    private ClientUserBean clientUserBean;
-
     @Override
     public OAuth2AccessToken enhance(OAuth2AccessToken oauth2AccessToken, OAuth2Authentication oauth2Authentication) {
         User user = (User) oauth2Authentication.getPrincipal();

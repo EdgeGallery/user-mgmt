@@ -58,6 +58,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private String mailEnabled;
 
     @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
     private MecUserDetailsService mecUserDetailsService;
 
     @Autowired
@@ -120,7 +123,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(mecUserDetailsService);
-        provider.setPasswordEncoder(passwordEncoder());
+        provider.setPasswordEncoder(passwordEncoder);
         provider.setHideUserNotFoundExceptions(false);
         return provider;
     }
@@ -154,17 +157,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
         urlBasedCorsConfigurationSource.registerCorsConfiguration("/auth/logout", corsConfiguration);
         return new CorsFilter(urlBasedCorsConfigurationSource);
-    }
-
-    /**
-     * Define the PBKDF2 encoder with sha256.
-     *
-     * @return
-     */
-    @Bean
-    public Pbkdf2PasswordEncoder passwordEncoder() {
-        Pbkdf2PasswordEncoder encoder = new Pbkdf2PasswordEncoder();
-        encoder.setAlgorithm(Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA256);
-        return encoder;
     }
 }
