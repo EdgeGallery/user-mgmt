@@ -34,28 +34,27 @@ public class AuthServerTokenEnhancer implements TokenEnhancer {
 
     @Autowired
     TenantPoMapper tenantPoMapper;
+
     @Autowired
     private HttpServletRequest request;
+
     @Autowired
     private SmsConfig smsConfig;
+
     @Value("${mail.enabled}")
     private String mailEnabled;
 
     @Override
-    public OAuth2AccessToken enhance(OAuth2AccessToken oauth2AccessToken,
-                                     OAuth2Authentication oauth2Authentication) {
+    public OAuth2AccessToken enhance(OAuth2AccessToken oauth2AccessToken, OAuth2Authentication oauth2Authentication) {
         User user = (User) oauth2Authentication.getPrincipal();
         TenantPo tenant = tenantPoMapper.getTenantByUsername(user.getUsername());
-        if (tenant == null) {
-            return oauth2AccessToken;
-        }
         String code = oauth2Authentication.getOAuth2Request().getRequestParameters().get("code");
         Map<String, Object> additionalMap = new HashMap<>();
-        additionalMap.put("userId", tenant.getTenantId());
+        additionalMap.put("userId", tenant != null ? tenant.getTenantId() : null);
         additionalMap.put("enableSms", smsConfig.getEnabled());
         additionalMap.put("enableMail", mailEnabled);
         additionalMap.put("ssoSessionId", request.getServletContext().getAttribute(code));
-        additionalMap.put("userName", tenant.getUsername());
+        additionalMap.put("userName", user.getUsername());
         ((DefaultOAuth2AccessToken) oauth2AccessToken).setAdditionalInformation(additionalMap);
         return oauth2AccessToken;
     }
