@@ -109,7 +109,7 @@ public class MecUserDetailsService implements UserDetailsService {
         }
         final String inClientId = userNameArr[0];
         String inTime = userNameArr[1];
-        if (new Date().getTime() - Long.valueOf(inTime) > CLIENT_LOGIN_TIMEOUT) {
+        if (new Date().getTime() - Long.parseLong(inTime) > CLIENT_LOGIN_TIMEOUT) {
             return null;
         }
         oauthClientDetailsConfig.getClients().forEach(clientDetail -> {
