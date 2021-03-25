@@ -1,5 +1,5 @@
 /*
- *  Copyright 2020 Huawei Technologies Co., Ltd.
+ *  Copyright 2021 Huawei Technologies Co., Ltd.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package org.edgegallery.user.auth.config.security;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import org.edgegallery.user.auth.config.OAuthClientDetail;
 import org.edgegallery.user.auth.config.OAuthClientDetailsConfig;
 import org.edgegallery.user.auth.db.EnumPlatform;
 import org.edgegallery.user.auth.db.EnumRole;
