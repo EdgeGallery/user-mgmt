@@ -101,6 +101,11 @@ public class MecUserDetailsService implements UserDetailsService {
         return roles;
     }
 
+    /**
+     * to parse the username if this is a client user, and return this user.
+     * @param userName input username
+     * @return User
+     */
     public User parserClientUser(String userName) {
         final TenantPo clientUser = new TenantPo();
         String[] userNameArr = userName.split(":");
