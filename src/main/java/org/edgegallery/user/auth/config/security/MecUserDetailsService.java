@@ -26,7 +26,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import org.edgegallery.user.auth.config.OAuthClientDetail;
 import org.edgegallery.user.auth.config.OAuthClientDetailsConfig;
 import org.edgegallery.user.auth.db.EnumPlatform;
 import org.edgegallery.user.auth.db.EnumRole;
@@ -120,15 +122,16 @@ public class MecUserDetailsService implements UserDetailsService {
         if (new Date().getTime() - Long.parseLong(inTime) > CLIENT_LOGIN_TIMEOUT) {
             return null;
         }
-        oauthClientDetailsConfig.getClients().forEach(clientDetail -> {
-            String clientId = clientDetail.getClientId();
-            if (inClientId.equalsIgnoreCase(clientId)) {
-                String secret = clientDetail.getClientSecret();
-                clientUser.setUsername(clientId);
-                clientUser.setPassword(passwordEncoder.encode(secret));
-                return;
-            }
-        });
+        Optional<OAuthClientDetail> client = oauthClientDetailsConfig.getClients().stream()
+            .filter(clientDetail -> inClientId.equalsIgnoreCase(clientDetail.getClientId())).findFirst();
+        if (client.isPresent()) {
+            OAuthClientDetail clientDetail = client.get();
+            String secret = clientDetail.getClientSecret();
+            clientUser.setUsername(clientDetail.getClientId());
+            clientUser.setPassword(passwordEncoder.encode(secret));
+        } else {
+            return null;
+        }
         List<RolePo> rolePos = clientDefaultRoles();
         List<GrantedAuthority> authorities = new ArrayList<>();
         rolePos.forEach(rolePo -> authorities.add(new SimpleGrantedAuthority("ROLE_" + rolePo.toString())));
