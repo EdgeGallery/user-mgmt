@@ -74,7 +74,7 @@ public class MecUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String uniqueUserFlag) throws UsernameNotFoundException {
         TenantPo tenant = tenantPoMapper.getTenantByUniqueFlag(uniqueUserFlag);
-        if (tenant == null || !tenant.isAllowed()) {
+        if (tenant == null) {
             // to check client user
             User user = parserClientUser(uniqueUserFlag);
             if (user == null) {
@@ -82,6 +82,8 @@ public class MecUserDetailsService implements UserDetailsService {
             } else {
                 return user;
             }
+        } else if (!tenant.isAllowed()) {
+            throw new UsernameNotFoundException("User not found: " + uniqueUserFlag);
         }
         List<RolePo> rolePos = tenantPoMapper.getRolePoByTenantId(tenant.getTenantId());
         List<GrantedAuthority> authorities = new ArrayList<>();
@@ -103,6 +105,7 @@ public class MecUserDetailsService implements UserDetailsService {
 
     /**
      * to parse the username if this is a client user, and return this user.
+     *
      * @param userName input username
      * @return User
      */
