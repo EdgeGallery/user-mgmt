@@ -4,6 +4,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 
 
 import com.google.gson.Gson;
+import java.util.Date;
 import javax.servlet.http.Cookie;
 import org.edgegallery.user.auth.MainServer;
 import org.edgegallery.user.auth.controller.dto.response.TenantRespDto;
@@ -78,8 +79,34 @@ public class LoginTest {
     public void should_successful_when_login_with_admin() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/login").contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .header("X-XSRF-TOKEN", xsrfToken).cookie(cookies).accept(MediaType.APPLICATION_JSON_VALUE)
-            .param("username", "admin").param("password", "Admin@321")).andExpect(MockMvcResultMatchers.status().isOk());
+            .param("username", "admin").param("password", "Admin@321"))
+            .andExpect(MockMvcResultMatchers.status().isOk());
     }
+
+    @Test
+    public void should_successful_when_login_with_client_user() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/login").contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .header("X-XSRF-TOKEN", xsrfToken).cookie(cookies).accept(MediaType.APPLICATION_JSON_VALUE)
+            .param("username", "test:" + new Date().getTime()).param("password", "test"))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    public void should_failed_when_login_with_client_user_timeout() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/login").contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .header("X-XSRF-TOKEN", xsrfToken).cookie(cookies).accept(MediaType.APPLICATION_JSON_VALUE)
+            .param("username", "test:" + (new Date().getTime() - 5000)).param("password", "test"))
+            .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+    }
+
+    @Test
+    public void should_failed_when_login_with_client_user_not_found() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/login").contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .header("X-XSRF-TOKEN", xsrfToken).cookie(cookies).accept(MediaType.APPLICATION_JSON_VALUE)
+            .param("username", "testnotfound:" + new Date().getTime()).param("password", "test"))
+            .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+    }
+
 
     @Test
     public void should_failed_when_login_with_wrong_password() throws Exception {
@@ -117,15 +144,15 @@ public class LoginTest {
         }
         mvc.perform(MockMvcRequestBuilders.post("/login").contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .header("X-XSRF-TOKEN", xsrfToken).cookie(cookies).accept(MediaType.APPLICATION_JSON_VALUE)
-            .param("username", "tenant2").param("password", "tenant"))
-            .andExpect(MockMvcResultMatchers.status().isOk());
+            .param("username", "tenant2").param("password", "tenant")).andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
     public void should_failed_when_login_with_no_username() throws Exception {
-        MvcResult result = mvc.perform(MockMvcRequestBuilders.post("/login").contentType(MediaType.APPLICATION_FORM_URLENCODED)
-            .header("X-XSRF-TOKEN", xsrfToken).cookie(cookies).accept(MediaType.APPLICATION_JSON_VALUE)
-            .param("username", "not_found_user").param("password", "Test!123"))
+        MvcResult result = mvc.perform(
+            MockMvcRequestBuilders.post("/login").contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .header("X-XSRF-TOKEN", xsrfToken).cookie(cookies).accept(MediaType.APPLICATION_JSON_VALUE)
+                .param("username", "not_found_user").param("password", "Test!123"))
             .andExpect(MockMvcResultMatchers.status().isUnauthorized()).andReturn();
     }
 }
