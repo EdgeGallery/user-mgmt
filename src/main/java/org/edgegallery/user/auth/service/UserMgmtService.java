@@ -73,17 +73,17 @@ public class UserMgmtService {
         LOGGER.info("Begin register user");
         if (!StringUtils.isEmpty(reqParam.getTelephone())
             && mapper.getTenantByTelephone(reqParam.getTelephone()) != null) {
-            return Either.right(new FormatRespDto(Status.FORBIDDEN, "Telephone has existed"));
+            return Either.right(new FormatRespDto(Status.BAD_REQUEST, "Telephone has existed"));
         }
 
         if (!StringUtils.isEmpty(reqParam.getMailAddress())
             && mapper.getTenantByMailAddress(reqParam.getMailAddress()) != null) {
-            return Either.right(new FormatRespDto(Status.FORBIDDEN, "MailAddress has existed"));
+            return Either.right(new FormatRespDto(Status.BAD_REQUEST, "MailAddress has existed"));
         }
 
         if (!StringUtils.isEmpty(reqParam.getUsername())
             && mapper.getTenantByUsername(reqParam.getUsername()) != null) {
-            return Either.right(new FormatRespDto(Status.FORBIDDEN, "Username has existed"));
+            return Either.right(new FormatRespDto(Status.BAD_REQUEST, "Username has existed"));
         }
 
         TenantRegisterReqDto registerRequest = reqParam;
@@ -161,7 +161,7 @@ public class UserMgmtService {
         TenantPo tenantPo = findTenantToModifyPw(modifyRequest, currUserName);
         if (tenantPo == null) {
             LOGGER.error(ErrorEnum.USER_NOT_FOUND.detail());
-            return Either.right(new FormatRespDto(Status.FORBIDDEN, ErrorEnum.USER_NOT_FOUND.detail()));
+            return Either.right(new FormatRespDto(Status.BAD_REQUEST, ErrorEnum.USER_NOT_FOUND.detail()));
         }
 
         Either<Boolean, FormatRespDto> checkResult = checkOnModifyPw(modifyRequest, tenantPo);
@@ -199,7 +199,7 @@ public class UserMgmtService {
             String verificationCode = modifyRequest.getVerificationCode();
             if (!verifyCode(verificationCode, keyOfVerifyCode)) {
                 LOGGER.error("verification code is error");
-                return Either.right(new FormatRespDto(Status.FORBIDDEN, "Verification code is error"));
+                return Either.right(new FormatRespDto(Status.BAD_REQUEST, "Verification code is error"));
             }
         } else {
             // check old pw
@@ -207,11 +207,11 @@ public class UserMgmtService {
             try {
                 if (!passwordEncoder.matches(modifyRequest.getOldPassword(), tenantPo.getPassword())) {
                     LOGGER.error(ErrorEnum.PASSWORD_INCORRECT.detail());
-                    return Either.right(new FormatRespDto(Status.FORBIDDEN, ErrorEnum.PASSWORD_INCORRECT.detail()));
+                    return Either.right(new FormatRespDto(Status.BAD_REQUEST, ErrorEnum.PASSWORD_INCORRECT.detail()));
                 }
             } catch (Exception e) {
                 LOGGER.error("failed for password match.");
-                return Either.right(new FormatRespDto(Status.FORBIDDEN, ErrorEnum.PASSWORD_INCORRECT.detail()));
+                return Either.right(new FormatRespDto(Status.BAD_REQUEST, ErrorEnum.PASSWORD_INCORRECT.detail()));
             }
         }
         return null;
@@ -317,7 +317,7 @@ public class UserMgmtService {
         TenantPo oldUserPo = mapper.getTenantBasicPoData(user.getUserId());
         if (oldUserPo == null) {
             LOGGER.error(ErrorEnum.USER_NOT_FOUND.detail());
-            return Either.right(new FormatRespDto(Status.FORBIDDEN, ErrorEnum.USER_NOT_FOUND.detail()));
+            return Either.right(new FormatRespDto(Status.BAD_REQUEST, ErrorEnum.USER_NOT_FOUND.detail()));
         }
 
         if (!oldUserPo.getUsername().equalsIgnoreCase(currUserName)
