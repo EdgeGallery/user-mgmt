@@ -2,34 +2,25 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-  User Management 用户管理模块，为EdgeGallery提供了基本的用户增删改查功能，定义了用户的角色与权限，并且包含了两个关键特性：手机验证和单点登录（Single Sign On）能力。
+用户管理模块为EdgeGallery平台提供了用户注册与登录、密码找回、帐号中心、用户列表管理、邮箱和手机验证等功能。
 
 ## 角色定义
 
-- **租户** 系统内的普通用户，可以创建项目/上传App等操作，租户之间数据不能相互访问；
+用户管理模块定义了用户的角色与权限模型，包括：
 
-- **用户管理员** 系统的用户管理员，可以对其他用户进行管理，修改用户信息与权限；
+- **租户** 系统内的普通用户，可以创建项目/上传App等操作，租户之间数据不能相互访问。
 
-- **访客** 直接访问Portal时，默认是访客权限，只能浏览各平台的基本功能，不能做编辑或创建数据。
+- **管理员** 系统管理员，可以对系统的应用数据进行管理和维护操作。
 
-新注册的用户，默认是“租户”权限，“用户管理员”权限只能通过修改数据库获取，目前没有提供注册或编辑入口。
+- **访客** 直接访问Portal时，默认是访客权限，只能浏览各平台的基本功能，不能做创建、编辑和删除等操作。
 
-## 特性简介
+- **超级管理员** 系统内置一个默认用户：admin，作为超级管理员，也作为用户管理员。可以对其他用户进行统一管理，停用/启用用户，设置用户权限。
 
+新注册的用户，默认是“租户”权限。“管理员”权限只能由admin在用户列表管理功能中，为租户提权获得。
 
-- **手机验证**
-
-  新用户在注册时，需要填写手机号和验证码，只有通过校验才能成功注册，一个手机号只能注册一个账户，忘记密码可以通过手机号找回；
-  
-  在登录时可以使用用户名与密码登录，也可以使用手机号与密码登录，手机号码与用户名都要求是唯一的。
-  
-  更多的架构设计可以点击[这里](http://docs.edgegallery.org/en/latest/)
-
-- **单点登录**
-
-  User Management 用户管理提供单点登录能力，被User Management信任的平台可以使用同一个认证服务器，在任一平台登录后，登录有效期内在其他平台无需重复登录即可正常进入操作界面。目前被信任的平台有Developer Portal（开发者平台）、Application Store（应用仓库）和 MEC Platform（MEC 平台）。
-  
-  更多的架构设计可以点击[这里](http://docs.edgegallery.org/en/latest/)
+## 主要特性
+ 
+  用户管理模块提供的主要特性可以点击查看：[用户管理模块特性设计](http://docs.edgegallery.org/en/latest/Projects/User%20Management/User_Features.html)
 
 ## 编译运行
 
@@ -44,7 +35,7 @@
   | OpenJDK1.8 |1.8.0 | [download](http://openjdk.java.net/install/)
   | MavApache Maven |3.6.3 | [download](https://maven.apache.org/download.cgi)
   | IntelliJ IDEA |Community |[download](https://www.jetbrains.com/idea/download/)
-  | Servicecomb Service-Center    | 1.3.0 | [download](https://servicecomb.apache.org/cn/release/service-center-downloads/)
+  | Servicecomb Service-Center    | 1.3.2 | [download](https://servicecomb.apache.org/cn/release/service-center-downloads/)
   | Postgres  | 9.6.17 or above |   [download](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads)
   | Redis  | 3.2.100 or above | [download](https://github.com/microsoftarchive/redis/releases) |
   
