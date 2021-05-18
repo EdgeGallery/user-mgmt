@@ -95,7 +95,8 @@ public class RedisUtil {
     }
 
     public enum RedisKeyType {
-        VERIFICATION_CODE(redisConfig.getVerificationTimeOut());
+        VERIFICATION_CODE(redisConfig.getVerificationTimeOut()),
+        IMG_VERIFICATION_CODE(redisConfig.getImgVerificationTimeout());
 
         private int timeOut;
 

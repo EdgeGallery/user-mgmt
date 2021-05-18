@@ -20,6 +20,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 import org.apache.http.HttpStatus;
 import org.apache.servicecomb.provider.rest.common.RestSchema;
 import org.edgegallery.user.auth.config.DescriptionConfig;
@@ -32,9 +36,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @RestSchema(schemaId = "identity")
 @RequestMapping("/v1/identity")
@@ -76,5 +82,32 @@ public class VerificationController extends BeGenericServlet {
     public ResponseEntity<Object> sendVerificationCodeByMail(
         @ApiParam(value = "verificationRequest", required = true) @RequestBody VerificationReqByMailDto request) {
         return buildCreatedResponse(identityService.sendVerificationCodeByMail(request));
+    }
+
+    /**
+     * generate image verification code.
+     *
+     * @return generate result
+     */
+    @GetMapping(value = "/verifycode-image", produces = MediaType.IMAGE_JPEG_VALUE)
+    @ResponseBody
+    @ApiOperation(value = "generate image verification code", response = Object.class)
+    public byte[] generateImgVerificationCode() throws IOException {
+        BufferedImage image = identityService.generateImgVerificationCode();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ImageIO.write(image, "JPEG", outputStream);
+        return outputStream.toByteArray();
+    }
+
+    /**
+     * precheck image verification code.
+     *
+     * @return check result
+     */
+    @GetMapping(value = "/verifycode-image/precheck", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @ApiOperation(value = "check image verification code", response = Object.class)
+    public ResponseEntity<Object> preCheckImgVerificationCode() throws IOException {
+        return buildResponse(identityService.preCheckImgVerificationCode());
     }
 }

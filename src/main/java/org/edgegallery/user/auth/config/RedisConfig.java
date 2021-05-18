@@ -33,6 +33,8 @@ public class RedisConfig {
 
     private Integer verificationTimeOut;
 
+    private Integer imgVerificationTimeout;
+
     private String password;
 
     private Integer maxTotal;

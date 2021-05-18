@@ -1,5 +1,5 @@
 /*
- *  Copyright 2020 Huawei Technologies Co., Ltd.
+ *  Copyright 2020-2021 Huawei Technologies Co., Ltd.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package org.edgegallery.user.auth.config.log;
+package org.edgegallery.user.auth.config.filter;
 
 import com.google.gson.Gson;
 import java.io.IOException;
@@ -26,21 +26,36 @@ import javax.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.edgegallery.user.auth.config.security.LoginFailHandler;
+import org.edgegallery.user.auth.service.IdentityService;
+import org.edgegallery.user.auth.utils.ErrorEnum;
+import org.edgegallery.user.auth.utils.redis.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 import org.springframework.web.util.WebUtils;
 
 @Component
-public class HttpTraceLogFilter extends OncePerRequestFilter implements Ordered {
+public class UserMgmtRequestFilter extends OncePerRequestFilter implements Ordered {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HttpTraceLogFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserMgmtRequestFilter.class);
     private static final String[] urlPatterns = {"/login", "/logout", "/auth/", "/v1/"};
+    private static final String[] checkVerifyCodeUrlPatterns = {"/login", "/v1/identity/sms",
+        "/v1/identity/mail", "/v1/users", "/v1/users/"};
     private static final String UNKNOWN = "unknown";
+
+    @Autowired
+    private IdentityService identityService;
+
+    @Autowired
+    private LoginFailHandler loginFailHandler;
 
     @Override
     public int getOrder() {
@@ -50,6 +65,10 @@ public class HttpTraceLogFilter extends OncePerRequestFilter implements Ordered 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
         throws ServletException, IOException {
+        if (!checkVerificationCodeOnLogin(request, response)) {
+            return;
+        }
+
         String url = request.getRequestURI();
         if (!StringUtils.startsWithAny(url, urlPatterns)) {
             filterChain.doFilter(request, response);
@@ -71,6 +90,24 @@ public class HttpTraceLogFilter extends OncePerRequestFilter implements Ordered 
             updateResponse(response);
             LOGGER.info("Http Request log: {}", new Gson().toJson(logs));
         }
+    }
+
+    private boolean checkVerificationCodeOnLogin(HttpServletRequest request, HttpServletResponse response)
+        throws IOException {
+        String url = request.getRequestURI();
+        if (!StringUtils.equalsAny(url, checkVerifyCodeUrlPatterns)) {
+            return true;
+        }
+
+        String verificationCode = ServletRequestUtils.getStringParameter(request, "verifyCode", "");
+        if (!identityService.checkVerificatinCode(RedisUtil.RedisKeyType.IMG_VERIFICATION_CODE,
+            request.getSession().getId(), verificationCode)) {
+            loginFailHandler.onAuthenticationFailure(request, response,
+                new AuthenticationServiceException(ErrorEnum.VERIFY_CODE_ERROR.detail()));
+            return false;
+        }
+
+        return true;
     }
 
     private HttpRequestTraceLog logForRequest(HttpServletRequest request) {

@@ -32,15 +32,9 @@ import org.springframework.util.StringUtils;
 @ApiModel(value = "TenantRegisterRequest")
 public class TenantRegisterReqDto extends TenantBasicReqDto implements IStringTrim {
 
-    @ApiModelProperty(required = true, example = "TestPassword1")
+    @ApiModelProperty(required = true, example = "Test@Password")
     @Pattern(regexp = ServiceConfig.PATTERN_USERPW)
     private String password;
-
-    @SerializedName("verificationCode")
-    @JsonProperty("verificationCode")
-    @ApiModelProperty(example = "123456")
-    @Pattern(regexp = ServiceConfig.PATTERN_VERIFICATION_CODE)
-    private String verificationCode;
 
     /**
      * check basic data by trim.
@@ -48,6 +42,5 @@ public class TenantRegisterReqDto extends TenantBasicReqDto implements IStringTr
     public void stringTrim() {
         super.stringTrim();
         this.password = StringUtils.trimWhitespace(this.password);
-        this.verificationCode = StringUtils.trimWhitespace(this.verificationCode);
     }
 }

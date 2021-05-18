@@ -21,7 +21,8 @@ public enum ErrorEnum {
     USER_NOT_FOUND(100000002, "User not exist", "User not exist"),
     MOBILEPHONE_NOT_FOUND(100000003, "mobile phone not exist", "mobile phone not exist"),
     MAILADDR_NOT_FOUND(100000004, "email address not exist", "email address not exist"),
-    PASSWORD_INCORRECT(100000005, "password incorrect", "password incorrect");
+    PASSWORD_INCORRECT(100000005, "password incorrect", "password incorrect"),
+    VERIFY_CODE_ERROR(100000006, "verification code incorrect", "verification code incorrect");
 
     private int code;
     private String message;
