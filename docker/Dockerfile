@@ -36,6 +36,7 @@ RUN mkdir -p /usr/app/bin
 # Create an app user so our program doesn't run as root.
 RUN apk update &&\
     apk add shadow &&\
+    apk add --update ttf-dejavu fontconfig &&\
     groupadd -r -g $GID $GROUP_NAME &&\
     useradd -r -u $UID -g $GID -d $APP_HOME -s /sbin/nologin -c "Docker image user" $USER_NAME
 
@@ -48,9 +49,6 @@ RUN chmod -R 750 $APP_HOME &&\
     mkdir -p -m 700 $APP_HOME/ssl &&\
     chown -R $USER_NAME:$GROUP_NAME $APP_HOME &&\
     chown -R $USER_NAME:$GROUP_NAME $APP_HOME/log
-
-RUN yum -y install fontconfig
-RUN fc-cache --force
 
 COPY --chown=$USER_NAME:$GROUP_NAME target/*.jar $APP_HOME/bin
 
