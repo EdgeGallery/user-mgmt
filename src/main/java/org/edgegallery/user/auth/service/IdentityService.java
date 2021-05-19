@@ -45,8 +45,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.ServletRequestUtils;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Service("identityService")
 public class IdentityService {
@@ -225,12 +223,13 @@ public class IdentityService {
 
     /**
      * precheck image verification code.
+     *
+     * @param httpServletRequest HTTP Servlet Request
      * @return check result
      */
-    public Either<Map<String, Boolean>, FormatRespDto> preCheckImgVerificationCode() {
+    public Either<Map<String, Boolean>, FormatRespDto> preCheckImgVerificationCode(
+        HttpServletRequest httpServletRequest) {
         String key = httpSession.getId();
-        HttpServletRequest httpServletRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
-            .getRequest();
         String verificationCode = ServletRequestUtils.getStringParameter(httpServletRequest, "verifyCode", "");
 
         // delete verification code on redis if check failed

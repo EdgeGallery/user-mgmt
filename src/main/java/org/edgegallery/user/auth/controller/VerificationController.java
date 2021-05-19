@@ -24,6 +24,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.http.HttpStatus;
 import org.apache.servicecomb.provider.rest.common.RestSchema;
 import org.edgegallery.user.auth.config.DescriptionConfig;
@@ -102,12 +103,14 @@ public class VerificationController extends BeGenericServlet {
     /**
      * precheck image verification code.
      *
+     * @param httpServletRequest HTTP Servlet Request
      * @return check result
      */
     @GetMapping(value = "/verifycode-image/precheck", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @ApiOperation(value = "check image verification code", response = Object.class)
-    public ResponseEntity<Object> preCheckImgVerificationCode() throws IOException {
-        return buildResponse(identityService.preCheckImgVerificationCode());
+    public ResponseEntity<Object> preCheckImgVerificationCode(HttpServletRequest httpServletRequest)
+        throws IOException {
+        return buildResponse(identityService.preCheckImgVerificationCode(httpServletRequest));
     }
 }

@@ -20,6 +20,7 @@ import fj.data.Either;
 import mockit.Mock;
 import mockit.MockUp;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.edgegallery.user.auth.utils.redis.RedisUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -73,9 +74,10 @@ public class RetrievePasswordTest {
 
     @Test
     public void should_successfully_when_modify_password() {
-        new MockUp<UserMgmtService>() {
+        new MockUp<IdentityService>() {
             @Mock
-            private boolean verifyCode(String verificationCode, String keyOfVerifyCode) {
+            public boolean checkVerificatinCode(RedisUtil.RedisKeyType keyType, String keyOfVerifyCode,
+                String verificationCode) {
                 return true;
             }
         };
@@ -95,20 +97,15 @@ public class RetrievePasswordTest {
         request.setNewPassword("newPassword1234.");
         request.setVerificationCode("123456");
 
-        new MockUp<UserMgmtService>() {
+        new MockUp<IdentityService>() {
             @Mock
-            private boolean verifyCode(String verificationCode, String keyOfVerifyCode) {
+            public boolean checkVerificatinCode(RedisUtil.RedisKeyType keyType, String keyOfVerifyCode,
+                String verificationCode) {
                 return false;
             }
         };
         Either<Boolean, FormatRespDto> either = userMgmtService.modifyPassword(request, "");
-        new MockUp<UserMgmtService>() {
-            @Mock
-            private boolean verifyCode(String verificationCode, String keyOfVerifyCode) {
-                return true;
-            }
-        };
-        Assert.assertTrue(either.isRight());
+        Assert.assertTrue(either.isLeft());
     }
 
     @Test
@@ -118,12 +115,6 @@ public class RetrievePasswordTest {
         request.setNewPassword("newPassword1234.");
         request.setVerificationCode("123456");
 
-        new MockUp<UserMgmtService>() {
-            @Mock
-            private boolean verifyCode(String verificationCode, String keyOfVerifyCode) {
-                return true;
-            }
-        };
         Either<Boolean, FormatRespDto> either = userMgmtService.modifyPassword(request, "");
         Assert.assertTrue(either.isRight());
     }
@@ -135,12 +126,6 @@ public class RetrievePasswordTest {
         request.setNewPassword("ne9%$");
         request.setVerificationCode("123456");
 
-        new MockUp<UserMgmtService>() {
-            @Mock
-            private boolean verifyCode(String verificationCode, String keyOfVerifyCode) {
-                return true;
-            }
-        };
         Either<Boolean, FormatRespDto> either = userMgmtService.modifyPassword(request, "");
         Assert.assertTrue(either.isRight());
     }
