@@ -49,6 +49,9 @@ RUN chmod -R 750 $APP_HOME &&\
     chown -R $USER_NAME:$GROUP_NAME $APP_HOME &&\
     chown -R $USER_NAME:$GROUP_NAME $APP_HOME/log
 
+RUN yum -y install fontconfig
+RUN fc-cache --force
+
 COPY --chown=$USER_NAME:$GROUP_NAME target/*.jar $APP_HOME/bin
 
 EXPOSE 8067
