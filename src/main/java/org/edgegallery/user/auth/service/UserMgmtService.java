@@ -62,6 +62,9 @@ public class UserMgmtService {
     @Autowired
     private Pbkdf2PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private IdentityService identityService;
+
     /**
      * register user info by telephone, verification code and so on.
      *
@@ -132,22 +135,6 @@ public class UserMgmtService {
     }
 
     /**
-     * whether the verification code is correct.
-     *
-     * @param verificationCode verificationCode
-     * @param keyOfVerifyCode key of verify code
-     * @return
-     */
-    private boolean verifyCode(String verificationCode, String keyOfVerifyCode) {
-        if (StringUtils.isEmpty(verificationCode) || !verificationCode
-            .equals(RedisUtil.get(RedisUtil.RedisKeyType.VERIFICATION_CODE, keyOfVerifyCode))) {
-            return false;
-        }
-        RedisUtil.delete(RedisUtil.RedisKeyType.VERIFICATION_CODE, keyOfVerifyCode);
-        return true;
-    }
-
-    /**
      * modify password.
      *
      * @param modifyRequest modify request dto
@@ -197,7 +184,8 @@ public class UserMgmtService {
                 ? modifyRequest.getMailAddress()
                 : modifyRequest.getTelephone();
             String verificationCode = modifyRequest.getVerificationCode();
-            if (!verifyCode(verificationCode, keyOfVerifyCode)) {
+            if (!identityService.checkVerificatinCode(RedisUtil.RedisKeyType.VERIFICATION_CODE,
+                keyOfVerifyCode, verificationCode)) {
                 LOGGER.error("verification code is error");
                 return Either.right(new FormatRespDto(Status.BAD_REQUEST, "Verification code is error"));
             }

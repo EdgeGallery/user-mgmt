@@ -111,7 +111,7 @@ public class LoginTest {
     public void should_failed_when_login_with_client_user_timeout() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/login").contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .header("X-XSRF-TOKEN", xsrfToken).cookie(cookies).accept(MediaType.APPLICATION_JSON_VALUE)
-            .param("username", "test:" + (new Date().getTime() - 5000)).param("password", "test"))
+            .param("username", "test:" + (new Date().getTime() - 6000)).param("password", "test"))
             .andExpect(MockMvcResultMatchers.status().is4xxClientError());
     }
 

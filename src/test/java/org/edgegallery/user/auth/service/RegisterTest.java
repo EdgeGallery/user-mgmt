@@ -51,12 +51,6 @@ public class RegisterTest {
         request.setTelephone(telephone);
         request.setCompany("huawei");
         request.setGender("male");
-        new MockUp<UserMgmtService>() {
-            @Mock
-            private boolean verifyCode(String verificationCode, String keyOfVerifyCode) {
-                return true;
-            }
-        };
 
         Either<TenantRespDto, FormatRespDto> either = userMgmtService.register(request);
         Assert.assertTrue(either.isLeft());
@@ -166,13 +160,6 @@ public class RegisterTest {
         request.setTelephone("15012345678");
         request.setCompany("huawei");
         request.setGender("male");
-
-        new MockUp<UserMgmtService>() {
-            @Mock
-            private boolean verifyCode(String verificationCode, String keyOfVerifyCode) {
-                return false;
-            }
-        };
 
         Either<TenantRespDto, FormatRespDto> either = userMgmtService.register(request);
         Assert.assertTrue(either.isRight());

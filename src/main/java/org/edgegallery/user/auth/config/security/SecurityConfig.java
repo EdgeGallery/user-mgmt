@@ -81,6 +81,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers(HttpMethod.POST, "/v1/users", "/v1/users/action/uniqueness", "/v1/identity/sms",
                 "/v1/identity/mail")
             .permitAll()
+            .antMatchers(HttpMethod.GET, "/v1/identity/verifycode-image/**")
+            .permitAll()
             .antMatchers(HttpMethod.PUT, "/v1/users/password")
             .permitAll()
             .antMatchers(HttpMethod.GET, "/health")
