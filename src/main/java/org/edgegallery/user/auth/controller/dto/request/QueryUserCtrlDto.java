@@ -31,7 +31,7 @@ import org.springframework.util.StringUtils;
 public class QueryUserCtrlDto extends CheckParamsGenericUtils implements IStringTrim {
     private static final String DEFAULT_SORTBY = "createTime";
 
-    private static final String DEFAULT_SORTORDER = "ASC";
+    private static final String DEFAULT_SORTORDER = "DESC";
 
     @Min(value = -1)
     private int offset;
