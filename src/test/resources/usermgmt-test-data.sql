@@ -29,7 +29,7 @@
 -- add a admin user
     merge into tbl_tenant (TENANTID, USERNAME, PASSWORD, COMPANY, TELEPHONENUMBER, MAILADDRESS, GENDER, isallowed, CREATETIME, MODIFYTIME) key(TENANTID)
     values('39937079-99fe-4cd8-881f-04ca8c4fe09d', 'admin',
-    '45709693f38464c0c0fbf525ec7a740ddf63e28ef39e56836601dc43b00ed20c86713bbcd73bb215', 'company', '13800000001', '13800000001@edgegallery.org', '1', true, now(), now());
+    '472645ad1af0101adaa6769cc865fec3b29fedeba6dc912900a59b1364b7a6bb17bb9a0575854547', 'company', '13800000001', '13800000001@edgegallery.org', '1', true, now(), now());
 --    ON CONFLICT(TENANTID) do nothing;
 
 -- add a tenant1 user

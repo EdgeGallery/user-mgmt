@@ -95,7 +95,7 @@ public class LoginTest {
     public void should_successful_when_login_with_admin() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/login").contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .header("X-XSRF-TOKEN", xsrfToken).cookie(cookies).accept(MediaType.APPLICATION_JSON_VALUE)
-            .param("username", "admin").param("password", "Admin@321"))
+            .param("username", "admin").param("password", "admin"))
             .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
