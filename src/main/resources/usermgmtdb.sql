@@ -10,6 +10,7 @@
       	isallowed           boolean           NOT NULL,
       	CREATETIME          TIMESTAMP         NULL,
       	MODIFYTIME          TIMESTAMP         NULL,
+      	PWEFFECTTIME        TIMESTAMP         NULL,
       	CONSTRAINT USERNAME UNIQUE (username),
       	CONSTRAINT TELEPHONENUMBER UNIQUE (telephonenumber),
       	CONSTRAINT MAILADDRESS UNIQUE (mailaddress)

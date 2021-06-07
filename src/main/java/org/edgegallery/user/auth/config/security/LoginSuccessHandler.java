@@ -39,6 +39,8 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginSuccessHandler.class);
 
+    private static final String HEADER_KEY_PW_MODIFY_SCENE = "pwmodiscene";
+
     @Autowired
     private MecUserDetailsService mecUserDetailsService;
 
@@ -56,6 +58,11 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
             if (redirectUrl != null) {
                 URL url = new URL(redirectUrl);
                 response.sendRedirect(String.format("%s://%s/#/index", url.getProtocol(), url.getAuthority()));
+            }
+        } else {
+            int pwModiScene = mecUserDetailsService.getPwModifyScene(userName);
+            if (pwModiScene > 0) {
+                response.addIntHeader(HEADER_KEY_PW_MODIFY_SCENE, pwModiScene);
             }
         }
     }

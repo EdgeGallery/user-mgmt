@@ -50,6 +50,8 @@ public interface TenantPoMapper {
 
     int modifyPassword(String tenantId, String password);
 
+    String getPwEffectTime(String username);
+
     int insertRolesByTenantId(String tenantId, List<RolePo> roles);
 
     boolean deleteUser(String tenantId);

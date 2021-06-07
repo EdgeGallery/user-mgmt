@@ -19,6 +19,8 @@ package org.edgegallery.user.auth.config.security;
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import es.moki.ratelimitj.inmemory.request.InMemorySlidingWindowRequestRateLimiter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,9 +37,11 @@ import org.edgegallery.user.auth.db.EnumRole;
 import org.edgegallery.user.auth.db.entity.RolePo;
 import org.edgegallery.user.auth.db.entity.TenantPo;
 import org.edgegallery.user.auth.db.mapper.TenantPoMapper;
+import org.edgegallery.user.auth.utils.Consts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -46,6 +50,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 @Component
 public class MecUserDetailsService implements UserDetailsService {
@@ -72,6 +77,9 @@ public class MecUserDetailsService implements UserDetailsService {
 
     @Autowired
     private Pbkdf2PasswordEncoder passwordEncoder;
+
+    @Value("${secPolicy.pwTimeout}")
+    private int pwTimeout;
 
     @Override
     public UserDetails loadUserByUsername(String uniqueUserFlag) throws UsernameNotFoundException {
@@ -167,5 +175,35 @@ public class MecUserDetailsService implements UserDetailsService {
      */
     public void clearFailedCount(String userId) {
         LIMITER.resetLimit(userId);
+    }
+
+    /**
+     * get pw modify scene.
+     *
+     * @param userName User Name
+     * @return pw modify scene
+     */
+    public int getPwModifyScene(String userName) {
+        String pwEffectTime = tenantPoMapper.getPwEffectTime(userName);
+        if (StringUtils.isEmpty(pwEffectTime)) {
+            return -1;
+        }
+
+        try {
+            Date pwEffectDate = new SimpleDateFormat(Consts.DATE_PATTERN).parse(pwEffectTime);
+            long passedDayCount = (System.currentTimeMillis() - pwEffectDate.getTime()) / Consts.MILLIS_ONE_DAY;
+            if (passedDayCount > Consts.FIRST_LOGIN_JUDGE_DAYCOUNT) {
+                return Consts.PwModifyScene.FIRSTLOGIN;
+            } else if (passedDayCount > pwTimeout) {
+                return Consts.PwModifyScene.EXPIRED;
+            } else {
+                LOGGER.debug("pw has not expired.");
+                return -1;
+            }
+        } catch (ParseException e) {
+            LOGGER.error("pw effect time parse failed! pwEffectTime = {}", pwEffectTime);
+        }
+
+        return -1;
     }
 }
