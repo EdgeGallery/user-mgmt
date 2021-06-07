@@ -33,7 +33,10 @@ import org.springframework.security.oauth2.provider.token.TokenEnhancer;
 public class AuthServerTokenEnhancer implements TokenEnhancer {
 
     @Autowired
-    TenantPoMapper tenantPoMapper;
+    private MecUserDetailsService mecUserDetailsService;
+
+    @Autowired
+    private TenantPoMapper tenantPoMapper;
 
     @Autowired
     private HttpServletRequest request;
@@ -55,6 +58,10 @@ public class AuthServerTokenEnhancer implements TokenEnhancer {
         additionalMap.put("enableMail", mailEnabled);
         additionalMap.put("ssoSessionId", request.getServletContext().getAttribute(code));
         additionalMap.put("userName", user.getUsername());
+        if (mecUserDetailsService.getPwModifyScene(user.getUsername()) > 0) {
+            additionalMap.put("pwmodiscene", null);
+        }
+
         ((DefaultOAuth2AccessToken) oauth2AccessToken).setAdditionalInformation(additionalMap);
         return oauth2AccessToken;
     }

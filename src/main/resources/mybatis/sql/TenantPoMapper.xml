@@ -89,9 +89,9 @@
     <insert id="addTenantPo" parameterType="org.edgegallery.user.auth.db.entity.TenantPo">
         INSERT INTO
         tbl_tenant
-        (TENANTID, USERNAME, PASSWORD, COMPANY, TELEPHONENUMBER, MAILADDRESS, GENDER, isallowed, CREATETIME, MODIFYTIME)
+        (TENANTID, USERNAME, PASSWORD, COMPANY, TELEPHONENUMBER, MAILADDRESS, GENDER, isallowed, CREATETIME, MODIFYTIME, PWEFFECTTIME)
         VALUES
-        (#{tenantId}, #{username}, #{password}, #{company}, #{telephoneNumber}, #{mailAddress}, #{gender}, #{isAllowed}, now(), now())
+        (#{tenantId}, #{username}, #{password}, #{company}, #{telephoneNumber}, #{mailAddress}, #{gender}, #{isAllowed}, now(), now(), now())
     </insert>
 
     <delete id="deleteUser" >
@@ -101,10 +101,16 @@
     <update id="modifyPassword">
         UPDATE
         tbl_tenant
-        SET PASSWORD = #{param2}
+        SET PASSWORD = #{param2},
+        PWEFFECTTIME = now()
         WHERE
         TENANTID = #{param1};
     </update>
+
+    <select id="getPwEffectTime" resultType="java.lang.String">
+        SELECT PWEFFECTTIME FROM tbl_tenant
+        WHERE USERNAME = #{param1};
+    </select>
 
     <insert id ="insertRolesByTenantId" parameterType="java.util.List" >
         insert into
