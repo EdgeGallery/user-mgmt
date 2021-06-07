@@ -193,9 +193,9 @@ public class MecUserDetailsService implements UserDetailsService {
             Date pwEffectDate = new SimpleDateFormat(Consts.DATE_PATTERN).parse(pwEffectTime);
             long passedDayCount = (System.currentTimeMillis() - pwEffectDate.getTime()) / Consts.MILLIS_ONE_DAY;
             if (passedDayCount > Consts.FIRST_LOGIN_JUDGE_DAYCOUNT) {
-                return Consts.PW_MODIFY_SCENE.FIRSTLOGIN;
+                return Consts.PwModifyScene.FIRSTLOGIN;
             } else if (passedDayCount > pwTimeout) {
-                return Consts.PW_MODIFY_SCENE.EXPIRED;
+                return Consts.PwModifyScene.EXPIRED;
             } else {
                 LOGGER.debug("pw has not expired.");
                 return -1;

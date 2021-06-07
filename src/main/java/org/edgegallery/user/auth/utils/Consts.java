@@ -37,7 +37,7 @@ public class Consts {
 
     public static final long MILLIS_ONE_DAY = 1 * 24 * 3600 * 1000L;
 
-    public static final class PW_MODIFY_SCENE {
+    public static final class PwModifyScene {
         public static final int FIRSTLOGIN = 1;
 
         public static final int EXPIRED = 2;
