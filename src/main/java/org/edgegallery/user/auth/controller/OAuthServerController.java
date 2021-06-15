@@ -31,6 +31,7 @@ import org.edgegallery.user.auth.controller.dto.response.FormatRespDto;
 import org.edgegallery.user.auth.controller.dto.response.TenantRespDto;
 import org.edgegallery.user.auth.db.entity.TenantPo;
 import org.edgegallery.user.auth.db.mapper.TenantPoMapper;
+import org.edgegallery.user.auth.utils.ErrorEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,15 +103,15 @@ public class OAuthServerController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getName() == null) {
             FormatRespDto response = new FormatRespDto(Response.Status.NOT_FOUND,
-                "Login user not found, may have logged out.");
-            return ResponseEntity.status(response.getErrStatus().getStatusCode()).body(response);
+                ErrorRespDto.build(ErrorEnum.NO_LOGIN_USER));
+            return ResponseEntity.status(response.getErrStatus().getStatusCode()).body(response.getErrorRespDto());
         }
         LOGGER.info(String.format("%s want to get login user information.", authentication.getName()));
         TenantPo user = tenantPoMapper.getTenantByUsername(authentication.getName());
         if (user == null) {
             FormatRespDto response = new FormatRespDto(Response.Status.NOT_FOUND,
-                "Login user not found, may have logged out.");
-            return ResponseEntity.status(response.getErrStatus().getStatusCode()).body(response);
+                ErrorRespDto.build(ErrorEnum.NO_LOGIN_USER));
+            return ResponseEntity.status(response.getErrStatus().getStatusCode()).body(response.getErrorRespDto());
         }
         TenantRespDto tenantRespDto = new TenantRespDto();
         tenantRespDto.setResponse(user);

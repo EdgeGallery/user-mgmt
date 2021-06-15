@@ -17,21 +17,32 @@
 package org.edgegallery.user.auth.utils;
 
 public enum ErrorEnum {
-    DATABASE_EXCEPTION(100000001, "Database Exception", "Database Exception"),
-    USER_NOT_FOUND(100000002, "User not exist", "User not exist"),
-    MOBILEPHONE_NOT_FOUND(100000003, "mobile phone not exist", "mobile phone not exist"),
-    MAILADDR_NOT_FOUND(100000004, "email address not exist", "email address not exist"),
-    PASSWORD_INCORRECT(100000005, "password incorrect", "password incorrect"),
-    VERIFY_CODE_ERROR(100000006, "verification code incorrect", "verification code incorrect");
+    NO_LOGIN_USER(70000, "No login user."),
+    NO_PERMISSION(70001, "No permission."),
+    PARA_ILLEGAL(70002, "Illegal parameter."),
+    DATABASE_EXCEPTION(70003, "Database Exception"),
+    USER_NOT_FOUND(70004, "User not exist"),
+    MOBILEPHONE_NOT_FOUND(70005, "mobile phone not exist"),
+    MAILADDR_NOT_FOUND(70006, "email address not exist"),
+    USERNAME_EXIST(70007, "Username has existed"),
+    MOBILEPHONE_EXIST(70008, "Telephone has existed"),
+    MAILADDR_EXIST(70009, "MailAddress has existed"),
+    PASSWORD_INCORRECT(70010, "password incorrect"),
+    VERIFY_CODE_ERROR(70011, "verification code incorrect"),
+    SMS_CONNECT_FAILED(70012, "sms server connect failed."),
+    SEND_VERIFYCODE_SMS_FAILED(70013, "send verification code by sms failed."),
+    SEND_VERIFYCODE_MAIL_FAILED(70014, "send verification code by mail failed."),
+    USER_REGISTER_FAILED(70015, "User register failed."),
+    MODIFY_PW_FAILED(70016, "Modify password failed."),
+
+    UNKNOWN(79999, "Unkown Error.");
 
     private int code;
     private String message;
-    private String detail;
 
-    ErrorEnum(int code, String message, String detail) {
+    ErrorEnum(int code, String message) {
         this.code = code;
         this.message = message;
-        this.detail = detail;
     }
 
     public int code() {
@@ -40,9 +51,5 @@ public enum ErrorEnum {
 
     public String message() {
         return this.message;
-    }
-
-    public String detail() {
-        return this.detail;
     }
 }

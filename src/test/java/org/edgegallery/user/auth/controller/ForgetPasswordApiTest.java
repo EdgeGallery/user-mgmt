@@ -18,6 +18,8 @@ package org.edgegallery.user.auth.controller;
 
 import fj.data.Either;
 import javax.ws.rs.core.Response;
+import org.edgegallery.user.auth.controller.dto.response.ErrorRespDto;
+import org.edgegallery.user.auth.utils.ErrorEnum;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.edgegallery.user.auth.controller.dto.request.ModifyPasswordReqDto;
@@ -52,7 +54,8 @@ public class ForgetPasswordApiTest extends UserControllerTest {
         request.setNewPassword("password");
         request.setTelephone("18012345678");
 
-        Either<Boolean, FormatRespDto> response = Either.right(new FormatRespDto(Response.Status.FORBIDDEN, "Forbidden or No Permission to Access."));
+        Either<Boolean, FormatRespDto> response = Either.right(new FormatRespDto(Response.Status.FORBIDDEN,
+            ErrorRespDto.build(ErrorEnum.NO_PERMISSION)));
         Mockito.when(userMgmtService.modifyPassword(Mockito.any(ModifyPasswordReqDto.class), Mockito.any(String.class))).thenReturn(response);
 
         mvc.perform(MockMvcRequestBuilders.put("/v1/users/password").contentType(MediaType.APPLICATION_JSON_VALUE)

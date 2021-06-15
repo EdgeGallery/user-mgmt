@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
-import org.edgegallery.user.auth.config.security.LoginFailHandler;
+import org.edgegallery.user.auth.controller.dto.response.ErrorRespDto;
 import org.edgegallery.user.auth.service.IdentityService;
 import org.edgegallery.user.auth.utils.ErrorEnum;
 import org.edgegallery.user.auth.utils.redis.RedisUtil;
@@ -34,7 +34,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
-import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -56,9 +57,6 @@ public class UserMgmtRequestFilter extends OncePerRequestFilter implements Order
     @Autowired
     private IdentityService identityService;
 
-    @Autowired
-    private LoginFailHandler loginFailHandler;
-
     @Override
     public int getOrder() {
         return Ordered.HIGHEST_PRECEDENCE;
@@ -67,7 +65,7 @@ public class UserMgmtRequestFilter extends OncePerRequestFilter implements Order
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
         throws ServletException, IOException {
-        if (!checkVerificationCodeOnLogin(request, response)) {
+        if (!checkVerificationCode(request, response)) {
             return;
         }
 
@@ -94,7 +92,7 @@ public class UserMgmtRequestFilter extends OncePerRequestFilter implements Order
         }
     }
 
-    private boolean checkVerificationCodeOnLogin(HttpServletRequest request, HttpServletResponse response)
+    private boolean checkVerificationCode(HttpServletRequest request, HttpServletResponse response)
         throws IOException {
         String url = request.getRequestURI();
         if (!StringUtils.equalsAny(url, checkVerifyCodeUrlPatterns)) {
@@ -104,8 +102,10 @@ public class UserMgmtRequestFilter extends OncePerRequestFilter implements Order
         String verificationCode = ServletRequestUtils.getStringParameter(request, "verifyCode", "");
         if (!identityService.checkVerificatinCode(RedisUtil.RedisKeyType.IMG_VERIFICATION_CODE,
             request.getSession().getId(), verificationCode)) {
-            loginFailHandler.onAuthenticationFailure(request, response,
-                new AuthenticationServiceException(ErrorEnum.VERIFY_CODE_ERROR.detail()));
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.getWriter().println(new Gson()
+                .toJson(ErrorRespDto.build(ErrorEnum.VERIFY_CODE_ERROR)));
             return false;
         }
 

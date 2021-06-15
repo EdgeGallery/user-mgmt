@@ -27,19 +27,16 @@ import org.edgegallery.user.auth.utils.ErrorEnum;
 public class ErrorRespDto {
     private int code;
     private String message;
-    private String detail;
 
     /**
      * construct.
      *
      * @param returnCode int code
      * @param message msg
-     * @param detail detail
      */
-    public ErrorRespDto(int returnCode, String message, String detail) {
+    public ErrorRespDto(int returnCode, String message) {
         this.code = returnCode;
         this.message = message;
-        this.detail = detail;
     }
 
     /**
@@ -49,6 +46,6 @@ public class ErrorRespDto {
      * @return ErrorRespDto
      */
     public static ErrorRespDto build(ErrorEnum errorEnum) {
-        return new ErrorRespDto(errorEnum.code(), errorEnum.message(), errorEnum.detail());
+        return new ErrorRespDto(errorEnum.code(), errorEnum.message());
     }
 }

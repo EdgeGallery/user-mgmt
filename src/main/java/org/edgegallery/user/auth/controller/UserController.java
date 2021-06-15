@@ -36,6 +36,7 @@ import org.edgegallery.user.auth.controller.dto.response.QueryUserRespDto;
 import org.edgegallery.user.auth.controller.dto.response.TenantRespDto;
 import org.edgegallery.user.auth.service.UserMgmtService;
 import org.edgegallery.user.auth.utils.Consts;
+import org.edgegallery.user.auth.utils.ErrorEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -93,7 +94,7 @@ public class UserController extends BeGenericServlet {
         String currUserName = authentication != null ? authentication.getName() : "";
         if (Consts.GUEST_USER_NAME.equalsIgnoreCase(currUserName)) {
             FormatRespDto formatRespDto = new FormatRespDto(Response.Status.FORBIDDEN,
-                "The guest user can not modify password.");
+                ErrorRespDto.build(ErrorEnum.NO_PERMISSION));
             return ResponseEntity.status(formatRespDto.getErrStatus().getStatusCode())
                 .body(formatRespDto.getErrorRespDto());
         }
@@ -121,15 +122,15 @@ public class UserController extends BeGenericServlet {
     @ApiResponses(value = {
         @ApiResponse(code = HttpStatus.SC_BAD_REQUEST, message = "Bad Request", response = ErrorRespDto.class)
     })
-    public ResponseEntity<String> deleteUser(
+    public ResponseEntity<Object> deleteUser(
         @ApiParam(value = "user id") @PathVariable("userId") @Pattern(regexp = REG_UUID) String userId) {
         // login user must be admin
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!Consts.SUPER_ADMIN_NAME.equalsIgnoreCase(authentication.getName())) {
             FormatRespDto formatRespDto = new FormatRespDto(Response.Status.FORBIDDEN,
-                "The user has no permission to delete user.");
+                ErrorRespDto.build(ErrorEnum.NO_PERMISSION));
             return ResponseEntity.status(formatRespDto.getErrStatus().getStatusCode())
-                .body(formatRespDto.getErrorRespDto().getDetail());
+                .body(formatRespDto.getErrorRespDto());
         }
 
         userMgmtService.deleteUser(userId);
@@ -157,7 +158,7 @@ public class UserController extends BeGenericServlet {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!Consts.SUPER_ADMIN_NAME.equalsIgnoreCase(authentication.getName())) {
             FormatRespDto formatRespDto = new FormatRespDto(Response.Status.FORBIDDEN,
-                    "The user has no permission to query users.");
+                    ErrorRespDto.build(ErrorEnum.NO_PERMISSION));
             return ResponseEntity.status(formatRespDto.getErrStatus().getStatusCode())
                 .body(formatRespDto.getErrorRespDto());
         }
@@ -207,7 +208,7 @@ public class UserController extends BeGenericServlet {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!Consts.SUPER_ADMIN_NAME.equalsIgnoreCase(authentication.getName())) {
             FormatRespDto formatRespDto = new FormatRespDto(Response.Status.FORBIDDEN,
-                    "The user has no permission to modify user settings.");
+                    ErrorRespDto.build(ErrorEnum.NO_PERMISSION));
             return ResponseEntity.status(formatRespDto.getErrStatus().getStatusCode())
                 .body(formatRespDto.getErrorRespDto());
         }
@@ -235,7 +236,7 @@ public class UserController extends BeGenericServlet {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!Consts.SUPER_ADMIN_NAME.equalsIgnoreCase(authentication.getName())) {
             FormatRespDto formatRespDto = new FormatRespDto(Response.Status.FORBIDDEN,
-                    "The user has no permission to disallow user.");
+                    ErrorRespDto.build(ErrorEnum.NO_PERMISSION));
             return ResponseEntity.status(formatRespDto.getErrStatus().getStatusCode())
                 .body(formatRespDto.getErrorRespDto());
         }
@@ -262,7 +263,7 @@ public class UserController extends BeGenericServlet {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!Consts.SUPER_ADMIN_NAME.equalsIgnoreCase(authentication.getName())) {
             FormatRespDto formatRespDto = new FormatRespDto(Response.Status.FORBIDDEN,
-                    "The user has no permission to allow user.");
+                    ErrorRespDto.build(ErrorEnum.NO_PERMISSION));
             return ResponseEntity.status(formatRespDto.getErrStatus().getStatusCode())
                 .body(formatRespDto.getErrorRespDto());
         }

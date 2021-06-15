@@ -22,7 +22,9 @@ import javax.ws.rs.core.Response;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.edgegallery.user.auth.controller.dto.response.ErrorRespDto;
 import org.edgegallery.user.auth.controller.dto.response.FormatRespDto;
+import org.edgegallery.user.auth.utils.ErrorEnum;
 import org.edgegallery.user.auth.utils.ValidatorUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +71,9 @@ public class ValidateAspect {
             }
             Either<Boolean, String> validateResult = ValidatorUtil.validate(arg);
             if (validateResult.isRight()) {
-                return Either.right(new FormatRespDto(Response.Status.BAD_REQUEST, validateResult.right().value()));
+                ErrorRespDto errRespDto = ErrorRespDto.build(ErrorEnum.PARA_ILLEGAL);
+                errRespDto.setMessage(validateResult.right().value());
+                return Either.right(new FormatRespDto(Response.Status.BAD_REQUEST, errRespDto));
             }
             if (arg instanceof ICheckParams) {
                 Either<Boolean, FormatRespDto> dataCheckResult = ((ICheckParams) arg).checkData();
