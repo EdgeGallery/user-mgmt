@@ -20,7 +20,8 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.edgegallery.user.auth.controller.dto.response.LoginRespDto;
+import org.edgegallery.user.auth.controller.dto.response.ErrorRespDto;
+import org.edgegallery.user.auth.utils.ErrorEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -39,15 +40,17 @@ public class LoginFailHandler extends SimpleUrlAuthenticationFailureHandler {
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
         AuthenticationException exception) throws IOException {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        ErrorRespDto errorRespDto = ErrorRespDto.build(ErrorEnum.LOGIN_FAILED);
+        errorRespDto.setMessage(exception.getLocalizedMessage());
         if (exception instanceof LockedException) {
             response.setStatus(HttpStatus.LOCKED.value());
             response.getWriter().println(
-                new Gson().toJson(new LoginRespDto(HttpStatus.LOCKED.toString(), exception.getLocalizedMessage())));
+                new Gson().toJson(errorRespDto));
         } else {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.getWriter().println(new Gson()
-                .toJson(new LoginRespDto(HttpStatus.UNAUTHORIZED.toString(), exception.getLocalizedMessage())));
+                .toJson(errorRespDto));
         }
-        LOGGER.info("failed to get token.");
+        LOGGER.error("failed to get token.");
     }
 }

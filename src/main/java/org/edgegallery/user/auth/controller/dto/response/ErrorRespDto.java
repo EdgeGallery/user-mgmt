@@ -34,7 +34,7 @@ public class ErrorRespDto {
      * @param returnCode int code
      * @param message msg
      */
-    public ErrorRespDto(int returnCode, String message) {
+    private ErrorRespDto(int returnCode, String message) {
         this.code = returnCode;
         this.message = message;
     }
