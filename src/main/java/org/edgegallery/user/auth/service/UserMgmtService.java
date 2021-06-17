@@ -77,17 +77,17 @@ public class UserMgmtService {
         LOGGER.info("Begin register user");
         if (!StringUtils.isEmpty(reqParam.getTelephone())
             && mapper.getTenantByTelephone(reqParam.getTelephone()) != null) {
-            return Either.right(new FormatRespDto(Status.BAD_REQUEST, ErrorRespDto.build(ErrorEnum.MOBILEPHONE_EXIST)));
+            return Either.right(new FormatRespDto(Status.BAD_REQUEST, ErrorRespDto.build(ErrorEnum.MOBILEPHONE_REGISTERED)));
         }
 
         if (!StringUtils.isEmpty(reqParam.getMailAddress())
             && mapper.getTenantByMailAddress(reqParam.getMailAddress()) != null) {
-            return Either.right(new FormatRespDto(Status.BAD_REQUEST, ErrorRespDto.build(ErrorEnum.MAILADDR_EXIST)));
+            return Either.right(new FormatRespDto(Status.BAD_REQUEST, ErrorRespDto.build(ErrorEnum.MAILADDR_REGISTERED)));
         }
 
         if (!StringUtils.isEmpty(reqParam.getUsername())
             && mapper.getTenantByUsername(reqParam.getUsername()) != null) {
-            return Either.right(new FormatRespDto(Status.BAD_REQUEST, ErrorRespDto.build(ErrorEnum.USERNAME_EXIST)));
+            return Either.right(new FormatRespDto(Status.BAD_REQUEST, ErrorRespDto.build(ErrorEnum.USERNAME_REGISTERED)));
         }
 
         TenantRegisterReqDto registerRequest = reqParam;
@@ -349,15 +349,15 @@ public class UserMgmtService {
         if (uniqueness.isLeft()) {
             if (uniqueness.left().value().isMailAddress()) {
                 return Either.right(new FormatRespDto(Status.BAD_REQUEST,
-                    ErrorRespDto.build(ErrorEnum.MAILADDR_EXIST)));
+                    ErrorRespDto.build(ErrorEnum.MAILADDR_REGISTERED)));
             }
             if (uniqueness.left().value().isTelephone()) {
                 return Either.right(new FormatRespDto(Status.BAD_REQUEST,
-                    ErrorRespDto.build(ErrorEnum.MOBILEPHONE_EXIST)));
+                    ErrorRespDto.build(ErrorEnum.MOBILEPHONE_REGISTERED)));
             }
             if (uniqueness.left().value().isUsername()) {
                 return Either.right(new FormatRespDto(Status.BAD_REQUEST,
-                    ErrorRespDto.build(ErrorEnum.USERNAME_EXIST)));
+                    ErrorRespDto.build(ErrorEnum.USERNAME_REGISTERED)));
             }
         }
         return null;
