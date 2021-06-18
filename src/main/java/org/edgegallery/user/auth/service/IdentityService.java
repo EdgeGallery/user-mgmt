@@ -117,14 +117,14 @@ public class IdentityService {
         String smsVerificationCode = randomCode();
         try {
             if (!verification.sendVerificationCode(telephone, smsVerificationCode)) {
-                LOGGER.error("send verification code by sms fail");
+                LOGGER.error("send verification code by sms failed.");
                 return Either.right(new FormatRespDto(Response.Status.EXPECTATION_FAILED,
-                        "send verification code by sms fail, please again try."));
+                        ErrorRespDto.build(ErrorEnum.SEND_VERIFYCODE_SMS_FAILED)));
             }
         } catch (Exception e) {
-            LOGGER.error("connection out");
+            LOGGER.error("sms server connect failed.");
             return Either.right(new FormatRespDto(Response.Status.EXPECTATION_FAILED,
-                    "connection out, please again try."));
+                    ErrorRespDto.build(ErrorEnum.SMS_CONNECT_FAILED)));
         }
 
         RedisUtil.save(RedisUtil.RedisKeyType.VERIFICATION_CODE, telephone, smsVerificationCode);
@@ -156,9 +156,9 @@ public class IdentityService {
         String content = String.format(MAIL_CONTENT_VERIFYCODE,
             mailVerificationCode, redisConfig.getVerificationTimeOut() / 60);
         if (!mailService.sendSimpleMail(mailAddress, subject, content)) {
-            LOGGER.error("send verification code by mail fail");
+            LOGGER.error("send verification code by mail failed.");
             return Either.right(new FormatRespDto(Response.Status.EXPECTATION_FAILED,
-                "send verification code by mail fail"));
+                ErrorRespDto.build(ErrorEnum.SEND_VERIFYCODE_MAIL_FAILED)));
         }
 
         RedisUtil.save(RedisUtil.RedisKeyType.VERIFICATION_CODE, mailAddress, mailVerificationCode);

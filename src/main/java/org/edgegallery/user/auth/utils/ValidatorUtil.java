@@ -34,7 +34,7 @@ public class ValidatorUtil {
      * @param <T> T
      * @return
      */
-    public static <T> Either<Boolean,String> validate(T obj) {
+    public static <T> Either<Boolean, String> validate(T obj) {
         Set<ConstraintViolation<T>> set = validator.validate(obj);
         if (set == null || set.isEmpty()) {
             return Either.left(true);

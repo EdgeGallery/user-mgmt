@@ -31,8 +31,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.edgegallery.user.auth.config.validate.CheckParamsGenericUtils;
 import org.edgegallery.user.auth.config.validate.IStringTrim;
+import org.edgegallery.user.auth.controller.dto.response.ErrorRespDto;
 import org.edgegallery.user.auth.controller.dto.response.FormatRespDto;
 import org.edgegallery.user.auth.utils.Consts;
+import org.edgegallery.user.auth.utils.ErrorEnum;
 import org.springframework.util.StringUtils;
 
 @Setter
@@ -80,7 +82,8 @@ public class QueryUserReqDto extends CheckParamsGenericUtils implements IStringT
             try {
                 beginDate = LocalDate.parse(createTimeBegin, Consts.DATE_TIME_FORMATTER);
             } catch (DateTimeParseException dtpe) {
-                return Either.right(new FormatRespDto(Response.Status.BAD_REQUEST, "begin time is invalid."));
+                return Either.right(new FormatRespDto(Response.Status.BAD_REQUEST,
+                    ErrorRespDto.build(ErrorEnum.PARA_ILLEGAL)));
             }
         }
 
@@ -89,12 +92,14 @@ public class QueryUserReqDto extends CheckParamsGenericUtils implements IStringT
             try {
                 endDate = LocalDate.parse(createTimeEnd, Consts.DATE_TIME_FORMATTER);
             } catch (DateTimeParseException dtpe) {
-                return Either.right(new FormatRespDto(Response.Status.BAD_REQUEST, "end time is invalid."));
+                return Either.right(new FormatRespDto(Response.Status.BAD_REQUEST,
+                    ErrorRespDto.build(ErrorEnum.PARA_ILLEGAL)));
             }
         }
 
         if (beginDate != null && endDate != null && beginDate.isAfter(endDate)) {
-            return Either.right(new FormatRespDto(Response.Status.BAD_REQUEST, "begin time is after end time."));
+            return Either.right(new FormatRespDto(Response.Status.BAD_REQUEST,
+                ErrorRespDto.build(ErrorEnum.PARA_ILLEGAL)));
         }
 
         if (endDate != null) {

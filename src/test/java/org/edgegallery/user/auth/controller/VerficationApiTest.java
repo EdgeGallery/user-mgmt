@@ -19,6 +19,8 @@ package org.edgegallery.user.auth.controller;
 import com.google.gson.Gson;
 import fj.data.Either;
 import javax.ws.rs.core.Response;
+import org.edgegallery.user.auth.controller.dto.response.ErrorRespDto;
+import org.edgegallery.user.auth.utils.ErrorEnum;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -74,7 +76,8 @@ public class VerficationApiTest {
         request.setTelephone("15194251243");
 
         Either<Boolean, FormatRespDto> response = Either
-            .right(new FormatRespDto(Response.Status.BAD_REQUEST, "Can not send verification code."));
+            .right(new FormatRespDto(Response.Status.BAD_REQUEST,
+                ErrorRespDto.build(ErrorEnum.SEND_VERIFYCODE_SMS_FAILED)));
         Mockito.when(identityService.sendVerificationCodeBySms(Mockito.any(VerificationReqDto.class))).thenReturn(response);
 
         mvc.perform(MockMvcRequestBuilders.post("/v1/identity/sms").contentType(MediaType.APPLICATION_JSON_VALUE)

@@ -27,6 +27,7 @@ import org.edgegallery.user.auth.controller.dto.request.ModifyPasswordReqDto;
 import org.edgegallery.user.auth.controller.dto.request.QueryUserReqDto;
 import org.edgegallery.user.auth.controller.dto.request.TenantRegisterReqDto;
 import org.edgegallery.user.auth.controller.dto.request.UniqueReqDto;
+import org.edgegallery.user.auth.controller.dto.response.ErrorRespDto;
 import org.edgegallery.user.auth.controller.dto.response.FormatRespDto;
 import org.edgegallery.user.auth.controller.dto.response.QueryUserRespDto;
 import org.edgegallery.user.auth.controller.dto.response.TenantBasicRespDto;
@@ -76,17 +77,20 @@ public class UserMgmtService {
         LOGGER.info("Begin register user");
         if (!StringUtils.isEmpty(reqParam.getTelephone())
             && mapper.getTenantByTelephone(reqParam.getTelephone()) != null) {
-            return Either.right(new FormatRespDto(Status.BAD_REQUEST, "Telephone has existed"));
+            return Either.right(new FormatRespDto(Status.BAD_REQUEST,
+                ErrorRespDto.build(ErrorEnum.MOBILEPHONE_REGISTERED)));
         }
 
         if (!StringUtils.isEmpty(reqParam.getMailAddress())
             && mapper.getTenantByMailAddress(reqParam.getMailAddress()) != null) {
-            return Either.right(new FormatRespDto(Status.BAD_REQUEST, "MailAddress has existed"));
+            return Either.right(new FormatRespDto(Status.BAD_REQUEST,
+                ErrorRespDto.build(ErrorEnum.MAILADDR_REGISTERED)));
         }
 
         if (!StringUtils.isEmpty(reqParam.getUsername())
             && mapper.getTenantByUsername(reqParam.getUsername()) != null) {
-            return Either.right(new FormatRespDto(Status.BAD_REQUEST, "Username has existed"));
+            return Either.right(new FormatRespDto(Status.BAD_REQUEST,
+                ErrorRespDto.build(ErrorEnum.USERNAME_REGISTERED)));
         }
 
         TenantRegisterReqDto registerRequest = reqParam;
@@ -119,7 +123,7 @@ public class UserMgmtService {
         } catch (Exception e) {
             LOGGER.error("Database Operate Exception: {}", e.getMessage());
             return Either.right(new FormatRespDto(Status.INTERNAL_SERVER_ERROR,
-                ErrorEnum.DATABASE_EXCEPTION.detail()));
+                ErrorRespDto.build(ErrorEnum.DATABASE_EXCEPTION)));
         }
 
         if (result > 0) {
@@ -130,7 +134,8 @@ public class UserMgmtService {
             return Either.left(tenantRespDto);
         } else {
             LOGGER.error("User register failed");
-            return Either.right(new FormatRespDto(Status.BAD_REQUEST, "User register failed"));
+            return Either.right(new FormatRespDto(Status.BAD_REQUEST,
+                ErrorRespDto.build(ErrorEnum.USER_REGISTER_FAILED)));
         }
     }
 
@@ -147,8 +152,8 @@ public class UserMgmtService {
         //User not exit
         TenantPo tenantPo = findTenantToModifyPw(modifyRequest, currUserName);
         if (tenantPo == null) {
-            LOGGER.error(ErrorEnum.USER_NOT_FOUND.detail());
-            return Either.right(new FormatRespDto(Status.BAD_REQUEST, ErrorEnum.USER_NOT_FOUND.detail()));
+            LOGGER.error("user not found.");
+            return Either.right(new FormatRespDto(Status.BAD_REQUEST, ErrorRespDto.build(ErrorEnum.USER_NOT_FOUND)));
         }
 
         Either<Boolean, FormatRespDto> checkResult = checkOnModifyPw(modifyRequest, tenantPo);
@@ -163,7 +168,7 @@ public class UserMgmtService {
         } catch (Exception e) {
             LOGGER.error("Database Operate Exception: {}", e.getMessage());
             return Either.right(new FormatRespDto(Status.INTERNAL_SERVER_ERROR,
-                ErrorEnum.DATABASE_EXCEPTION.detail()));
+                ErrorRespDto.build(ErrorEnum.DATABASE_EXCEPTION)));
         }
 
         if (result > 0) {
@@ -171,7 +176,7 @@ public class UserMgmtService {
             return Either.left(true);
         } else {
             LOGGER.error("Modify password failed");
-            return Either.right(new FormatRespDto(Status.BAD_REQUEST, "Modify password fail"));
+            return Either.right(new FormatRespDto(Status.BAD_REQUEST, ErrorRespDto.build(ErrorEnum.MODIFY_PW_FAILED)));
         }
     }
 
@@ -187,19 +192,22 @@ public class UserMgmtService {
             if (!identityService.checkVerificatinCode(RedisUtil.RedisKeyType.VERIFICATION_CODE,
                 keyOfVerifyCode, verificationCode)) {
                 LOGGER.error("verification code is error");
-                return Either.right(new FormatRespDto(Status.BAD_REQUEST, "Verification code is error"));
+                return Either.right(new FormatRespDto(Status.BAD_REQUEST,
+                    ErrorRespDto.build(ErrorEnum.VERIFY_CODE_ERROR)));
             }
         } else {
             // check old pw
             LOGGER.info("check password");
             try {
                 if (!passwordEncoder.matches(modifyRequest.getOldPassword(), tenantPo.getPassword())) {
-                    LOGGER.error(ErrorEnum.PASSWORD_INCORRECT.detail());
-                    return Either.right(new FormatRespDto(Status.BAD_REQUEST, ErrorEnum.PASSWORD_INCORRECT.detail()));
+                    LOGGER.error("password incorrect.");
+                    return Either.right(new FormatRespDto(Status.BAD_REQUEST,
+                        ErrorRespDto.build(ErrorEnum.PASSWORD_INCORRECT)));
                 }
             } catch (Exception e) {
                 LOGGER.error("failed for password match.");
-                return Either.right(new FormatRespDto(Status.BAD_REQUEST, ErrorEnum.PASSWORD_INCORRECT.detail()));
+                return Either.right(new FormatRespDto(Status.BAD_REQUEST,
+                    ErrorRespDto.build(ErrorEnum.PASSWORD_INCORRECT)));
             }
         }
         return null;
@@ -269,7 +277,7 @@ public class UserMgmtService {
         } catch (Exception e) {
             LOGGER.error("Database Exception on Query Users: {}", e.getMessage());
             return Either.right(new FormatRespDto(Status.INTERNAL_SERVER_ERROR,
-                ErrorEnum.DATABASE_EXCEPTION.detail()));
+                ErrorRespDto.build(ErrorEnum.DATABASE_EXCEPTION)));
         }
     }
 
@@ -285,11 +293,11 @@ public class UserMgmtService {
             if (mapper.updateStatus(tenantId, allowFlag)) {
                 return Either.left("");
             }
-            return Either.right(new FormatRespDto(Status.BAD_REQUEST, ErrorEnum.USER_NOT_FOUND.detail()));
+            return Either.right(new FormatRespDto(Status.BAD_REQUEST, ErrorRespDto.build(ErrorEnum.USER_NOT_FOUND)));
         } catch (Exception e) {
             LOGGER.error("Database Exception on Update User Status: {}", e.getMessage());
             return Either.right(new FormatRespDto(Status.INTERNAL_SERVER_ERROR,
-                ErrorEnum.DATABASE_EXCEPTION.detail()));
+                ErrorRespDto.build(ErrorEnum.DATABASE_EXCEPTION)));
         }
     }
 
@@ -304,14 +312,14 @@ public class UserMgmtService {
         LOGGER.info("Begin modify user.");
         TenantPo oldUserPo = mapper.getTenantBasicPoData(user.getUserId());
         if (oldUserPo == null) {
-            LOGGER.error(ErrorEnum.USER_NOT_FOUND.detail());
-            return Either.right(new FormatRespDto(Status.BAD_REQUEST, ErrorEnum.USER_NOT_FOUND.detail()));
+            LOGGER.error("user not found.");
+            return Either.right(new FormatRespDto(Status.BAD_REQUEST, ErrorRespDto.build(ErrorEnum.USER_NOT_FOUND)));
         }
 
         if (!oldUserPo.getUsername().equalsIgnoreCase(currUserName)
             && !Consts.SUPER_ADMIN_NAME.equalsIgnoreCase(currUserName)) {
             LOGGER.error("The user has no permission to modify user.");
-            return Either.right(new FormatRespDto(Status.FORBIDDEN, "The user has no permission to modify user."));
+            return Either.right(new FormatRespDto(Status.FORBIDDEN, ErrorRespDto.build(ErrorEnum.NO_PERMISSION)));
         }
 
         LOGGER.info("correct modify information.");
@@ -340,20 +348,19 @@ public class UserMgmtService {
         uniqueReqDto.setMailAddress(
             user.getMailAddress() == null || user.getMailAddress().equals(oldUserPo.getMailAddress())
                 ? null : user.getMailAddress());
-        String msg = "";
         Either<UniquenessRespDto, FormatRespDto> uniqueness = uniqueness(uniqueReqDto);
         if (uniqueness.isLeft()) {
             if (uniqueness.left().value().isMailAddress()) {
-                msg = "repeat of mail address.";
+                return Either.right(new FormatRespDto(Status.BAD_REQUEST,
+                    ErrorRespDto.build(ErrorEnum.MAILADDR_REGISTERED)));
             }
             if (uniqueness.left().value().isTelephone()) {
-                msg = "repeat of telephone.";
+                return Either.right(new FormatRespDto(Status.BAD_REQUEST,
+                    ErrorRespDto.build(ErrorEnum.MOBILEPHONE_REGISTERED)));
             }
             if (uniqueness.left().value().isUsername()) {
-                msg += "repeat of username.";
-            }
-            if (!msg.isEmpty()) {
-                return Either.right(new FormatRespDto(Status.BAD_REQUEST, msg));
+                return Either.right(new FormatRespDto(Status.BAD_REQUEST,
+                    ErrorRespDto.build(ErrorEnum.USERNAME_REGISTERED)));
             }
         }
         return null;
@@ -372,7 +379,7 @@ public class UserMgmtService {
         } catch (Exception e) {
             LOGGER.error("Database Exception on Modify User Settings: {}", e.getMessage());
             return Either.right(new FormatRespDto(Status.INTERNAL_SERVER_ERROR,
-                ErrorEnum.DATABASE_EXCEPTION.detail()));
+                ErrorRespDto.build(ErrorEnum.DATABASE_EXCEPTION)));
         }
     }
 }

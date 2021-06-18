@@ -18,6 +18,8 @@ package org.edgegallery.user.auth.controller;
 
 import fj.data.Either;
 import javax.ws.rs.core.Response.Status;
+import org.edgegallery.user.auth.controller.dto.response.ErrorRespDto;
+import org.edgegallery.user.auth.utils.ErrorEnum;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.edgegallery.user.auth.controller.dto.request.TenantRegisterReqDto;
@@ -53,7 +55,8 @@ public class RegisterApiTest extends UserControllerTest {
         request.setUsername("user");
         request.setPassword("password");
 
-        Either<TenantRespDto, FormatRespDto> response = Either.right(new FormatRespDto(Status.BAD_REQUEST, "Data format error."));
+        Either<TenantRespDto, FormatRespDto> response = Either.right(new FormatRespDto(Status.BAD_REQUEST,
+            ErrorRespDto.build(ErrorEnum.PARA_ILLEGAL)));
         Mockito.when(userMgmtService.register(Mockito.any(TenantRegisterReqDto.class))).thenReturn(response);
 
         mvc.perform(MockMvcRequestBuilders.post("/v1/users").contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -68,7 +71,8 @@ public class RegisterApiTest extends UserControllerTest {
         request.setUsername("username");
         request.setPassword("pass");
 
-        Either<TenantRespDto, FormatRespDto> response = Either.right(new FormatRespDto(Status.BAD_REQUEST, "Data format error."));
+        Either<TenantRespDto, FormatRespDto> response = Either.right(new FormatRespDto(Status.BAD_REQUEST,
+            ErrorRespDto.build(ErrorEnum.PARA_ILLEGAL)));
         Mockito.when(userMgmtService.register(Mockito.any(TenantRegisterReqDto.class))).thenReturn(response);
 
         mvc.perform(MockMvcRequestBuilders.post("/v1/users").contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -83,7 +87,8 @@ public class RegisterApiTest extends UserControllerTest {
         TenantRegisterReqDto request = new TenantRegisterReqDto();
         request.setUsername("username");
         request.setPassword("password");
-        Either<TenantRespDto, FormatRespDto> response = Either.right(new FormatRespDto(Status.EXPECTATION_FAILED, "Save user information exception."));
+        Either<TenantRespDto, FormatRespDto> response = Either.right(new FormatRespDto(Status.EXPECTATION_FAILED,
+            ErrorRespDto.build(ErrorEnum.USER_REGISTER_FAILED)));
         Mockito.when(userMgmtService.register(Mockito.any(TenantRegisterReqDto.class))).thenReturn(response);
 
         mvc.perform(MockMvcRequestBuilders.post("/v1/users").contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -96,7 +101,8 @@ public class RegisterApiTest extends UserControllerTest {
     public void should_failed_when_no_username() throws Exception {
         TenantRegisterReqDto request = new TenantRegisterReqDto();
         request.setPassword("password");
-        Either<TenantRespDto, FormatRespDto> response = Either.right(new FormatRespDto(Status.BAD_REQUEST, "Data Required error."));
+        Either<TenantRespDto, FormatRespDto> response = Either.right(new FormatRespDto(Status.BAD_REQUEST,
+            ErrorRespDto.build(ErrorEnum.PARA_ILLEGAL)));
         Mockito.when(userMgmtService.register(Mockito.any(TenantRegisterReqDto.class))).thenReturn(response);
 
         mvc.perform(MockMvcRequestBuilders.post("/v1/users").contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -109,7 +115,8 @@ public class RegisterApiTest extends UserControllerTest {
     public void should_failed_when_no_pw() throws Exception {
         TenantRegisterReqDto request = new TenantRegisterReqDto();
         request.setUsername("username");
-        Either<TenantRespDto, FormatRespDto> response = Either.right(new FormatRespDto(Status.BAD_REQUEST, "Data Required error."));
+        Either<TenantRespDto, FormatRespDto> response = Either.right(new FormatRespDto(Status.BAD_REQUEST,
+            ErrorRespDto.build(ErrorEnum.PARA_ILLEGAL)));
         Mockito.when(userMgmtService.register(Mockito.any(TenantRegisterReqDto.class))).thenReturn(response);
 
         mvc.perform(MockMvcRequestBuilders.post("/v1/users").contentType(MediaType.APPLICATION_JSON_VALUE)
