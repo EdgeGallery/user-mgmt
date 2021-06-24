@@ -109,8 +109,7 @@ public class VerificationController extends BeGenericServlet {
     @GetMapping(value = "/verifycode-image/precheck", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @ApiOperation(value = "check image verification code", response = Object.class)
-    public ResponseEntity<Object> preCheckImgVerificationCode(HttpServletRequest httpServletRequest)
-        throws IOException {
+    public ResponseEntity<Object> preCheckImgVerificationCode(HttpServletRequest httpServletRequest) {
         return buildResponse(identityService.preCheckImgVerificationCode(httpServletRequest));
     }
 }
