@@ -105,7 +105,7 @@ public class RetrievePasswordTest {
             }
         };
         Either<Boolean, FormatRespDto> either = userMgmtService.modifyPassword(request, "");
-        Assert.assertTrue(either.isLeft());
+        Assert.assertTrue(either.isRight());
     }
 
     @Test
