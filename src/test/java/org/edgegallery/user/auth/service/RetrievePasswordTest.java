@@ -74,11 +74,10 @@ public class RetrievePasswordTest {
 
     @Test
     public void should_successfully_when_modify_password() {
-        new MockUp<IdentityService>() {
+        new MockUp<RedisUtil>() {
             @Mock
-            public boolean checkVerificatinCode(RedisUtil.RedisKeyType keyType, String keyOfVerifyCode,
-                String verificationCode) {
-                return true;
+            public String get(RedisUtil.RedisKeyType type, String key) {
+                return "123456";
             }
         };
 
@@ -97,11 +96,10 @@ public class RetrievePasswordTest {
         request.setNewPassword("newPassword1234.");
         request.setVerificationCode("123456");
 
-        new MockUp<IdentityService>() {
+        new MockUp<RedisUtil>() {
             @Mock
-            public boolean checkVerificatinCode(RedisUtil.RedisKeyType keyType, String keyOfVerifyCode,
-                String verificationCode) {
-                return false;
+            public String get(RedisUtil.RedisKeyType type, String key) {
+                return "654321";
             }
         };
         Either<Boolean, FormatRespDto> either = userMgmtService.modifyPassword(request, "");
@@ -112,6 +110,17 @@ public class RetrievePasswordTest {
     public void should_failed_when_telephone_not_exit() {
         ModifyPasswordReqDto request = new ModifyPasswordReqDto();
         request.setTelephone("15945678912");
+        request.setNewPassword("newPassword1234.");
+        request.setVerificationCode("123456");
+
+        Either<Boolean, FormatRespDto> either = userMgmtService.modifyPassword(request, "");
+        Assert.assertTrue(either.isRight());
+    }
+
+    @Test
+    public void should_failed_when_mailaddress_not_exit() {
+        ModifyPasswordReqDto request = new ModifyPasswordReqDto();
+        request.setMailAddress("test@example.com");
         request.setNewPassword("newPassword1234.");
         request.setVerificationCode("123456");
 
