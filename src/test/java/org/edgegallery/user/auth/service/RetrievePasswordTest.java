@@ -20,18 +20,18 @@ import fj.data.Either;
 import mockit.Mock;
 import mockit.MockUp;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.edgegallery.user.auth.utils.redis.RedisUtil;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.edgegallery.user.auth.MainServer;
 import org.edgegallery.user.auth.controller.dto.request.ModifyPasswordReqDto;
 import org.edgegallery.user.auth.controller.dto.request.TenantRegisterReqDto;
 import org.edgegallery.user.auth.controller.dto.response.FormatRespDto;
 import org.edgegallery.user.auth.controller.dto.response.TenantRespDto;
 import org.edgegallery.user.auth.db.mapper.TenantPoMapper;
+import org.edgegallery.user.auth.utils.redis.RedisUtil;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -49,15 +49,19 @@ public class RetrievePasswordTest {
 
     private String tenantId;
 
+    private String username = "s" + RandomStringUtils.randomAlphanumeric(16);
+
     private String telephone = "15191881234";
+
+    private String mailAddress = "test@example.com";
 
     @Before
     public void registerUser() {
-        String username = "s" + RandomStringUtils.randomAlphanumeric(16);
         TenantRegisterReqDto request = new TenantRegisterReqDto();
         request.setUsername(username);
         request.setPassword("password1234.");
         request.setTelephone(telephone);
+        request.setMailAddress(mailAddress);
         request.setCompany("huawei");
         request.setGender("male");
         Either<TenantRespDto, FormatRespDto> either = userMgmtService.register(request);
@@ -120,13 +124,14 @@ public class RetrievePasswordTest {
     @Test
     public void should_failed_when_mailaddress_not_exit() {
         ModifyPasswordReqDto request = new ModifyPasswordReqDto();
-        request.setMailAddress("test@example.com");
+        request.setMailAddress("test123@example.com");
         request.setNewPassword("newPassword1234.");
         request.setVerificationCode("123456");
 
         Either<Boolean, FormatRespDto> either = userMgmtService.modifyPassword(request, "");
         Assert.assertTrue(either.isRight());
     }
+
 
     @Test
     public void should_failed_when_password_less_6(){
@@ -138,4 +143,25 @@ public class RetrievePasswordTest {
         Either<Boolean, FormatRespDto> either = userMgmtService.modifyPassword(request, "");
         Assert.assertTrue(either.isRight());
     }
+
+    @Test
+    public void should_successfully_on_normal_modifypw() {
+        ModifyPasswordReqDto retrieveRequest = new ModifyPasswordReqDto();
+        retrieveRequest.setType(1);
+        retrieveRequest.setOldPassword("password1234.");
+        retrieveRequest.setNewPassword("newPassword1234.");
+        Either<Boolean, FormatRespDto> eitherResult = userMgmtService.modifyPassword(retrieveRequest, username);
+        Assert.assertTrue(eitherResult.isLeft());
+    }
+
+    @Test
+    public void should_failed_when_wrong_pw_on_normal_modifypw() {
+        ModifyPasswordReqDto retrieveRequest = new ModifyPasswordReqDto();
+        retrieveRequest.setType(1);
+        retrieveRequest.setOldPassword("password123456.");
+        retrieveRequest.setNewPassword("newPassword1234.");
+        Either<Boolean, FormatRespDto> eitherResult = userMgmtService.modifyPassword(retrieveRequest, username);
+        Assert.assertTrue(eitherResult.isRight());
+    }
+
 }
