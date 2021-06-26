@@ -17,13 +17,11 @@
 package org.edgegallery.user.auth.service;
 
 import fj.data.Either;
-import java.util.HashMap;
-import java.util.Map;
-import javax.ws.rs.core.Response;
 import mockit.Mock;
 import mockit.MockUp;
 import org.edgegallery.user.auth.MainServer;
 import org.edgegallery.user.auth.config.SmsConfig;
+import org.edgegallery.user.auth.controller.dto.request.VerificationReqByMailDto;
 import org.edgegallery.user.auth.controller.dto.request.VerificationReqDto;
 import org.edgegallery.user.auth.controller.dto.response.FormatRespDto;
 import org.edgegallery.user.auth.utils.HttpsUtil;
@@ -37,6 +35,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.web.bind.ServletRequestUtils;
+
+import javax.servlet.ServletRequest;
+import javax.ws.rs.core.Response;
+import java.awt.image.BufferedImage;
+import java.util.Map;
 
 @SpringBootTest(classes = {MainServer.class})
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -66,45 +70,167 @@ public class VerificationTest {
     }
 
     @Test
-    public void should_successfully_when_right_verify_code() {
+    public void sms_should_successfully_when_normal() {
         VerificationReqDto request = new VerificationReqDto();
         request.setTelephone("13800000003");
-        new MockUp<RedisUtil>() {
-            @Mock
-            public void save(RedisUtil.RedisKeyType type, String key, String value) {
-                return;
-            }
-        };
         new MockUp<HttpsUtil>() {
             @Mock
             public boolean httpsPost(String url, Map<String, String> headers, String bodyParam) {
                 return true;
             }
         };
-        Map<String, String> anyMap = new HashMap<>();
         Either<Boolean, FormatRespDto> either = identityService.sendVerificationCodeBySms(request);
         Assert.assertTrue(either.isLeft());
+        Assert.assertTrue(either.left().value());
     }
 
     @Test
-    public void should_failed_when_wrong_verify_code() {
+    public void sms_should_failed_when_http_failed() {
         VerificationReqDto request = new VerificationReqDto();
         request.setTelephone("13800000003");
-        new MockUp<RedisUtil>() {
-            @Mock
-            public void save(RedisUtil.RedisKeyType type, String key, String value) {
-                return;
-            }
-        };
         new MockUp<HttpsUtil>() {
             @Mock
             public boolean httpsPost(String url, Map<String, String> headers, String bodyParam) {
                 return false;
             }
         };
-        Map<String, String> anyMap = new HashMap<>();
         Either<Boolean, FormatRespDto> either = identityService.sendVerificationCodeBySms(request);
         Assert.assertTrue(either.isRight());
         Assert.assertEquals(either.right().value().getErrStatus(), Response.Status.EXPECTATION_FAILED);
+    }
+
+    @Test
+    public void sms_should_successfully_when_disabled() {
+        smsConfig.setEnabled("false");
+        VerificationReqDto request = new VerificationReqDto();
+        request.setTelephone("13800000003");
+        Either<Boolean, FormatRespDto> either = identityService.sendVerificationCodeBySms(request);
+        Assert.assertTrue(either.isLeft());
+        Assert.assertTrue(either.left().value());
+    }
+
+    @Test
+    public void sms_should_failed_when_no_telephone() {
+        VerificationReqDto request = new VerificationReqDto();
+        request.setTelephone("13800000099");
+        Either<Boolean, FormatRespDto> either = identityService.sendVerificationCodeBySms(request);
+        Assert.assertTrue(either.isRight());
+        Assert.assertEquals(either.right().value().getErrStatus(), Response.Status.BAD_REQUEST);
+    }
+
+    @Test
+    public void mail_should_successfully_when_disabled() {
+        VerificationReqByMailDto request = new VerificationReqByMailDto();
+        request.setMailAddress("13800000003@edgegallery.org");
+        Either<Boolean, FormatRespDto> either = identityService.sendVerificationCodeByMail(request);
+        Assert.assertTrue(either.isLeft());
+        Assert.assertTrue(either.left().value());
+    }
+
+    @Test
+    public void mail_should_successfully_when_normal() {
+        VerificationReqByMailDto request = new VerificationReqByMailDto();
+        request.setMailAddress("13800000003@edgegallery.org");
+        new MockUp<Boolean>() {
+            @Mock
+            public boolean parseBoolean(String boolValue) {
+                return true;
+            }
+        };
+        new MockUp<MailService>() {
+            @Mock
+            public boolean sendSimpleMail(String receiver, String subject, String content) {
+                return true;
+            }
+        };
+        Either<Boolean, FormatRespDto> either = identityService.sendVerificationCodeByMail(request);
+        Assert.assertTrue(either.isLeft());
+        Assert.assertTrue(either.left().value());
+    }
+
+    @Test
+    public void mail_should_failed_when_no_mailaddress() {
+        VerificationReqByMailDto request = new VerificationReqByMailDto();
+        request.setMailAddress("13800000099@edgegallery.org");
+        new MockUp<Boolean>() {
+            @Mock
+            public boolean parseBoolean(String boolValue) {
+                return true;
+            }
+        };
+        Either<Boolean, FormatRespDto> either = identityService.sendVerificationCodeByMail(request);
+        Assert.assertTrue(either.isRight());
+        Assert.assertEquals(either.right().value().getErrStatus(), Response.Status.BAD_REQUEST);
+    }
+
+    @Test
+    public void mail_should_failed_when_send_failed() {
+        VerificationReqByMailDto request = new VerificationReqByMailDto();
+        request.setMailAddress("13800000003@edgegallery.org");
+        new MockUp<Boolean>() {
+            @Mock
+            public boolean parseBoolean(String boolValue) {
+                return true;
+            }
+        };
+        new MockUp<MailService>() {
+            @Mock
+            public boolean sendSimpleMail(String receiver, String subject, String content) {
+                return false;
+            }
+        };
+        Either<Boolean, FormatRespDto> either = identityService.sendVerificationCodeByMail(request);
+        Assert.assertTrue(either.isRight());
+        Assert.assertEquals(either.right().value().getErrStatus(), Response.Status.EXPECTATION_FAILED);
+    }
+
+    @Test
+    public void generate_img_code() {
+        BufferedImage bi= identityService.generateImgVerificationCode();
+        Assert.assertNotNull(bi);
+    }
+
+    @Test
+    public void pre_check_img_code_right() {
+        new MockUp<ServletRequestUtils>() {
+            @Mock
+            public String getStringParameter(ServletRequest request, String name, String defaultVal) {
+                return "1234";
+            }
+        };
+        new MockUp<RedisUtil>() {
+            @Mock
+            public String get(RedisUtil.RedisKeyType type, String key) {
+                return "1234";
+            }
+        };
+        Either<Map<String, Boolean>, FormatRespDto> eitherResult = identityService.preCheckImgVerificationCode(null);
+        Assert.assertTrue(eitherResult.isLeft());
+        Map<String, Boolean> checkResult = eitherResult.left().value();
+        Assert.assertNotNull(checkResult);
+        Assert.assertTrue(checkResult.containsKey("checkResult"));
+        Assert.assertTrue(checkResult.get("checkResult"));
+    }
+
+    @Test
+    public void pre_check_img_code_wrong() {
+        new MockUp<ServletRequestUtils>() {
+            @Mock
+            public String getStringParameter(ServletRequest request, String name, String defaultVal) {
+                return "1234";
+            }
+        };
+        new MockUp<RedisUtil>() {
+            @Mock
+            public String get(RedisUtil.RedisKeyType type, String key) {
+                return "4321";
+            }
+        };
+        Either<Map<String, Boolean>, FormatRespDto> eitherResult = identityService.preCheckImgVerificationCode(null);
+        Assert.assertTrue(eitherResult.isLeft());
+        Map<String, Boolean> checkResult = eitherResult.left().value();
+        Assert.assertNotNull(checkResult);
+        Assert.assertTrue(checkResult.containsKey("checkResult"));
+        Assert.assertFalse(checkResult.get("checkResult"));
     }
 }
