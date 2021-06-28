@@ -84,7 +84,7 @@ public class OAuthServerController {
             try {
                 REST_TEMPLATE.getForObject(url, String.class);
             } catch (RestClientException e) {
-                LOGGER.warn("can not access logout: {}", url);
+                LOGGER.warn("can not access logout: {}", clientDetail.getClientId());
             }
         });
         return new ResponseEntity<>("Succeed", HttpStatus.OK);
