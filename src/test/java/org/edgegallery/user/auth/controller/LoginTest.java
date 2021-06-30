@@ -22,7 +22,10 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import com.google.gson.Gson;
 import java.util.Date;
 import javax.servlet.http.Cookie;
+import mockit.Mock;
+import mockit.MockUp;
 import org.edgegallery.user.auth.MainServer;
+import org.edgegallery.user.auth.config.security.MecUserDetailsService;
 import org.edgegallery.user.auth.controller.dto.response.TenantRespDto;
 import org.edgegallery.user.auth.service.UserMgmtService;
 import org.junit.Before;
@@ -72,6 +75,11 @@ public class LoginTest {
         this.xsrfToken = response.getCookie("XSRF-TOKEN").getValue();
         this.cookies = response.getCookies();
 
+        new MockUp<MecUserDetailsService>() {
+            @Mock
+            public void checkVerificationCode(String uniqueUserFlag) {
+            }
+        };
     }
 
     private TenantRespDto getCurrentLoginUser() throws Exception {

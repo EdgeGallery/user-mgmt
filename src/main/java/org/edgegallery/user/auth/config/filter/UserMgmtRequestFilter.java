@@ -48,8 +48,7 @@ public class UserMgmtRequestFilter extends OncePerRequestFilter implements Order
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserMgmtRequestFilter.class);
     private static final String[] urlPatterns = {"/login", "/logout", "/auth/", "/v1/"};
-    private static final String[] checkVerifyCodeUrlPatterns = {"/login", "/login/",
-        "/v1/identity/sms", "/v1/identity/sms/",
+    private static final String[] checkVerifyCodeUrlPatterns = {"/v1/identity/sms", "/v1/identity/sms/",
         "/v1/identity/mail", "/v1/identity/mail/",
         "/v1/users", "/v1/users/"};
     private static final String UNKNOWN = "unknown";
@@ -66,6 +65,7 @@ public class UserMgmtRequestFilter extends OncePerRequestFilter implements Order
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
         throws ServletException, IOException {
         if (!checkVerificationCode(request, response)) {
+            LOGGER.error("invalid verification code, forbbiden access.");
             return;
         }
 

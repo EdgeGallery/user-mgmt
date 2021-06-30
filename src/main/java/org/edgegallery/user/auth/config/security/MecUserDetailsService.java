@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import javax.servlet.http.HttpServletRequest;
 import org.edgegallery.user.auth.config.OAuthClientDetail;
 import org.edgegallery.user.auth.config.OAuthClientDetailsConfig;
 import org.edgegallery.user.auth.db.EnumPlatform;
@@ -37,11 +38,15 @@ import org.edgegallery.user.auth.db.EnumRole;
 import org.edgegallery.user.auth.db.entity.RolePo;
 import org.edgegallery.user.auth.db.entity.TenantPo;
 import org.edgegallery.user.auth.db.mapper.TenantPoMapper;
+import org.edgegallery.user.auth.service.IdentityService;
 import org.edgegallery.user.auth.utils.Consts;
+import org.edgegallery.user.auth.utils.ErrorEnum;
+import org.edgegallery.user.auth.utils.redis.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -51,6 +56,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.ServletRequestUtils;
 
 @Component
 public class MecUserDetailsService implements UserDetailsService {
@@ -78,11 +84,18 @@ public class MecUserDetailsService implements UserDetailsService {
     @Autowired
     private Pbkdf2PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private HttpServletRequest request;
+
+    @Autowired
+    private IdentityService identityService;
+
     @Value("${secPolicy.pwTimeout}")
     private int pwTimeout;
 
     @Override
     public UserDetails loadUserByUsername(String uniqueUserFlag) throws UsernameNotFoundException {
+        checkVerificationCode(uniqueUserFlag);
         TenantPo tenant = tenantPoMapper.getTenantByUniqueFlag(uniqueUserFlag);
         if (tenant == null) {
             // to check client user
@@ -103,6 +116,26 @@ public class MecUserDetailsService implements UserDetailsService {
             LOGGER.info("username:{} have been locked.", tenant.getUsername());
         }
         return new User(tenant.getUsername(), tenant.getPassword(), true, true, true, !isLocked, authorities);
+    }
+
+    private void checkVerificationCode(String uniqueUserFlag) {
+        if (Consts.GUEST_USER_NAME.equalsIgnoreCase(uniqueUserFlag)) {
+            LOGGER.debug("guest login, no need check verification code.");
+            return;
+        }
+
+        if (oauthClientDetailsConfig.getClients().stream()
+            .anyMatch(clientDetail -> uniqueUserFlag.startsWith(clientDetail.getClientId() + ":"))) {
+            LOGGER.debug("inner client login, no need check verification code.");
+            return;
+        }
+
+        String verificationCode = ServletRequestUtils.getStringParameter(request, "verifyCode", "");
+        if (!identityService.checkVerificatinCode(RedisUtil.RedisKeyType.IMG_VERIFICATION_CODE,
+            request.getSession().getId(), verificationCode)) {
+            LOGGER.error("invalid verification code.");
+            throw new InternalAuthenticationServiceException(ErrorEnum.VERIFY_CODE_ERROR.message());
+        }
     }
 
     private List<RolePo> clientDefaultRoles() {
