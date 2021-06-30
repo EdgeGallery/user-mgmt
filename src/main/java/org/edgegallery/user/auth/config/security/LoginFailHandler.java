@@ -47,9 +47,16 @@ public class LoginFailHandler extends SimpleUrlAuthenticationFailureHandler {
             response.getWriter().println(
                 new Gson().toJson(errorRespDto));
         } else {
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.getWriter().println(new Gson()
-                .toJson(errorRespDto));
+            if (errorRespDto.getMessage().equalsIgnoreCase(ErrorEnum.VERIFY_CODE_ERROR.message())) {
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+                errorRespDto.setCode(ErrorEnum.VERIFY_CODE_ERROR.code());
+                response.getWriter().println(new Gson()
+                    .toJson(errorRespDto));
+            } else {
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                response.getWriter().println(new Gson()
+                    .toJson(errorRespDto));
+            }
         }
         LOGGER.error("failed to get token.");
     }
