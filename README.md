@@ -64,7 +64,7 @@
   
   - 推荐参考此处[安装和启动PostgreSQL](https://www.runoob.com/postgresql/windows-install-postgresql.html)，建议选择9.6或以上版本；
   
-  - 使用文件`/docker/user-mgmt-postgresql/postgres.sql`初始化数据库表结构；
+  - 使用文件`/src/main/resources/usermgmtdb.sql`初始化数据库表结构；
   
   - 修改文件/src/main/resources/application.yaml，指向本地数据库，例如：
   
