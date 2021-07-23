@@ -36,7 +36,7 @@
   | MavApache Maven |3.6.3 | [download](https://maven.apache.org/download.cgi)
   | IntelliJ IDEA |Community |[download](https://www.jetbrains.com/idea/download/)
   | Servicecomb Service-Center    | 1.3.2 | [download](https://servicecomb.apache.org/cn/release/service-center-downloads/)
-  | Postgres  | 9.6.17 or above |   [download](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads)
+  | Postgres  | 10 or above |   [download](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads)
   | Redis  | 3.2.100 or above | [download](https://github.com/microsoftarchive/redis/releases) |
   
   **2.源码下载：** 使用 git clone 或者下载压缩包的形式将User Management源代码下载到本地，默认master分支
