@@ -25,7 +25,7 @@ import org.springframework.util.StringUtils;
 
 @Setter
 @Getter
-public abstract class TenantBasicRespDto {
+public abstract class BaseTenantRespDto {
 
     @ApiModelProperty(required = true, example = "TestUser1")
     private String username;

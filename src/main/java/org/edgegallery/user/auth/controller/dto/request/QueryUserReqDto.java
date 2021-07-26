@@ -29,7 +29,7 @@ import javax.validation.constraints.Pattern;
 import javax.ws.rs.core.Response;
 import lombok.Getter;
 import lombok.Setter;
-import org.edgegallery.user.auth.config.validate.CheckParamsGenericUtils;
+import org.edgegallery.user.auth.config.validate.AbstractCheckParamsGenericUtils;
 import org.edgegallery.user.auth.config.validate.IStringTrim;
 import org.edgegallery.user.auth.controller.dto.response.ErrorRespDto;
 import org.edgegallery.user.auth.controller.dto.response.FormatRespDto;
@@ -39,7 +39,7 @@ import org.springframework.util.StringUtils;
 
 @Setter
 @Getter
-public class QueryUserReqDto extends CheckParamsGenericUtils implements IStringTrim {
+public class QueryUserReqDto extends AbstractCheckParamsGenericUtils implements IStringTrim {
     private String username;
 
     private String mailAddress;

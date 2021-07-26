@@ -19,7 +19,7 @@ package org.edgegallery.user.auth.config.validate;
 import fj.data.Either;
 import org.edgegallery.user.auth.controller.dto.response.FormatRespDto;
 
-public abstract class CheckParamsGenericUtils implements ICheckParams {
+public abstract class AbstractCheckParamsGenericUtils implements ICheckParams {
 
     /**
      * check data.

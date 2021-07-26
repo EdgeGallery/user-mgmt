@@ -60,7 +60,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private MecUserDetailsService mecUserDetailsService;
+    private MecUserDetailsServiceImpl mecUserDetailsService;
 
     @Autowired
     private LoginFailHandler loginFailHandler;

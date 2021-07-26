@@ -20,5 +20,16 @@ package org.edgegallery.user.auth.db;
  * roles info.
  */
 public enum EnumRole {
-    GUEST,TENANT,ADMIN
+    /**
+     * Guest.
+     */
+    GUEST,
+    /**
+     * Tenant.
+     */
+    TENANT,
+    /**
+     * Admin.
+     */
+    ADMIN
 }

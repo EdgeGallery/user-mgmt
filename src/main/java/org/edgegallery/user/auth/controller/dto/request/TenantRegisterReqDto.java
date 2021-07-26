@@ -28,7 +28,7 @@ import org.springframework.util.StringUtils;
 @Setter
 @Getter
 @ApiModel(value = "TenantRegisterRequest")
-public class TenantRegisterReqDto extends TenantBasicReqDto implements IStringTrim {
+public class TenantRegisterReqDto extends BaseTenantBasicReqDto implements IStringTrim {
 
     @ApiModelProperty(required = true, example = "Test@Password")
     @Pattern(regexp = ServiceConfig.PATTERN_USERPW)

@@ -21,14 +21,14 @@ import javax.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 import org.edgegallery.user.auth.config.ServiceConfig;
-import org.edgegallery.user.auth.config.validate.CheckParamsGenericUtils;
+import org.edgegallery.user.auth.config.validate.AbstractCheckParamsGenericUtils;
 import org.edgegallery.user.auth.config.validate.IStringTrim;
 import org.springframework.util.StringUtils;
 
 
 @Getter
 @Setter
-public class UniqueReqDto extends CheckParamsGenericUtils implements IStringTrim {
+public class UniqueReqDto extends AbstractCheckParamsGenericUtils implements IStringTrim {
 
     @ApiModelProperty(required = true, example = "zhangtest")
     @Pattern(regexp = ServiceConfig.PATTERN_USERNAME)

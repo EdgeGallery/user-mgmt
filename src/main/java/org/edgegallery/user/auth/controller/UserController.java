@@ -25,7 +25,7 @@ import javax.ws.rs.core.Response;
 import org.apache.http.HttpStatus;
 import org.apache.servicecomb.provider.rest.common.RestSchema;
 import org.edgegallery.user.auth.config.DescriptionConfig;
-import org.edgegallery.user.auth.controller.base.BeGenericServlet;
+import org.edgegallery.user.auth.controller.base.AbstractBeGenericServlet;
 import org.edgegallery.user.auth.controller.dto.request.ModifyPasswordReqDto;
 import org.edgegallery.user.auth.controller.dto.request.QueryUserReqDto;
 import org.edgegallery.user.auth.controller.dto.request.TenantRegisterReqDto;
@@ -53,7 +53,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RestSchema(schemaId = "users-mgmt")
 @RequestMapping("/v1/users")
 @Controller
-public class UserController extends BeGenericServlet {
+public class UserController extends AbstractBeGenericServlet {
 
     private static final String REG_UUID = "[0-9a-f]{32}";
 

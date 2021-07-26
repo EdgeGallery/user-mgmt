@@ -25,13 +25,13 @@ import javax.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 import org.edgegallery.user.auth.config.ServiceConfig;
-import org.edgegallery.user.auth.config.validate.CheckParamsGenericUtils;
+import org.edgegallery.user.auth.config.validate.AbstractCheckParamsGenericUtils;
 import org.edgegallery.user.auth.config.validate.IStringTrim;
 import org.springframework.util.StringUtils;
 
 @Getter
 @Setter
-public class ModifyPasswordReqDto extends CheckParamsGenericUtils implements IStringTrim {
+public class ModifyPasswordReqDto extends AbstractCheckParamsGenericUtils implements IStringTrim {
     @SerializedName("type")
     @JsonProperty("type")
     @Min(value = 1)

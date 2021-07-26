@@ -23,13 +23,13 @@ import javax.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 import org.edgegallery.user.auth.config.ServiceConfig;
-import org.edgegallery.user.auth.config.validate.CheckParamsGenericUtils;
+import org.edgegallery.user.auth.config.validate.AbstractCheckParamsGenericUtils;
 import org.edgegallery.user.auth.config.validate.IStringTrim;
 import org.springframework.util.StringUtils;
 
 @Setter
 @Getter
-public class VerificationReqByMailDto extends CheckParamsGenericUtils implements IStringTrim {
+public class VerificationReqByMailDto extends AbstractCheckParamsGenericUtils implements IStringTrim {
 
     @SerializedName("mailAddress")
     @JsonProperty("mailAddress")
