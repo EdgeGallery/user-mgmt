@@ -63,7 +63,7 @@ public class IdentityService {
 
     private static final int VERIFY_CODE_IMG_LINECOUNT = 40;
 
-    private static final Random RANDOM_INSTANCE = new Random();
+    private static final Random RANDOM_INSTANCE = new SecureRandom();
 
     @Autowired
     private TenantPoMapper mapper;

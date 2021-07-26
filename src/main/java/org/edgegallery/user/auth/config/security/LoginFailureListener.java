@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 public class LoginFailureListener implements ApplicationListener<AbstractAuthenticationFailureEvent> {
 
     @Autowired
-    private MecUserDetailsService mecUserDetailsService;
+    private MecUserDetailsServiceImpl mecUserDetailsService;
 
     @Override
     public void onApplicationEvent(AbstractAuthenticationFailureEvent event) {

@@ -70,7 +70,7 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
     private OAuthClientDetailsConfig oauthClientDetailsConfig;
 
     @Autowired
-    private MecUserDetailsService mecUserDetailsService;
+    private MecUserDetailsServiceImpl mecUserDetailsService;
 
     @Autowired
     private AuthInMemoryAuthorizationCodeServices authInMemoryAuthorizationCodeServices;

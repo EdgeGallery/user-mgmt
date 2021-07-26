@@ -22,7 +22,7 @@ import es.moki.ratelimitj.inmemory.request.InMemorySlidingWindowRequestRateLimit
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,11 +30,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import org.edgegallery.user.auth.config.OAuthClientDetail;
 import org.edgegallery.user.auth.config.OAuthClientDetailsConfig;
 import org.edgegallery.user.auth.db.EnumPlatform;
-import org.edgegallery.user.auth.db.EnumRole;
 import org.edgegallery.user.auth.db.entity.RolePo;
 import org.edgegallery.user.auth.db.entity.TenantPo;
 import org.edgegallery.user.auth.db.mapper.TenantPoMapper;
@@ -59,11 +59,11 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.ServletRequestUtils;
 
 @Component
-public class MecUserDetailsService implements UserDetailsService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MecUserDetailsService.class);
+public class MecUserDetailsServiceImpl implements UserDetailsService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MecUserDetailsServiceImpl.class);
 
     // when login failed 5 times, account will be locked.
-    private static final Set<RequestLimitRule> rules = Collections
+    private static final Set<RequestLimitRule> REQUEST_LIMIT_RULES = Collections
         .singleton(RequestLimitRule.of(Duration.ofMinutes(5), 4));
 
     // locked overtime
@@ -71,7 +71,7 @@ public class MecUserDetailsService implements UserDetailsService {
 
     private static final int CLIENT_LOGIN_TIMEOUT = 5000;
 
-    private static final RequestRateLimiter LIMITER = new InMemorySlidingWindowRequestRateLimiter(rules);
+    private static final RequestRateLimiter LIMITER = new InMemorySlidingWindowRequestRateLimiter(REQUEST_LIMIT_RULES);
 
     private static final Map<String, Long> LOCKED_USERS_MAP = new HashMap<>();
 
@@ -109,8 +109,8 @@ public class MecUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("User not found: " + uniqueUserFlag);
         }
         List<RolePo> rolePos = tenantPoMapper.getRolePoByTenantId(tenant.getTenantId());
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        rolePos.forEach(rolePo -> authorities.add(new SimpleGrantedAuthority("ROLE_" + rolePo.toString())));
+        List<GrantedAuthority> authorities = rolePos.stream()
+            .map(rolePo -> new SimpleGrantedAuthority("ROLE_" + rolePo.toString())).collect(Collectors.toList());
         boolean isLocked = isLocked(uniqueUserFlag);
         if (isLocked) {
             LOGGER.info("username:{} have been locked.", tenant.getUsername());
@@ -138,14 +138,6 @@ public class MecUserDetailsService implements UserDetailsService {
         }
     }
 
-    private List<RolePo> clientDefaultRoles() {
-        List<RolePo> roles = new ArrayList<>();
-        for (EnumPlatform plat : EnumPlatform.values()) {
-            roles.add(new RolePo(plat, EnumRole.TENANT));
-        }
-        return roles;
-    }
-
     /**
      * to parse the username if this is a client user, and return this user.
      *
@@ -165,17 +157,17 @@ public class MecUserDetailsService implements UserDetailsService {
         }
         Optional<OAuthClientDetail> client = oauthClientDetailsConfig.getClients().stream()
             .filter(clientDetail -> inClientId.equalsIgnoreCase(clientDetail.getClientId())).findFirst();
-        if (client.isPresent()) {
-            OAuthClientDetail clientDetail = client.get();
-            String secret = clientDetail.getClientSecret();
-            clientUser.setUsername(clientDetail.getClientId());
-            clientUser.setPassword(passwordEncoder.encode(secret));
-        } else {
+        if (!client.isPresent()) {
+            LOGGER.error("client not found.");
             return null;
         }
-        List<RolePo> rolePos = clientDefaultRoles();
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        rolePos.forEach(rolePo -> authorities.add(new SimpleGrantedAuthority("ROLE_" + rolePo.toString())));
+
+        OAuthClientDetail clientDetail = client.get();
+        String secret = clientDetail.getClientSecret();
+        clientUser.setUsername(clientDetail.getClientId());
+        clientUser.setPassword(passwordEncoder.encode(secret));
+        List<GrantedAuthority> authorities = Arrays.stream(EnumPlatform.values())
+            .map(plat -> new SimpleGrantedAuthority("ROLE_" + plat + "_TENANT")).collect(Collectors.toList());
         return new User(clientUser.getUsername(), clientUser.getPassword(), true, true, true, true, authorities);
     }
 

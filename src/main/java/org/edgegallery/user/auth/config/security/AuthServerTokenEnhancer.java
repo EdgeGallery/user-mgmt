@@ -33,7 +33,7 @@ import org.springframework.security.oauth2.provider.token.TokenEnhancer;
 public class AuthServerTokenEnhancer implements TokenEnhancer {
 
     @Autowired
-    private MecUserDetailsService mecUserDetailsService;
+    private MecUserDetailsServiceImpl mecUserDetailsService;
 
     @Autowired
     private TenantPoMapper tenantPoMapper;

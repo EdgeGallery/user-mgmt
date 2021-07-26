@@ -25,7 +25,7 @@ import javax.servlet.http.Cookie;
 import mockit.Mock;
 import mockit.MockUp;
 import org.edgegallery.user.auth.MainServer;
-import org.edgegallery.user.auth.config.security.MecUserDetailsService;
+import org.edgegallery.user.auth.config.security.MecUserDetailsServiceImpl;
 import org.edgegallery.user.auth.controller.dto.response.TenantRespDto;
 import org.edgegallery.user.auth.service.UserMgmtService;
 import org.junit.Before;
@@ -75,7 +75,7 @@ public class LoginTest {
         this.xsrfToken = response.getCookie("XSRF-TOKEN").getValue();
         this.cookies = response.getCookies();
 
-        new MockUp<MecUserDetailsService>() {
+        new MockUp<MecUserDetailsServiceImpl>() {
             @Mock
             public void checkVerificationCode(String uniqueUserFlag) {
             }

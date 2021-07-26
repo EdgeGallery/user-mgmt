@@ -21,7 +21,7 @@ import javax.ws.rs.core.Response.Status;
 import org.edgegallery.user.auth.controller.dto.response.FormatRespDto;
 import org.springframework.http.ResponseEntity;
 
-public abstract class BeGenericServlet {
+public abstract class AbstractBeGenericServlet {
 
     protected <T> ResponseEntity<Object> buildResponse(Either<T, FormatRespDto> either) {
         return either.isRight() ? buildErrorResponse(either.right().value()) : ResponseEntity.ok(either.left().value());

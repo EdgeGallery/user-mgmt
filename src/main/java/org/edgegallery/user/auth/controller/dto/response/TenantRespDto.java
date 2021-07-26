@@ -28,7 +28,7 @@ import org.edgegallery.user.auth.db.entity.TenantPo;
 @ToString
 @Setter
 @Getter
-public class TenantRespDto extends TenantBasicRespDto {
+public class TenantRespDto extends BaseTenantRespDto {
 
     @ApiModelProperty(required = true, example = "37423702-051a-46b4-bf2b-f190759cc0b8")
     private String userId;

@@ -27,10 +27,10 @@ import org.edgegallery.user.auth.controller.dto.request.ModifyPasswordReqDto;
 import org.edgegallery.user.auth.controller.dto.request.QueryUserReqDto;
 import org.edgegallery.user.auth.controller.dto.request.TenantRegisterReqDto;
 import org.edgegallery.user.auth.controller.dto.request.UniqueReqDto;
+import org.edgegallery.user.auth.controller.dto.response.BaseTenantRespDto;
 import org.edgegallery.user.auth.controller.dto.response.ErrorRespDto;
 import org.edgegallery.user.auth.controller.dto.response.FormatRespDto;
 import org.edgegallery.user.auth.controller.dto.response.QueryUserRespDto;
-import org.edgegallery.user.auth.controller.dto.response.TenantBasicRespDto;
 import org.edgegallery.user.auth.controller.dto.response.TenantRespDto;
 import org.edgegallery.user.auth.controller.dto.response.UniquenessRespDto;
 import org.edgegallery.user.auth.db.EnumPlatform;
@@ -272,7 +272,7 @@ public class UserMgmtService {
             QueryUserRespDto queryResp = new QueryUserRespDto();
             queryResp.setUserList(mapper.queryUsers(queryReq));
             queryResp.setTotalCount(mapper.queryUserCount(queryReq));
-            queryResp.getUserList().forEach(TenantBasicRespDto::anonymize);
+            queryResp.getUserList().forEach(BaseTenantRespDto::anonymize);
             return Either.left(queryResp);
         } catch (Exception e) {
             LOGGER.error("Database Exception on Query Users: {}", e.getMessage());

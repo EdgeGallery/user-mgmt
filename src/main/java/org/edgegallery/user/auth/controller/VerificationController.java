@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.http.HttpStatus;
 import org.apache.servicecomb.provider.rest.common.RestSchema;
 import org.edgegallery.user.auth.config.DescriptionConfig;
-import org.edgegallery.user.auth.controller.base.BeGenericServlet;
+import org.edgegallery.user.auth.controller.base.AbstractBeGenericServlet;
 import org.edgegallery.user.auth.controller.dto.request.VerificationReqByMailDto;
 import org.edgegallery.user.auth.controller.dto.request.VerificationReqDto;
 import org.edgegallery.user.auth.controller.dto.response.ErrorRespDto;
@@ -46,7 +46,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RestSchema(schemaId = "identity")
 @RequestMapping("/v1/identity")
 @Controller
-public class VerificationController extends BeGenericServlet {
+public class VerificationController extends AbstractBeGenericServlet {
 
     @Autowired
     private IdentityService identityService;

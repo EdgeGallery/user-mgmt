@@ -47,8 +47,8 @@ import org.springframework.web.util.WebUtils;
 public class UserMgmtRequestFilter extends OncePerRequestFilter implements Ordered {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserMgmtRequestFilter.class);
-    private static final String[] urlPatterns = {"/login", "/logout", "/auth/", "/v1/"};
-    private static final String[] checkVerifyCodeUrlPatterns = {"/v1/identity/sms", "/v1/identity/sms/",
+    private static final String[] URL_PATTERNS = {"/login", "/logout", "/auth/", "/v1/"};
+    private static final String[] CHECK_VERIFY_CODE_URL_PATTERNS = {"/v1/identity/sms", "/v1/identity/sms/",
         "/v1/identity/mail", "/v1/identity/mail/",
         "/v1/users", "/v1/users/"};
     private static final String UNKNOWN = "unknown";
@@ -70,7 +70,7 @@ public class UserMgmtRequestFilter extends OncePerRequestFilter implements Order
         }
 
         String url = request.getRequestURI();
-        if (!StringUtils.startsWithAny(url, urlPatterns)) {
+        if (!StringUtils.startsWithAny(url, URL_PATTERNS)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -95,7 +95,7 @@ public class UserMgmtRequestFilter extends OncePerRequestFilter implements Order
     private boolean checkVerificationCode(HttpServletRequest request, HttpServletResponse response)
         throws IOException {
         String url = request.getRequestURI();
-        if (!StringUtils.equalsAny(url, checkVerifyCodeUrlPatterns)) {
+        if (!StringUtils.equalsAny(url, CHECK_VERIFY_CODE_URL_PATTERNS)) {
             return true;
         }
 

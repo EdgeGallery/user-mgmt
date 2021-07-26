@@ -42,7 +42,7 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
     private static final String HEADER_KEY_PW_MODIFY_SCENE = "pwmodiscene";
 
     @Autowired
-    private MecUserDetailsService mecUserDetailsService;
+    private MecUserDetailsServiceImpl mecUserDetailsService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,

@@ -22,13 +22,13 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
-import org.edgegallery.user.auth.config.validate.CheckParamsGenericUtils;
+import org.edgegallery.user.auth.config.validate.AbstractCheckParamsGenericUtils;
 import org.edgegallery.user.auth.config.validate.IStringTrim;
 import org.springframework.util.StringUtils;
 
 @Setter
 @Getter
-public class QueryUserCtrlDto extends CheckParamsGenericUtils implements IStringTrim {
+public class QueryUserCtrlDto extends AbstractCheckParamsGenericUtils implements IStringTrim {
     private static final String DEFAULT_SORTBY = "createTime";
 
     private static final String DEFAULT_SORTORDER = "DESC";
