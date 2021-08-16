@@ -50,8 +50,6 @@ server:
       timeout: 3600
       cookie:
         name: AUTHSERVERSESSIONID
-        same-site: NONE
-        secure: true
 spring:
   datasource:
     url: jdbc:postgresql://${POSTGRES_IP:user-mgmt-postgres-svc}:${POSTGRES_PORT:5432}/${POSTGRES_DB_NAME:usermgmtdb}
