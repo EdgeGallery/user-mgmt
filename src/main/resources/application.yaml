@@ -84,4 +84,7 @@ oauth2:
     - clientId: ${OAUTH_LAB_CLIENT_ID:lab-fe}
       clientSecret: ${OAUTH_LAB_CLIENT_SECRET:}
       clientUrl: ${OAUTH_LAB_CLIENT_URL:}
+    - clientId: ${OAUTH_EDGEGALLERY_CLIENT_ID:edgegallery-fe}
+      clientSecret: ${OAUTH_EDGEGALLERY_CLIENT_SECRET:}
+      clientUrl: ${OAUTH_EDGEGALLERY_CLIENT_URL:}
 
