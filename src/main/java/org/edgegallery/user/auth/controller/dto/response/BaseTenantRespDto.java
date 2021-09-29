@@ -20,7 +20,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 import org.edgegallery.user.auth.db.entity.TenantPo;
-import org.edgegallery.user.auth.utils.AnomymizeUtil;
+import org.edgegallery.user.auth.utils.AnonymizeUtil;
 import org.springframework.util.StringUtils;
 
 @Setter
@@ -53,8 +53,8 @@ public abstract class BaseTenantRespDto {
      * anonymize some sensitive information.
      */
     public void anonymize() {
-        this.telephone = AnomymizeUtil.anomymizePhoneNum(this.telephone);
-        this.mailAddress = AnomymizeUtil.anomymizeMail(this.mailAddress);
+        this.telephone = AnonymizeUtil.anonymizePhoneNum(this.telephone);
+        this.mailAddress = AnonymizeUtil.anonymizeMail(this.mailAddress);
     }
 
     /**
@@ -63,10 +63,10 @@ public abstract class BaseTenantRespDto {
      * @param oldUserPo old user po object
      */
     public void assignAnonymizedValue(TenantPo oldUserPo) {
-        if (AnomymizeUtil.isAnomymized(this.telephone)) {
+        if (AnonymizeUtil.isAnonymized(this.telephone)) {
             setTelephone(oldUserPo.getTelephoneNumber());
         }
-        if (AnomymizeUtil.isAnomymized(this.mailAddress)) {
+        if (AnonymizeUtil.isAnonymized(this.mailAddress)) {
             setMailAddress(oldUserPo.getMailAddress());
         }
     }

@@ -18,21 +18,21 @@ package org.edgegallery.user.auth.utils;
 
 import org.apache.commons.lang3.StringUtils;
 
-public final class AnomymizeUtil {
+public final class AnonymizeUtil {
 
     private static final int MOBILE_PHONE_LEN = 11;
 
     private static final String MASK_SIGN = "****";
 
-    private AnomymizeUtil() {}
+    private AnonymizeUtil() {}
 
     /**
-     * anomymize mail address.
+     * anonymize mail address.
      *
      * @param phoneNum mobile phone number
-     * @return anomymized phone number
+     * @return anonymized phone number
      */
-    public static String anomymizePhoneNum(String phoneNum) {
+    public static String anonymizePhoneNum(String phoneNum) {
         if (StringUtils.isEmpty(phoneNum) || phoneNum.length() != MOBILE_PHONE_LEN) {
             return phoneNum;
         }
@@ -40,12 +40,12 @@ public final class AnomymizeUtil {
     }
 
     /**
-     * anomymize mail address.
+     * anonymize mail address.
      *
      * @param mailAddress email address
-     * @return anomymized email address
+     * @return anonymized email address
      */
-    public static String anomymizeMail(String mailAddress) {
+    public static String anonymizeMail(String mailAddress) {
         if (StringUtils.isEmpty(mailAddress)) {
             return mailAddress;
         }
@@ -59,12 +59,12 @@ public final class AnomymizeUtil {
     }
 
     /**
-     * check if anomymized.
+     * check if anonymized.
      *
      * @param strValue check str
-     * @return if anomymized
+     * @return if anonymized
      */
-    public static boolean isAnomymized(String strValue) {
+    public static boolean isAnonymized(String strValue) {
         if (StringUtils.isEmpty(strValue)) {
             return false;
         }
