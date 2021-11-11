@@ -56,8 +56,8 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
         if (userName.equalsIgnoreCase(Consts.GUEST_USER_NAME)) {
             String redirectUrl = getRedirectUrl(request, response);
             if (redirectUrl != null) {
-                URL url = new URL(redirectUrl);
-                response.sendRedirect(String.format("%s://%s/#/index", url.getProtocol(), url.getAuthority()));
+                redirectUrl = redirectUrl.replace("login", "#/index");
+                response.sendRedirect(redirectUrl);
             }
         } else {
             int pwModiScene = mecUserDetailsService.getPwModifyScene(userName);
@@ -85,8 +85,9 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
         String redirectUrl = null;
         for (String parameter : parameters) {
             String[] keyValue = parameter.split("=");
-            if (keyValue[0].equalsIgnoreCase("redirect_uri")) {
+            if (keyValue.length == 2 && keyValue[0].equalsIgnoreCase("redirect_uri")) {
                 redirectUrl = keyValue[1];
+                break;
             }
         }
         return redirectUrl;
