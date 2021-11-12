@@ -92,7 +92,7 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
         for (OAuthClientDetail oauthClientDetail : oauthClientDetailsConfig.getClients()) {
             String clientId = oauthClientDetail.getClientId();
             String clientSecret = oauthClientDetail.getClientSecret();
-            String clientUrl = oauthClientDetail.getClientUrl();
+            String clientUrl = oauthClientDetail.getClientAccessUrl();
             String encodedClientSecret = passwordEncoder.encode(clientSecret);
             inMemoryClientDetailsServiceBuilder.withClient(clientId)
                 .authorizedGrantTypes(Consts.GRANT_TYPE)
