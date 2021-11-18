@@ -27,24 +27,35 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import javax.crypto.EncryptedPrivateKeyInfo;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import org.apache.commons.codec.binary.Base64;
 import org.edgegallery.user.auth.config.OAuthClientDetail;
 import org.edgegallery.user.auth.config.OAuthClientDetailsConfig;
+import org.edgegallery.user.auth.utils.Consts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.config.annotation.builders.InMemoryClientDetailsServiceBuilder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.ClientDetailsService;
+import org.springframework.security.oauth2.provider.CompositeTokenGranter;
+import org.springframework.security.oauth2.provider.OAuth2RequestFactory;
+import org.springframework.security.oauth2.provider.TokenGranter;
+import org.springframework.security.oauth2.provider.TokenRequest;
+import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
+import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenEnhancer;
 import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
@@ -81,10 +92,10 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
         for (OAuthClientDetail oauthClientDetail : oauthClientDetailsConfig.getClients()) {
             String clientId = oauthClientDetail.getClientId();
             String clientSecret = oauthClientDetail.getClientSecret();
-            String clientUrl = oauthClientDetail.getClientUrl();
+            String clientUrl = oauthClientDetail.getClientAccessUrl();
             String encodedClientSecret = passwordEncoder.encode(clientSecret);
             inMemoryClientDetailsServiceBuilder.withClient(clientId)
-                .authorizedGrantTypes("authorization_code")
+                .authorizedGrantTypes(Consts.GRANT_TYPE)
                 .scopes("all")
                 .secret(encodedClientSecret)
                 .redirectUris(clientUrl + "/login")
@@ -106,6 +117,7 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
         endpoints.tokenStore(jwtTokenStore()).accessTokenConverter(accessTokenConverter())
             .userDetailsService(mecUserDetailsService).tokenEnhancer(enhancerChain);
         endpoints.authorizationCodeServices(authInMemoryAuthorizationCodeServices);
+        endpoints.tokenGranter(tokenGranter(endpoints));
     }
 
     /**
@@ -156,5 +168,32 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
     @Bean
     public TokenEnhancer authServerTokenEnhancer() {
         return new AuthServerTokenEnhancer();
+    }
+
+    @Bean
+    public TokenGranter tokenGranter(AuthorizationServerEndpointsConfigurer endpoints) {
+        return new TokenGranter() {
+            private CompositeTokenGranter delegate;
+
+            public OAuth2AccessToken grant(String grantType, TokenRequest tokenRequest) {
+                if (this.delegate == null) {
+                    this.delegate = new CompositeTokenGranter(loadDefaultTokenGranters(endpoints));
+                }
+
+                return this.delegate.grant(grantType, tokenRequest);
+            }
+        };
+    }
+
+    private List<TokenGranter> loadDefaultTokenGranters(AuthorizationServerEndpointsConfigurer endpoints) {
+        AuthorizationServerTokenServices tokenServices = endpoints.getTokenServices();
+        AuthorizationCodeServices authorizationCodeServices = endpoints.getAuthorizationCodeServices();
+        ClientDetailsService clientDetailsService = endpoints.getClientDetailsService();
+        OAuth2RequestFactory requestFactory = endpoints.getOAuth2RequestFactory();
+
+        List<TokenGranter> tokenGranters = new ArrayList();
+        tokenGranters.add(new ExtendAuthorizationCodeTokenGranter(tokenServices, authorizationCodeServices,
+            clientDetailsService, requestFactory));
+        return tokenGranters;
     }
 }

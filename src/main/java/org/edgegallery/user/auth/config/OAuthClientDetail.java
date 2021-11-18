@@ -27,4 +27,6 @@ public class OAuthClientDetail {
     private String clientSecret;
 
     private String clientUrl;
+
+    private String clientAccessUrl;
 }

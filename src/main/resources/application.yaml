@@ -72,19 +72,24 @@ oauth2:
     - clientId: ${OAUTH_APPSTORE_CLIENT_ID:appstore-fe}
       clientSecret: ${OAUTH_APPSTORE_CLIENT_SECRET:}
       clientUrl: ${OAUTH_APPSTORE_CLIENT_URL:}
+      clientAccessUrl: ${OAUTH_APPSTORE_CLIENT_ACCESS_URL:}
     - clientId: ${OAUTH_DEVELOPER_CLIENT_ID:developer-fe}
       clientSecret: ${OAUTH_DEVELOPER_CLIENT_SECRET:}
       clientUrl: ${OAUTH_DEVELOPER_CLIENT_URL:}
+      clientAccessUrl: ${OAUTH_DEVELOPER_CLIENT_ACCESS_URL:}
     - clientId: ${OAUTH_MECM_CLIENT_ID:mecm-fe}
       clientSecret: ${OAUTH_MECM_CLIENT_SECRET:}
       clientUrl: ${OAUTH_MECM_CLIENT_URL:}
+      clientAccessUrl: ${OAUTH_MECM_CLIENT_ACCESS_URL:}
     - clientId: ${OAUTH_ATP_CLIENT_ID:atp-fe}
       clientSecret: ${OAUTH_ATP_CLIENT_SECRET:}
       clientUrl: ${OAUTH_ATP_CLIENT_URL:}
+      clientAccessUrl: ${OAUTH_ATP_CLIENT_ACCESS_URL:}
     - clientId: ${OAUTH_LAB_CLIENT_ID:lab-fe}
       clientSecret: ${OAUTH_LAB_CLIENT_SECRET:}
       clientUrl: ${OAUTH_LAB_CLIENT_URL:}
+      clientAccessUrl: ${OAUTH_LAB_CLIENT_ACCESS_URL:}
     - clientId: ${OAUTH_EDGEGALLERY_CLIENT_ID:edgegallery-fe}
       clientSecret: ${OAUTH_EDGEGALLERY_CLIENT_SECRET:}
       clientUrl: ${OAUTH_EDGEGALLERY_CLIENT_URL:}
-
+      clientAccessUrl: ${OAUTH_EDGEGALLERY_CLIENT_ACCESS_URL:}

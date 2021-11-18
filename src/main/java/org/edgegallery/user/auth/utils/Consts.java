@@ -45,5 +45,7 @@ public class Consts {
 
         public static final int EXPIRED = 2;
     }
+
+    public static final String GRANT_TYPE = "authorization_code";
 }
 
