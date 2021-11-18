@@ -25,7 +25,7 @@ servicecomb:
     registry:
       address: ${SC_ADDRESS} #连接SC(Service Center,注册中心)的地址
   rest:
-    address: ${LISTEN_IP:192.168.1.153}:8067  #Rest通信地址
+    address: ${LISTEN_IP:0.0.0.0}:8067  #Rest通信地址
     servlet:
       urlPattern: /cse/*  #using spring mvc rest server to handle requests
   handler:
