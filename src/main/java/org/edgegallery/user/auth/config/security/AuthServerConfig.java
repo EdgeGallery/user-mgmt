@@ -125,7 +125,6 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
      *
      * @return
      */
-
     @Bean
     public JwtAccessTokenConverter accessTokenConverter()
         throws NoSuchAlgorithmException, InvalidKeySpecException, IOException, InvalidKeyException {
@@ -159,17 +158,37 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
         return converter;
     }
 
+    /**
+     * get jwt token store.
+     *
+     * @return jwt token store
+     * @throws NoSuchAlgorithmException
+     * @throws IOException
+     * @throws InvalidKeySpecException
+     * @throws InvalidKeyException
+     */
     @Bean
     public JwtTokenStore jwtTokenStore()
         throws NoSuchAlgorithmException, IOException, InvalidKeySpecException, InvalidKeyException {
         return new JwtTokenStore(accessTokenConverter());
     }
 
+    /**
+     * get auth server token enhancer.
+     *
+     * @return token enhancer
+     */
     @Bean
     public TokenEnhancer authServerTokenEnhancer() {
         return new AuthServerTokenEnhancer();
     }
 
+    /**
+     * get token granter.
+     *
+     * @param endpoints endpoints
+     * @return token granter
+     */
     @Bean
     public TokenGranter tokenGranter(AuthorizationServerEndpointsConfigurer endpoints) {
         return new TokenGranter() {
