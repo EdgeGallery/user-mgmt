@@ -162,10 +162,10 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
      * get jwt token store.
      *
      * @return jwt token store
-     * @throws NoSuchAlgorithmException
-     * @throws IOException
-     * @throws InvalidKeySpecException
-     * @throws InvalidKeyException
+     * @throws NoSuchAlgorithmException NoSuchAlgorithmException
+     * @throws IOException IOException
+     * @throws InvalidKeySpecException InvalidKeySpecException
+     * @throws InvalidKeyException InvalidKeyException
      */
     @Bean
     public JwtTokenStore jwtTokenStore()
