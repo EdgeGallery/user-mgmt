@@ -440,23 +440,8 @@
                     <failOnViolation>true</failOnViolation>
                     <violationSeverity>warning</violationSeverity>
                     <configLocation>
-                        https://raw.githubusercontent.com/EdgeGallery/docs/master/code-check-configs/edgegallery_checks.xml
+                        https://gitee.com/edgegallery/docs/raw/master/code-check-configs/edgegallery_checks.xml
                     </configLocation>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.owasp</groupId>
-                <artifactId>dependency-check-maven</artifactId>
-                <version>5.3.2</version>
-                <configuration>
-                    <autoUpdate>true</autoUpdate>
                 </configuration>
                 <executions>
                     <execution>
@@ -507,7 +492,7 @@
                     <failOnViolation>true</failOnViolation>
                     <violationSeverity>warning</violationSeverity>
                     <configLocation>
-                        https://raw.githubusercontent.com/EdgeGallery/docs/master/code-check-configs/edgegallery_checks.xml
+                        https://gitee.com/edgegallery/docs/raw/master/code-check-configs/edgegallery_checks.xml
                     </configLocation>
                 </configuration>
             </plugin>
