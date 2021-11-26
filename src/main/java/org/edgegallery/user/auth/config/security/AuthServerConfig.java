@@ -224,7 +224,7 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
         ClientDetailsService clientDetailsService = endpoints.getClientDetailsService();
         OAuth2RequestFactory requestFactory = endpoints.getOAuth2RequestFactory();
 
-        List<TokenGranter> tokenGranters = new ArrayList();
+        List<TokenGranter> tokenGranters = new ArrayList<>();
         tokenGranters.add(new ExtendAuthorizationCodeTokenGranter(tokenServices, authorizationCodeServices,
             clientDetailsService, requestFactory));
         return tokenGranters;
