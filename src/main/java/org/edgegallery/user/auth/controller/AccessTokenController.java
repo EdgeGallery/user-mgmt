@@ -21,12 +21,12 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpStatus;
 import org.apache.servicecomb.provider.rest.common.RestSchema;
-import org.edgegallery.user.auth.config.DescriptionConfig;
 import org.edgegallery.user.auth.controller.base.AbstractBeGenericServlet;
 import org.edgegallery.user.auth.controller.dto.request.GetAccessTokenReqDto;
 import org.edgegallery.user.auth.controller.dto.response.ErrorRespDto;
-import org.edgegallery.user.auth.db.mapper.TenantPoMapper;
+import org.edgegallery.user.auth.controller.dto.response.GetAccessTokenRespDto;
 import org.edgegallery.user.auth.service.AccessTokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,12 +42,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RestSchema(schemaId = "access-token")
 @RequestMapping("/v1/accesstoken")
 @Controller
-public class AccessTokenController  extends AbstractBeGenericServlet {
+public class AccessTokenController extends AbstractBeGenericServlet {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AccessTokenController.class);
-
-    @Autowired
-    private TenantPoMapper tenantPoMapper;
 
     @Autowired
     private AccessTokenService accessTokenService;
@@ -56,14 +53,17 @@ public class AccessTokenController  extends AbstractBeGenericServlet {
      * get access token.
      */
     @PostMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "", response = String.class, notes = DescriptionConfig.LOGOUT_MSG)
+    @ApiOperation(value = "get access token", response = String.class)
     @ApiResponses(value = {
-        @ApiResponse(code = org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR, message = "Internal error",
+        @ApiResponse(code = HttpStatus.SC_OK, message = "get access token success",
+            response = GetAccessTokenRespDto.class),
+        @ApiResponse(code = HttpStatus.SC_BAD_REQUEST, message = "Bad Request",
+            response = ErrorRespDto.class),
+        @ApiResponse(code = HttpStatus.SC_UNAUTHORIZED, message = "get access token failed",
             response = ErrorRespDto.class)
     })
-    public ResponseEntity<Object> getAccessToken(
-        @ApiParam(value = "GetAccessTokenReqDto", required = true)
-        @RequestBody GetAccessTokenReqDto getAccessTokenReqDto) {
+    public ResponseEntity<Object> getAccessToken(@ApiParam(value = "GetAccessTokenReqDto", required = true) @RequestBody
+        GetAccessTokenReqDto getAccessTokenReqDto) {
         LOGGER.info("get access token in controller.");
         return buildResponse(accessTokenService.getAccessToken(getAccessTokenReqDto));
     }
