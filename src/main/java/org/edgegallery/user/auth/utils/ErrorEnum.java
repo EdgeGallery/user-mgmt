@@ -92,6 +92,10 @@ public enum ErrorEnum {
      * Login failed.
      */
     LOGIN_FAILED(70017, "Login failed."),
+    /**
+     * User locked.
+     */
+    USER_LOCKED(70018, "User locked."),
 
     /**
      * Unkown Error.
