@@ -16,6 +16,7 @@
 
 package org.edgegallery.user.auth.config.security;
 
+import org.edgegallery.user.auth.utils.UserLockUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -26,13 +27,13 @@ import org.springframework.stereotype.Component;
 public class LoginFailureListener implements ApplicationListener<AbstractAuthenticationFailureEvent> {
 
     @Autowired
-    private MecUserDetailsServiceImpl mecUserDetailsService;
+    private UserLockUtil userLockUtil;
 
     @Override
     public void onApplicationEvent(AbstractAuthenticationFailureEvent event) {
         if (event.getException().getClass().equals(BadCredentialsException.class)) {
-            String userId = event.getAuthentication().getName();
-            mecUserDetailsService.addFailedCount(userId);
+            String userFlag = event.getAuthentication().getName();
+            userLockUtil.addFailedCount(userFlag);
         }
     }
 }

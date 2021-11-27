@@ -41,6 +41,7 @@ import org.edgegallery.user.auth.db.mapper.TenantPoMapper;
 import org.edgegallery.user.auth.service.IdentityService;
 import org.edgegallery.user.auth.utils.Consts;
 import org.edgegallery.user.auth.utils.ErrorEnum;
+import org.edgegallery.user.auth.utils.UserLockUtil;
 import org.edgegallery.user.auth.utils.redis.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,18 +63,7 @@ import org.springframework.web.bind.ServletRequestUtils;
 public class MecUserDetailsServiceImpl implements UserDetailsService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MecUserDetailsServiceImpl.class);
 
-    // when login failed 5 times, account will be locked.
-    private static final Set<RequestLimitRule> REQUEST_LIMIT_RULES = Collections
-        .singleton(RequestLimitRule.of(Duration.ofMinutes(5), 4));
-
-    // locked overtime
-    private static final long OVERTIME = 5 * 60 * 1000L;
-
     private static final int CLIENT_LOGIN_TIMEOUT = 5000;
-
-    private static final RequestRateLimiter LIMITER = new InMemorySlidingWindowRequestRateLimiter(REQUEST_LIMIT_RULES);
-
-    private static final Map<String, Long> LOCKED_USERS_MAP = new HashMap<>();
 
     @Autowired
     private TenantPoMapper tenantPoMapper;
@@ -89,6 +79,9 @@ public class MecUserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
     private IdentityService identityService;
+
+    @Autowired
+    private UserLockUtil userLockUtil;
 
     @Value("${secPolicy.pwTimeout}")
     private int pwTimeout;
@@ -111,7 +104,7 @@ public class MecUserDetailsServiceImpl implements UserDetailsService {
         List<RolePo> rolePos = tenantPoMapper.getRolePoByTenantId(tenant.getTenantId());
         List<GrantedAuthority> authorities = rolePos.stream()
             .map(rolePo -> new SimpleGrantedAuthority("ROLE_" + rolePo.toString())).collect(Collectors.toList());
-        boolean isLocked = isLocked(uniqueUserFlag);
+        boolean isLocked = userLockUtil.isLocked(uniqueUserFlag);
         if (isLocked) {
             LOGGER.info("username:{} have been locked.", tenant.getUsername());
         }
@@ -169,37 +162,6 @@ public class MecUserDetailsServiceImpl implements UserDetailsService {
         List<GrantedAuthority> authorities = Arrays.stream(EnumPlatform.values())
             .map(plat -> new SimpleGrantedAuthority("ROLE_" + plat + "_TENANT")).collect(Collectors.toList());
         return new User(clientUser.getUsername(), clientUser.getPassword(), true, true, true, true, authorities);
-    }
-
-    private boolean isLocked(String userId) {
-        if (LOCKED_USERS_MAP.containsKey(userId)) {
-            long lockedTime = LOCKED_USERS_MAP.get(userId);
-            if (System.currentTimeMillis() - lockedTime < OVERTIME) {
-                return true;
-            } else {
-                LOCKED_USERS_MAP.remove(userId);
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * when login failed.
-     */
-    public void addFailedCount(String userId) {
-        boolean isOver = LIMITER.overLimitWhenIncremented(userId);
-        if (isOver) {
-            LOCKED_USERS_MAP.put(userId, System.currentTimeMillis());
-        }
-    }
-
-    /**
-     * when login success.
-     */
-    public void clearFailedCount(String userId) {
-        LIMITER.resetLimit(userId);
     }
 
     /**

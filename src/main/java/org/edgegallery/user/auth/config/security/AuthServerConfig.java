@@ -99,7 +99,7 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
                 .scopes("all")
                 .secret(encodedClientSecret)
                 .redirectUris(clientUrl + "/login")
-                .accessTokenValiditySeconds(3600 * 12)
+                .accessTokenValiditySeconds(Consts.SECOND_HALF_DAY)
                 .autoApprove(true);
         }
     }
@@ -128,11 +128,27 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
     @Bean
     public JwtAccessTokenConverter accessTokenConverter()
         throws NoSuchAlgorithmException, InvalidKeySpecException, IOException, InvalidKeyException {
+        JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
+        converter.setKeyPair(getKeyPair());
+        return converter;
+    }
+
+    /**
+     * key pair.
+     *
+     * @return Key Pair
+     * @throws NoSuchAlgorithmException NoSuchAlgorithmException
+     * @throws InvalidKeySpecException InvalidKeySpecException
+     * @throws IOException IOException
+     * @throws InvalidKeyException InvalidKeyException
+     */
+    @Bean
+    public KeyPair getKeyPair()
+        throws NoSuchAlgorithmException, InvalidKeySpecException, IOException, InvalidKeyException {
         KeyPair keyPair;
         if (StringUtils.isEmpty(publicKeyStr) || StringUtils.isEmpty(encryptedPrivateKey) || StringUtils
             .isEmpty(encryptPasswordStr)) {
-            KeyPairGenerator keyPairGenerator = null;
-            keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
             keyPair = keyPairGenerator.generateKeyPair();
         } else {
             publicKeyStr = publicKeyStr.replace("-----BEGIN PUBLIC KEY-----", "")
@@ -153,9 +169,7 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
             PrivateKey privateKey = keyFactory.generatePrivate(privateKeySpec);
             keyPair = new KeyPair(publicKey, privateKey);
         }
-        JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
-        converter.setKeyPair(keyPair);
-        return converter;
+        return keyPair;
     }
 
     /**
@@ -210,7 +224,7 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
         ClientDetailsService clientDetailsService = endpoints.getClientDetailsService();
         OAuth2RequestFactory requestFactory = endpoints.getOAuth2RequestFactory();
 
-        List<TokenGranter> tokenGranters = new ArrayList();
+        List<TokenGranter> tokenGranters = new ArrayList<>();
         tokenGranters.add(new ExtendAuthorizationCodeTokenGranter(tokenServices, authorizationCodeServices,
             clientDetailsService, requestFactory));
         return tokenGranters;

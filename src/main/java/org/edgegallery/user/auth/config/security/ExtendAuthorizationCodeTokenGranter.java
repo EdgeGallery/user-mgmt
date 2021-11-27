@@ -56,10 +56,11 @@ public class ExtendAuthorizationCodeTokenGranter extends AbstractTokenGranter {
         this.authorizationCodeServices = authorizationCodeServices;
     }
 
+    @Override
     protected OAuth2Authentication getOAuth2Authentication(ClientDetails client, TokenRequest tokenRequest) {
         Map<String, String> parameters = tokenRequest.getRequestParameters();
-        String authorizationCode = (String) parameters.get("code");
-        String redirectUri = (String) parameters.get("redirect_uri");
+        String authorizationCode = parameters.get("code");
+        String redirectUri = parameters.get("redirect_uri");
         if (authorizationCode == null) {
             throw new InvalidRequestException("An authorization code must be supplied.");
         }
@@ -82,7 +83,7 @@ public class ExtendAuthorizationCodeTokenGranter extends AbstractTokenGranter {
             throw new InvalidClientException("Client ID mismatch");
         }
 
-        Map<String, String> combinedParameters = new HashMap(pendingOAuth2Request.getRequestParameters());
+        Map<String, String> combinedParameters = new HashMap<>(pendingOAuth2Request.getRequestParameters());
         combinedParameters.putAll(parameters);
         OAuth2Request finalStoredOAuth2Request = pendingOAuth2Request.createOAuth2Request(combinedParameters);
         Authentication userAuth = storedAuth.getUserAuthentication();

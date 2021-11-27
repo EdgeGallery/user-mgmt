@@ -37,6 +37,8 @@ public class Consts {
 
     public static final long MILLIS_ONE_DAY = 1 * 24 * 3600 * 1000L;
 
+    public static final int SECOND_HALF_DAY = 3600 * 12;
+
     public static final class PwModifyScene {
         private PwModifyScene() {
         }

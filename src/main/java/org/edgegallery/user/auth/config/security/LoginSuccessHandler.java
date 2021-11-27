@@ -17,11 +17,13 @@
 package org.edgegallery.user.auth.config.security;
 
 import java.io.IOException;
-import java.net.URL;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.edgegallery.user.auth.db.entity.TenantPo;
+import org.edgegallery.user.auth.db.mapper.TenantPoMapper;
 import org.edgegallery.user.auth.utils.Consts;
+import org.edgegallery.user.auth.utils.UserLockUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +46,12 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
     @Autowired
     private MecUserDetailsServiceImpl mecUserDetailsService;
 
+    @Autowired
+    private TenantPoMapper tenantPoMapper;
+
+    @Autowired
+    private UserLockUtil userLockUtil;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
         Authentication authentication) throws IOException, ServletException {
@@ -51,7 +59,7 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
         LOGGER.info("login success.");
 
         String userName = authentication.getName();
-        mecUserDetailsService.clearFailedCount(userName);
+        clearLock(userName);
 
         if (userName.equalsIgnoreCase(Consts.GUEST_USER_NAME)) {
             String redirectUrl = getRedirectUrl(request, response);
@@ -64,6 +72,22 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
             if (pwModiScene > 0) {
                 response.addIntHeader(HEADER_KEY_PW_MODIFY_SCENE, pwModiScene);
             }
+        }
+    }
+
+    private void clearLock(String userName) {
+        userLockUtil.clearFailedCount(userName);
+
+        TenantPo tenant = tenantPoMapper.getTenantByUniqueFlag(userName);
+        if (tenant == null) {
+            LOGGER.error("user login scceed but not found, it is abnormal.");
+            return;
+        }
+        if (!StringUtils.isEmpty(tenant.getMailAddress())) {
+            userLockUtil.clearFailedCount(tenant.getMailAddress());
+        }
+        if (!StringUtils.isEmpty(tenant.getTelephoneNumber())) {
+            userLockUtil.clearFailedCount(tenant.getTelephoneNumber());
         }
     }
 
