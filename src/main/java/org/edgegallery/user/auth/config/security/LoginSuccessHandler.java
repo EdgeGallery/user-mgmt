@@ -80,7 +80,7 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
 
         TenantPo tenant = tenantPoMapper.getTenantByUniqueFlag(userName);
         if (tenant == null) {
-            LOGGER.error("user login scceed but not found, it is abnormal.");
+            LOGGER.error("user login succeeded but not found, it is abnormal.");
             return;
         }
         if (!StringUtils.isEmpty(tenant.getMailAddress())) {
