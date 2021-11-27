@@ -32,7 +32,7 @@ public class LoginFailureListener implements ApplicationListener<AbstractAuthent
     @Override
     public void onApplicationEvent(AbstractAuthenticationFailureEvent event) {
         if (event.getException().getClass().equals(BadCredentialsException.class)) {
-            // when login failed, the getName of Authentication is original login credential: user name or email or telephone
+            // when login failed, the getName method return original login credential: user name or email or telephone
             String userFlag = event.getAuthentication().getName();
             userLockUtil.addFailedCount(userFlag);
         }
