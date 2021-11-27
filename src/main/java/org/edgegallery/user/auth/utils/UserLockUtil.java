@@ -24,14 +24,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class UserLockUtil {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserLockUtil.class);
 
     // when login failed 5 times, account will be locked.
     private static final Set<RequestLimitRule> REQUEST_LIMIT_RULES = Collections
