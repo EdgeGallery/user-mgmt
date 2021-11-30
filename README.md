@@ -119,7 +119,7 @@
 
 - ### 本地运行
 
-  运行/src/main/java/org/mec/houp/user/MainServer.java文件中的main函数就能启动User Management。
+  运行/src/main/java/org/edgegallery/user/auth/MainServer.java文件中的main函数就能启动User Management。
 
   启动成功后，可以单独访问User Management的界面：
 
