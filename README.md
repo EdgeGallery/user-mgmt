@@ -29,7 +29,7 @@
 
 - ### 环境搭建与配置
 
-  **1.环境准备：** 需要安装的工具包括jdk、maven、IDEA或Eclipse，此处默认已安装并配置好相关工具，如果没有安装，推荐参考此处[安装本地开发环境](https://docs.servicecomb.io/java-chassis/zh_CN/start/development-environment/)
+  **1.环境准备：** 需要安装的工具及下载地址如下表所示。
 
   |  Name     | Version   | Link |
   |  ----     | ----  |  ---- |
@@ -40,21 +40,24 @@
   | Postgres  | 10 or above |   [download](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads)
   | Redis  | 3.2.100 or above | [download](https://github.com/microsoftarchive/redis/releases) |
   
-  **2.源码下载：** 使用 git clone 或者下载压缩包的形式将User Management源代码下载到本地，默认master分支
-  ```sh
+  **2.源码下载：** 使用 git clone 或者下载压缩包的形式将User Management源代码下载到本地，默认master分支。
+  ```
   git clone https://gitee.com/edgegallery/user-mgmt.git
   ```
   
   **3.ServiceCenter配置：** User Management使用了开源的[ServiceComb](https://servicecomb.apache.org/)框架进行开发，服务在启动时会自动注册到指定的ServiceCenter，ServiceCenter会为服务提供注册与发现能力，供其他微服务进行调用。
+
   在启动User Management前需要先在本地启动ServiceCenter。
   
   - 首先[下载ServiceCenter](https://servicecomb.apache.org/cn/release/service-center-downloads/)，如Windows系统可以选择Windows的[Binary]版本，下载完成后解压；
   
   - 双击运行start-service-center.bat和start-frontend.bat即可在本地启动ServiceCenter和可视化面板，浏览器访问 http://127.0.0.1:30103 进行查看，ServiceCenter默认启动端口为30100；
   
-  - 本地运行User Management服务，需要增加如下环境变量配置以连接SC(Service Center,注册中心)：
+  - 本地运行User Management服务，需要增加如下环境变量以连接SC(Service Center，即服务中心)：
 
-      SC_ADDRESS=http://127.0.0.1:30100
+  ```
+    SC_ADDRESS：连接SC的地址。本地运行的SC默认为：http://127.0.0.1:30100
+  ```
    
   **4.PostgreSQL数据库配置：** User Management使用了开源的[PostgreSQL](https://www.postgresql.org/)数据库存储用户的信息，本地运行时需要先安装PostgreSQL。
   
@@ -62,32 +65,37 @@
   
   - 使用文件`/src/main/resources/usermgmtdb.sql`初始化数据库表结构；
   
-  - 本地运行User Management服务，需要增加如下环境变量配置以连接数据库：
+  - 本地运行User Management服务，需要增加如下环境变量以连接数据库：
 
-    POSTGRES_IP：数据库IP地址
+  ```
+    POSTGRES_IP：连接数据库的IP。本地运行的数据库，一般使用环回IP即可：127.0.0.1
 
-    POSTGRES_PORT：数据库连接端口。可以不配置，采取默认端口5432
+    POSTGRES_PORT：连接数据库的端口。可以不配置，采取默认端口5432
   
     POSTGRES_USERNAME：数据库用户名
 
     POSTGRES_PASSWORD：数据库密码
+  ```
   
   **5.Redis数据库配置：** User Management使用了Redis数据库存储图形验证码、手机/邮箱验证码，本地运行时需要先安装Redis。
   
   - 推荐参考此处[安装和启动Redis](https://www.runoob.com/redis/redis-install.html)；
   
-  - 本地运行User Management服务，需要增加如下环境变量配置以连接Redis：
+  - 本地运行User Management服务，需要增加如下环境变量以连接Redis：
   
-    REDIS_IP：Redis的IP地址
+  ```
+    REDIS_IP：连接Redis的IP。本地运行的Redis，一般使用环回IP即可：127.0.0.1
 
-    REDIS_PORT：Redis连接端口。可以不配置，采取默认端口6379
+    REDIS_PORT：连接Redis的端口。可以不配置，采取默认端口6379
 
     REDIS_PASSWORD：连接Redis的密码。如果没有为Redis设置密码，可以不配置
+  ```
 
   **6.业务平台Client配置：** User Management作为单点登录的Auth Server，各业务平台作为Auth Client。针对需要在本地运行的业务平台，User Management还需要增加对应该业务平台Client的配置信息。
 
-  - 如果本地需要运行AppStore，User Management需要配置一套如下环境变量：
+  - 如果本地需要运行AppStore，User Management需要配置如下环境变量：
 
+  ```
     OAUTH_APPSTORE_CLIENT_ID：AppStore业务平台的ClientID，配置为固定值appstore-fe。也可以不配置该变量，默认为appstore-fe
 
     OAUTH_APPSTORE_CLIENT_SECRET：AppStore业务平台的Client Secret，自行定义即可，但要注意AppStore业务平台运行时设置的Client Secret要与这里保持一致。
@@ -95,8 +103,9 @@
     OAUTH_APPSTORE_CLIENT_URL：连接AppStore业务平台的URL，如http://x.x.x.x:30091
 
     OAUTH_APPSTORE_CLIENT_ACCESS_URL：该配置是为代理访问模式定义的变量。正常访问模式下，与OAUTH_APPSTORE_CLIENT_URL保持一致即可
+  ```
 
-  - 类似的，如果本地要运行Developer、Mecm、ATP等平台，参考上述配置说明增加相应的环境变量配置。具体环境变量名称请参考配置文件/src/main/resources/application.yaml中的oauth2.clients部分。
+  - 类似的，如果本地要运行Developer、Mecm、ATP等平台，参考上述配置说明增加相应的环境变量配置。每个平台对应的环境变量名称请参考配置文件/src/main/resources/application.yaml中的oauth2.clients部分。
  
 - ### 拷贝前端资源
 
@@ -112,7 +121,9 @@
 
   运行/src/main/java/org/mec/houp/user/MainServer.java文件中的main函数就能启动User Management。
 
-  启动成功后，可以单独访问User Management的界面：http://x.x.x.x:8067/index.html。
+  启动成功后，可以单独访问User Management的界面：
+
+    http://x.x.x.x:8067/index.html
   
 ## Kubernetes环境部署
 
