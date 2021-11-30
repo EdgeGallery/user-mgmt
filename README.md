@@ -26,7 +26,7 @@
 
   User Management对外提供restful接口，基于开源ServiceComb微服务框架进行开发，并且集成了Spring Boot框架。能够在本地直接编译运行启动微服务，方便使用者进行本地调试。并且还可以制作成Docker镜像部署在普通Linux环境和Kubernetes集群。
 
-- ### 本地编译
+- ### 环境搭建与配置
 
   **1.环境准备：** 本地编译需要安装的工具包括jdk、maven、IDEA或Eclipse，此处默认已安装并配置好相关工具，如果没有安装，推荐参考此处[安装本地开发环境](https://docs.servicecomb.io/java-chassis/zh_CN/start/development-environment/)
 
@@ -83,7 +83,7 @@
 
     REDIS_PASSWORD：连接Redis的密码。如果没有为Redis设置密码，可以不配置
 
-  **6.User Management作为单点登录的Auth Server，各业务平台作为Auth Client。针对需要在本地运行的业务平台，User Management还需要增加对应该业务平台Client的配置信息：
+  **6.业务平台Client配置：** User Management作为单点登录的Auth Server，各业务平台作为Auth Client。针对需要在本地运行的业务平台，User Management还需要增加对应该业务平台Client的配置信息。
 
   - 如果本地需要运行AppStore，User Management需要配置一套如下环境变量：
 
@@ -97,8 +97,21 @@
 
   - 类似的，如果本地要运行Developer、Mecm、ATP等平台，参考上述配置说明增加相应的环境变量配置。具体环境变量名称请参考配置文件/src/main/resources/application.yaml中的oauth2.clients部分。
  
-  
-  **7.开始运行：** 直接运行/src/main/java/org/mec/houp/user/MainServer.java文件中的main函数就能启动项目，此时可以尝试使用登录接口，但只能登录建立数据库表时默认插入的数据。
+- ### 拷贝前端资源
+
+  当前工程为User Management的后台，需要拷贝前端资源到后台工程的资源目录下。
+
+  - 参考如下链接，编译User Management的前端资源：
+    
+    [https://gitee.com/edgegallery/user-mgmt-fe/blob/master/README.md](https://gitee.com/edgegallery/user-mgmt-fe/blob/master/README.md)
+
+  - 编译成功后，请把dist目录下的内容拷贝到后台工程的/src/main/resources/static目录。
+
+- ### 本地运行
+
+  运行/src/main/java/org/mec/houp/user/MainServer.java文件中的main函数就能启动User Management。
+
+  启动成功后，可以单独访问User Management的界面：http://x.x.x.x:8067/index.html。
   
 - ### Kubernetes环境部署
 
