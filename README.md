@@ -51,7 +51,7 @@
   
   - 双击运行start-service-center.bat和start-frontend.bat即可在本地启动ServiceCenter和可视化面板，浏览器访问 http://127.0.0.1:30103 进行查看，ServiceCenter默认启动端口为30100；
   
-  - 本地运行User Management服务，需要增加如下环境变量配置，连接SC(Service Center,注册中心)：
+  - 本地运行User Management服务，需要增加如下环境变量配置以连接SC(Service Center,注册中心)：
 
       SC_ADDRESS=http://127.0.0.1:30100
    
@@ -61,7 +61,7 @@
   
   - 使用文件`/src/main/resources/usermgmtdb.sql`初始化数据库表结构；
   
-  - 本地运行User Management服务，需要增加如下环境变量配置，连接数据库：
+  - 本地运行User Management服务，需要增加如下环境变量配置以连接数据库：
 
     POSTGRES_IP：数据库IP地址
 
@@ -75,7 +75,7 @@
   
   - 推荐参考此处[安装和启动Redis](https://www.runoob.com/redis/redis-install.html)；
   
-  - 本地运行User Management服务，需要增加如下环境变量配置，连接Redis：
+  - 本地运行User Management服务，需要增加如下环境变量配置以连接Redis：
   
     REDIS_IP：Redis的IP地址
 
@@ -93,7 +93,7 @@
 
     OAUTH_APPSTORE_CLIENT_URL：连接AppStore业务平台的URL，如http://x.x.x.x:30091
 
-    OAUTH_APPSTORE_CLIENT_ACCESS_URL：该配置是为代理访问模式定义的变量。正常访问模式下，与OAUTH_APPSTORE_CLIENT_URL一致即可
+    OAUTH_APPSTORE_CLIENT_ACCESS_URL：该配置是为代理访问模式定义的变量。正常访问模式下，与OAUTH_APPSTORE_CLIENT_URL保持一致即可
 
   - 类似的，如果本地要运行Developer、Mecm、ATP等平台，参考上述配置说明增加相应的环境变量配置。具体环境变量名称请参考配置文件/src/main/resources/application.yaml中的oauth2.clients部分。
  
