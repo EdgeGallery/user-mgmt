@@ -22,13 +22,14 @@
  
   用户管理模块提供的主要特性可以点击查看：[用户管理模块特性设计](http://docs.edgegallery.org/en/latest/Projects/User%20Management/User_Features.html)
 
-## 编译运行
+## 本地运行User Management服务
 
-  User Management对外提供restful接口，基于开源ServiceComb微服务框架进行开发，并且集成了Spring Boot框架。能够在本地直接编译运行启动微服务，方便使用者进行本地调试。并且还可以制作成Docker镜像部署在普通Linux环境和Kubernetes集群。
+  User Management对外提供restful接口，基于开源ServiceComb微服务框架进行开发，并且集成了Spring Boot框架。能够在本地直接编译运行启动微服务，方便使用者进行本地调试。
+
 
 - ### 环境搭建与配置
 
-  **1.环境准备：** 本地编译需要安装的工具包括jdk、maven、IDEA或Eclipse，此处默认已安装并配置好相关工具，如果没有安装，推荐参考此处[安装本地开发环境](https://docs.servicecomb.io/java-chassis/zh_CN/start/development-environment/)
+  **1.环境准备：** 需要安装的工具包括jdk、maven、IDEA或Eclipse，此处默认已安装并配置好相关工具，如果没有安装，推荐参考此处[安装本地开发环境](https://docs.servicecomb.io/java-chassis/zh_CN/start/development-environment/)
 
   |  Name     | Version   | Link |
   |  ----     | ----  |  ---- |
@@ -113,7 +114,9 @@
 
   启动成功后，可以单独访问User Management的界面：http://x.x.x.x:8067/index.html。
   
-- ### Kubernetes环境部署
+## Kubernetes环境部署
+
+  您还可以把User Management服务制作成Docker镜像部署在Linux环境和Kubernetes集群中运行。
 
   请参考[helm_charts](https://gitee.com/edgegallery/helm-charts/tree/master/edgegallery)项目
   
