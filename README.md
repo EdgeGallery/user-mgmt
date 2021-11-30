@@ -26,7 +26,7 @@
 
   User Management对外提供restful接口，基于开源ServiceComb微服务框架进行开发，并且集成了Spring Boot框架。能够在本地直接编译运行启动微服务，方便使用者进行本地调试。并且还可以制作成Docker镜像部署在普通Linux环境和Kubernetes集群。
 
-- ### 本地编译
+- ### 环境搭建与配置
 
   **1.环境准备：** 本地编译需要安装的工具包括jdk、maven、IDEA或Eclipse，此处默认已安装并配置好相关工具，如果没有安装，推荐参考此处[安装本地开发环境](https://docs.servicecomb.io/java-chassis/zh_CN/start/development-environment/)
 
@@ -51,14 +51,9 @@
   
   - 双击运行start-service-center.bat和start-frontend.bat即可在本地启动ServiceCenter和可视化面板，浏览器访问 http://127.0.0.1:30103 进行查看，ServiceCenter默认启动端口为30100；
   
-  - 本地运行user-mgmt时，需要配置service-center地址，修改配置文件/src/main/resources/application.yaml，例如：
-  
-    ```yaml
-    servicecomb:
-      service:
-        registry:
-          address: http://127.0.0.1:30100 #连接SC(Service Center,注册中心)的地址
-    ```
+  - 本地运行User Management服务，需要增加如下环境变量配置以连接SC(Service Center,注册中心)：
+
+      SC_ADDRESS=http://127.0.0.1:30100
    
   **4.PostgreSQL数据库配置：** User Management使用了开源的[PostgreSQL](https://www.postgresql.org/)数据库存储用户的信息，本地运行时需要先安装PostgreSQL。
   
@@ -66,35 +61,57 @@
   
   - 使用文件`/src/main/resources/usermgmtdb.sql`初始化数据库表结构；
   
-  - 修改文件/src/main/resources/application.yaml，指向本地数据库，例如：
+  - 本地运行User Management服务，需要增加如下环境变量配置以连接数据库：
+
+    POSTGRES_IP：数据库IP地址
+
+    POSTGRES_PORT：数据库连接端口。可以不配置，采取默认端口5432
   
-    ```yaml
-    spring:
-      datasource:
-        url: jdbc:postgresql://localhost:5432/${POSTGRES_DB_NAME:usermgmtdb}
-        username: ${POSTGRES_USERNAME}
-        password: ${POSTGRES_PASSWORD}
-        driver-class-name: org.postgresql.Driver
-    ```
-  ${POSTGRES_DB_NAME:usermgmtdb}：替换为本地部署的db名称
+    POSTGRES_USERNAME：数据库用户名
 
-  ${POSTGRES_USERNAME}：替换为本地数据库的用户名
-
-  ${POSTGRES_PASSWORD}：替换为本地数据库的密码
+    POSTGRES_PASSWORD：数据库密码
   
   **5.Redis数据库配置：** User Management使用了Redis数据库存储图形验证码、手机/邮箱验证码，本地运行时需要先安装Redis。
   
   - 推荐参考此处[安装和启动Redis](https://www.runoob.com/redis/redis-install.html)；
   
-  - 修改文件/src/main/resources/application.properties，指向本地Redis，例如：
+  - 本地运行User Management服务，需要增加如下环境变量配置以连接Redis：
   
-    ```properties
-    ##### Redis config #####
-    redis.ip=${REDIS_IP:127.0.0.1}
-    redis.port=6379
-    ```
-  
-  **6.开始运行：** 直接运行/src/main/java/org/mec/houp/user/MainServer.java文件中的main函数就能启动项目，此时可以尝试使用登录接口，但只能登录建立数据库表时默认插入的数据。
+    REDIS_IP：Redis的IP地址
+
+    REDIS_PORT：Redis连接端口。可以不配置，采取默认端口6379
+
+    REDIS_PASSWORD：连接Redis的密码。如果没有为Redis设置密码，可以不配置
+
+  **6.业务平台Client配置：** User Management作为单点登录的Auth Server，各业务平台作为Auth Client。针对需要在本地运行的业务平台，User Management还需要增加对应该业务平台Client的配置信息。
+
+  - 如果本地需要运行AppStore，User Management需要配置一套如下环境变量：
+
+    OAUTH_APPSTORE_CLIENT_ID：AppStore业务平台的ClientID，配置为固定值appstore-fe。也可以不配置该变量，默认为appstore-fe
+
+    OAUTH_APPSTORE_CLIENT_SECRET：AppStore业务平台的Client Secret，自行定义即可，但要注意AppStore业务平台运行时设置的Client Secret要与这里保持一致。
+
+    OAUTH_APPSTORE_CLIENT_URL：连接AppStore业务平台的URL，如http://x.x.x.x:30091
+
+    OAUTH_APPSTORE_CLIENT_ACCESS_URL：该配置是为代理访问模式定义的变量。正常访问模式下，与OAUTH_APPSTORE_CLIENT_URL保持一致即可
+
+  - 类似的，如果本地要运行Developer、Mecm、ATP等平台，参考上述配置说明增加相应的环境变量配置。具体环境变量名称请参考配置文件/src/main/resources/application.yaml中的oauth2.clients部分。
+ 
+- ### 拷贝前端资源
+
+  当前工程为User Management的后台，需要拷贝前端资源到后台工程的资源目录下。
+
+  - 参考如下链接，编译User Management的前端资源：
+    
+    [https://gitee.com/edgegallery/user-mgmt-fe/blob/master/README.md](https://gitee.com/edgegallery/user-mgmt-fe/blob/master/README.md)
+
+  - 编译成功后，请把dist目录下的内容拷贝到后台工程的/src/main/resources/static目录。
+
+- ### 本地运行
+
+  运行/src/main/java/org/mec/houp/user/MainServer.java文件中的main函数就能启动User Management。
+
+  启动成功后，可以单独访问User Management的界面：http://x.x.x.x:8067/index.html。
   
 - ### Kubernetes环境部署
 
