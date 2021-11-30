@@ -54,7 +54,9 @@
   
   - 本地运行User Management服务，需要增加如下环境变量配置以连接SC(Service Center,注册中心)：
 
+  ```
       SC_ADDRESS=http://127.0.0.1:30100
+  ```
    
   **4.PostgreSQL数据库配置：** User Management使用了开源的[PostgreSQL](https://www.postgresql.org/)数据库存储用户的信息，本地运行时需要先安装PostgreSQL。
   
@@ -64,13 +66,15 @@
   
   - 本地运行User Management服务，需要增加如下环境变量配置以连接数据库：
 
-    POSTGRES_IP：数据库IP地址
+  ```
+    POSTGRES_IP：数据库IP地址。本地运行的数据库，一般使用环回地址即可：127.0.0.1
 
     POSTGRES_PORT：数据库连接端口。可以不配置，采取默认端口5432
   
     POSTGRES_USERNAME：数据库用户名
 
     POSTGRES_PASSWORD：数据库密码
+  ```
   
   **5.Redis数据库配置：** User Management使用了Redis数据库存储图形验证码、手机/邮箱验证码，本地运行时需要先安装Redis。
   
@@ -78,11 +82,13 @@
   
   - 本地运行User Management服务，需要增加如下环境变量配置以连接Redis：
   
-    REDIS_IP：Redis的IP地址
+  ```
+    REDIS_IP：Redis的IP地址。本地运行的Redis，一般使用环回地址即可：127.0.0.1
 
     REDIS_PORT：Redis连接端口。可以不配置，采取默认端口6379
 
     REDIS_PASSWORD：连接Redis的密码。如果没有为Redis设置密码，可以不配置
+  ```
 
   **6.业务平台Client配置：** User Management作为单点登录的Auth Server，各业务平台作为Auth Client。针对需要在本地运行的业务平台，User Management还需要增加对应该业务平台Client的配置信息。
 
@@ -112,7 +118,9 @@
 
   运行/src/main/java/org/mec/houp/user/MainServer.java文件中的main函数就能启动User Management。
 
-  启动成功后，可以单独访问User Management的界面：http://x.x.x.x:8067/index.html。
+  启动成功后，可以单独访问User Management的界面：
+
+    http://x.x.x.x:8067/index.html
   
 ## Kubernetes环境部署
 
