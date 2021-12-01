@@ -64,6 +64,8 @@
   - 推荐参考此处[安装和启动PostgreSQL](https://www.runoob.com/postgresql/windows-install-postgresql.html)，建议选择9.6或以上版本；
   
   - 使用文件`/src/main/resources/usermgmtdb.sql`初始化数据库表结构；
+
+  - 使用文件`/src/main/resources/usermgmtdb-data.sql`初始化默认用户信息；
   
   - 本地运行User Management服务，需要增加如下环境变量以连接数据库：
 
