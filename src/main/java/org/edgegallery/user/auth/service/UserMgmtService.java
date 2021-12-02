@@ -93,30 +93,8 @@ public class UserMgmtService {
                 ErrorRespDto.build(ErrorEnum.USERNAME_REGISTERED)));
         }
 
-        TenantRegisterReqDto registerRequest = reqParam;
-
-        TenantPermissionVo tenantVo = new TenantPermissionVo();
-        tenantVo.setTenantId(UUID.randomUUID().toString());
-        tenantVo.setUsername(registerRequest.getUsername());
-        tenantVo.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-        tenantVo.setCompany(registerRequest.getCompany());
-        tenantVo.setGender(registerRequest.getGender());
-        if (!StringUtils.isEmpty(reqParam.getTelephone())) {
-            tenantVo.setTelephoneNumber(registerRequest.getTelephone());
-        }
-        if (!StringUtils.isEmpty(reqParam.getMailAddress())) {
-            tenantVo.setMailAddress(registerRequest.getMailAddress());
-        }
-        tenantVo.setAllowed(registerRequest.isAllowed());
-
-        List<RolePo> rolePoList = new ArrayList<>();
-        rolePoList.add(new RolePo(EnumPlatform.APPSTORE, EnumRole.TENANT));
-        rolePoList.add(new RolePo(EnumPlatform.DEVELOPER, EnumRole.TENANT));
-        rolePoList.add(new RolePo(EnumPlatform.MECM, EnumRole.TENANT));
-        rolePoList.add(new RolePo(EnumPlatform.ATP, EnumRole.TENANT));
-        rolePoList.add(new RolePo(EnumPlatform.LAB, EnumRole.TENANT));
-        tenantVo.setRoles(rolePoList);
-
+        LOGGER.info("save user in database.");
+        TenantPermissionVo tenantVo = getTenantPermissionVo(reqParam);
         int result = 0;
         try {
             result += tenantTransaction.registerTenant(tenantVo);
@@ -137,6 +115,32 @@ public class UserMgmtService {
             return Either.right(new FormatRespDto(Status.BAD_REQUEST,
                 ErrorRespDto.build(ErrorEnum.USER_REGISTER_FAILED)));
         }
+    }
+
+    private TenantPermissionVo getTenantPermissionVo(TenantRegisterReqDto reqParam) {
+        TenantPermissionVo tenantVo = new TenantPermissionVo();
+        tenantVo.setTenantId(UUID.randomUUID().toString());
+        tenantVo.setUsername(reqParam.getUsername());
+        tenantVo.setPassword(passwordEncoder.encode(reqParam.getPassword()));
+        tenantVo.setCompany(reqParam.getCompany());
+        tenantVo.setGender(reqParam.getGender());
+        if (!StringUtils.isEmpty(reqParam.getTelephone())) {
+            tenantVo.setTelephoneNumber(reqParam.getTelephone());
+        }
+        if (!StringUtils.isEmpty(reqParam.getMailAddress())) {
+            tenantVo.setMailAddress(reqParam.getMailAddress());
+        }
+        tenantVo.setAllowed(reqParam.isAllowed());
+
+        List<RolePo> rolePoList = new ArrayList<>();
+        rolePoList.add(new RolePo(EnumPlatform.APPSTORE, EnumRole.TENANT));
+        rolePoList.add(new RolePo(EnumPlatform.DEVELOPER, EnumRole.TENANT));
+        rolePoList.add(new RolePo(EnumPlatform.MECM, EnumRole.TENANT));
+        rolePoList.add(new RolePo(EnumPlatform.ATP, EnumRole.TENANT));
+        rolePoList.add(new RolePo(EnumPlatform.LAB, EnumRole.TENANT));
+        tenantVo.setRoles(rolePoList);
+
+        return tenantVo;
     }
 
     /**

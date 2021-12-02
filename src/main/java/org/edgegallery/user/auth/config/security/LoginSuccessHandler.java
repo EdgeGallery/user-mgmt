@@ -22,6 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.edgegallery.user.auth.db.entity.TenantPo;
 import org.edgegallery.user.auth.db.mapper.TenantPoMapper;
+import org.edgegallery.user.auth.external.iam.ExternalUserUtil;
+import org.edgegallery.user.auth.external.iam.model.ExternalUser;
 import org.edgegallery.user.auth.utils.Consts;
 import org.edgegallery.user.auth.utils.UserLockUtil;
 import org.slf4j.Logger;
@@ -59,7 +61,12 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
         LOGGER.info("login success.");
 
         String userName = authentication.getName();
-        clearLock(userName);
+        boolean isExternalUser = ExternalUserUtil.isExternalUser(userName);
+        if (isExternalUser) {
+            clearExternalUserLock(userName);
+        } else {
+            clearInnerUserLock(userName);
+        }
 
         if (userName.equalsIgnoreCase(Consts.GUEST_USER_NAME)) {
             String redirectUrl = getRedirectUrl(request, response);
@@ -68,14 +75,16 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
                 response.sendRedirect(redirectUrl);
             }
         } else {
-            int pwModiScene = mecUserDetailsService.getPwModifyScene(userName);
-            if (pwModiScene > 0) {
-                response.addIntHeader(HEADER_KEY_PW_MODIFY_SCENE, pwModiScene);
+            if (!isExternalUser) {
+                int pwModiScene = mecUserDetailsService.getPwModifyScene(userName);
+                if (pwModiScene > 0) {
+                    response.addIntHeader(HEADER_KEY_PW_MODIFY_SCENE, pwModiScene);
+                }
             }
         }
     }
 
-    private void clearLock(String userName) {
+    private void clearInnerUserLock(String userName) {
         userLockUtil.clearFailedCount(userName);
 
         TenantPo tenant = tenantPoMapper.getTenantByUniqueFlag(userName);
@@ -83,11 +92,26 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
             LOGGER.error("user login succeeded but not found, it is abnormal.");
             return;
         }
+
         if (!StringUtils.isEmpty(tenant.getMailAddress())) {
             userLockUtil.clearFailedCount(tenant.getMailAddress());
         }
+        
         if (!StringUtils.isEmpty(tenant.getTelephoneNumber())) {
             userLockUtil.clearFailedCount(tenant.getTelephoneNumber());
+        }
+    }
+
+    private void clearExternalUserLock(String userName) {
+        ExternalUser externalUser = new ExternalUser();
+        externalUser.parse(userName);
+
+        if (!StringUtils.isEmpty(externalUser.getUserName())) {
+            userLockUtil.clearFailedCount(externalUser.getUserName());
+        }
+
+        if (!StringUtils.isEmpty(externalUser.getMailAddress())) {
+            userLockUtil.clearFailedCount(externalUser.getMailAddress());
         }
     }
 

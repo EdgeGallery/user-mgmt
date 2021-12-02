@@ -22,6 +22,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.edgegallery.user.auth.config.SmsConfig;
 import org.edgegallery.user.auth.db.entity.TenantPo;
 import org.edgegallery.user.auth.db.mapper.TenantPoMapper;
+import org.edgegallery.user.auth.external.iam.ExternalUserUtil;
+import org.edgegallery.user.auth.external.iam.model.ExternalUser;
+import org.edgegallery.user.auth.utils.Consts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.User;
@@ -47,20 +50,33 @@ public class AuthServerTokenEnhancer implements TokenEnhancer {
     @Value("${mail.enabled}")
     private String mailEnabled;
 
+    @Value("${external.iam.enabled}")
+    private boolean externalIamEnabled;
+
     @Override
     public OAuth2AccessToken enhance(OAuth2AccessToken oauth2AccessToken, OAuth2Authentication oauth2Authentication) {
         User user = (User) oauth2Authentication.getPrincipal();
-        TenantPo tenant = tenantPoMapper.getTenantByUsername(user.getUsername());
-        String code = oauth2Authentication.getOAuth2Request().getRequestParameters().get("code");
         Map<String, Object> additionalMap = new HashMap<>();
-        additionalMap.put("userId", tenant != null ? tenant.getTenantId() : null);
-        additionalMap.put("enableSms", smsConfig.getEnabled());
-        additionalMap.put("enableMail", mailEnabled);
-        additionalMap.put("ssoSessionId", request.getServletContext().getAttribute(code));
-        additionalMap.put("userName", user.getUsername());
-        if (mecUserDetailsService.getPwModifyScene(user.getUsername()) > 0) {
-            additionalMap.put("pwmodiscene", null);
+        boolean isExternalUser = ExternalUserUtil.isExternalUser(user.getUsername());
+        if (isExternalUser) {
+            ExternalUser externalUser = new ExternalUser();
+            externalUser.parse(user.getUsername());
+            additionalMap.put("userId", externalUser.getUserId());
+            additionalMap.put("userName", externalUser.getUserName());
+        } else {
+            TenantPo tenant = tenantPoMapper.getTenantByUsername(user.getUsername());
+            additionalMap.put("userId", tenant != null ? tenant.getTenantId() : null);
+            additionalMap.put("userName", user.getUsername());
+            if (mecUserDetailsService.getPwModifyScene(user.getUsername()) > 0) {
+                additionalMap.put("pwmodiscene", null);
+            }
         }
+
+        additionalMap.put("enableSms", externalIamEnabled ? false : smsConfig.getEnabled());
+        additionalMap.put("enableMail", externalIamEnabled ? false : mailEnabled);
+        additionalMap.put("ssoSessionId", request.getServletContext()
+            .getAttribute(oauth2Authentication.getOAuth2Request().getRequestParameters().get("code")));
+        additionalMap.put("enableExternalIam", externalIamEnabled);
 
         ((DefaultOAuth2AccessToken) oauth2AccessToken).setAdditionalInformation(additionalMap);
         return oauth2AccessToken;
