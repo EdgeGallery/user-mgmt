@@ -93,3 +93,7 @@ oauth2:
       clientSecret: ${OAUTH_EDGEGALLERY_CLIENT_SECRET:}
       clientUrl: ${OAUTH_EDGEGALLERY_CLIENT_URL:}
       clientAccessUrl: ${OAUTH_EDGEGALLERY_CLIENT_ACCESS_URL:}
+    - clientId: ${OAUTH_APPMGMT_CLIENT_ID:app-mgmt-fe}
+      clientSecret: ${OAUTH_APPMGMT_CLIENT_SECRET:}
+      clientUrl: ${OAUTH_APPMGMT_CLIENT_URL:}
+      clientAccessUrl: ${OAUTH_APPMGMT_CLIENT_ACCESS_URL:}
