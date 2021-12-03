@@ -42,7 +42,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -115,8 +114,9 @@ public class MecUserDetailsServiceImpl implements UserDetailsService {
     private User loadInnerUser(String uniqueUserFlag) {
         TenantPo tenant = tenantPoMapper.getTenantByUniqueFlag(uniqueUserFlag);
         if (tenant == null || !tenant.isAllowed()) {
-            LOGGER.error("User not found: " + uniqueUserFlag);
-            throw new UsernameNotFoundException("User not found: " + uniqueUserFlag);
+            String errorContent = "User not found: " + uniqueUserFlag;
+            LOGGER.error(errorContent);
+            throw new UsernameNotFoundException(errorContent);
         }
         List<RolePo> rolePos = tenantPoMapper.getRolePoByTenantId(tenant.getTenantId());
         List<GrantedAuthority> authorities = rolePos.stream()

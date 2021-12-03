@@ -24,7 +24,6 @@ import org.edgegallery.user.auth.db.entity.TenantPo;
 import org.edgegallery.user.auth.db.mapper.TenantPoMapper;
 import org.edgegallery.user.auth.external.iam.ExternalUserUtil;
 import org.edgegallery.user.auth.external.iam.model.ExternalUser;
-import org.edgegallery.user.auth.utils.Consts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.User;
@@ -72,8 +71,8 @@ public class AuthServerTokenEnhancer implements TokenEnhancer {
             }
         }
 
-        additionalMap.put("enableSms", externalIamEnabled ? false : smsConfig.getEnabled());
-        additionalMap.put("enableMail", externalIamEnabled ? false : mailEnabled);
+        additionalMap.put("enableSms", externalIamEnabled ? Boolean.FALSE : smsConfig.getEnabled());
+        additionalMap.put("enableMail", externalIamEnabled ? Boolean.FALSE : mailEnabled);
         additionalMap.put("ssoSessionId", request.getServletContext()
             .getAttribute(oauth2Authentication.getOAuth2Request().getRequestParameters().get("code")));
         additionalMap.put("enableExternalIam", externalIamEnabled);

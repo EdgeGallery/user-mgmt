@@ -35,15 +35,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
-import org.springframework.web.client.RestTemplate;
 
 @Component
 public class ExternalIamLoginImpl implements IExternalIamLogin {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExternalIamLoginImpl.class);
-
-    private static final RestTemplate REST_TEMPLATE = new RestTemplate();
 
     @Autowired
     private Pbkdf2PasswordEncoder passwordEncoder;

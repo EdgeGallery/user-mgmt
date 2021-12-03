@@ -76,6 +76,6 @@ public class ExternalUser {
         setUserId(combinedUserInfoArr[index++]);
         setUserName(combinedUserInfoArr[index++]);
         setMailAddress(combinedUserInfoArr[index++]);
-        setUserRole(combinedUserInfoArr[index++]);
+        setUserRole(combinedUserInfoArr[index]);
     }
 }
