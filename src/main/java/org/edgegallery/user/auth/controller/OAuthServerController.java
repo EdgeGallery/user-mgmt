@@ -38,7 +38,6 @@ import org.edgegallery.user.auth.db.entity.TenantPo;
 import org.edgegallery.user.auth.db.mapper.TenantPoMapper;
 import org.edgegallery.user.auth.external.iam.ExternalUserUtil;
 import org.edgegallery.user.auth.external.iam.model.ExternalUser;
-import org.edgegallery.user.auth.utils.Consts;
 import org.edgegallery.user.auth.utils.ErrorEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
