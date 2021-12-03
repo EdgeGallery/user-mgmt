@@ -49,5 +49,14 @@ public class Consts {
     }
 
     public static final String GRANT_TYPE = "authorization_code";
+
+    public static final String EXTERNAL_USER_PREFIX = "EU-";
+
+    public static final class ExternalUserType {
+        private ExternalUserType() {
+        }
+
+        public static final String EXTERNAL_IAM_USER = "1";
+    }
 }
 

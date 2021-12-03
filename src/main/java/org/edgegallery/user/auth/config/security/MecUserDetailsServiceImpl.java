@@ -30,7 +30,9 @@ import org.edgegallery.user.auth.db.EnumPlatform;
 import org.edgegallery.user.auth.db.entity.RolePo;
 import org.edgegallery.user.auth.db.entity.TenantPo;
 import org.edgegallery.user.auth.db.mapper.TenantPoMapper;
+import org.edgegallery.user.auth.external.iam.IExternalIamLogin;
 import org.edgegallery.user.auth.service.IdentityService;
+import org.edgegallery.user.auth.utils.CommonUtil;
 import org.edgegallery.user.auth.utils.Consts;
 import org.edgegallery.user.auth.utils.ErrorEnum;
 import org.edgegallery.user.auth.utils.UserLockUtil;
@@ -40,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -78,19 +81,41 @@ public class MecUserDetailsServiceImpl implements UserDetailsService {
     @Value("${secPolicy.pwTimeout}")
     private int pwTimeout;
 
+    @Value("${external.iam.enabled}")
+    private boolean externalIamEnabled;
+
+    @Autowired
+    private IExternalIamLogin externalIamLogin;
+
+    @Autowired
+    private HttpServletRequest httpServletRequest;
+
     @Override
     public UserDetails loadUserByUsername(String uniqueUserFlag) throws UsernameNotFoundException {
-        checkVerificationCode(uniqueUserFlag);
-        TenantPo tenant = tenantPoMapper.getTenantByUniqueFlag(uniqueUserFlag);
-        if (tenant == null) {
-            // to check client user
-            User user = parserClientUser(uniqueUserFlag);
+        if (oauthClientDetailsConfig.getClients().stream()
+            .anyMatch(clientDetail -> uniqueUserFlag.startsWith(clientDetail.getClientId() + ":"))) {
+            LOGGER.debug("inner client login, parse client user.");
+            User user = parseClientUser(uniqueUserFlag);
             if (user == null) {
+                LOGGER.error("inner client login failed, client is {}", uniqueUserFlag);
                 throw new UsernameNotFoundException("User not found: " + uniqueUserFlag);
-            } else {
-                return user;
             }
-        } else if (!tenant.isAllowed()) {
+
+            return user;
+        }
+
+        checkVerificationCode(uniqueUserFlag);
+        if (!externalIamEnabled || CommonUtil.isInnerDefaultUser(uniqueUserFlag)) {
+            return loadInnerUser(uniqueUserFlag);
+        } else {
+            return externalIamLogin.loadUser(uniqueUserFlag, httpServletRequest.getParameter("password"));
+        }
+    }
+
+    private User loadInnerUser(String uniqueUserFlag) {
+        TenantPo tenant = tenantPoMapper.getTenantByUniqueFlag(uniqueUserFlag);
+        if (tenant == null || !tenant.isAllowed()) {
+            LOGGER.error("User not found: " + uniqueUserFlag);
             throw new UsernameNotFoundException("User not found: " + uniqueUserFlag);
         }
         List<RolePo> rolePos = tenantPoMapper.getRolePoByTenantId(tenant.getTenantId());
@@ -109,12 +134,6 @@ public class MecUserDetailsServiceImpl implements UserDetailsService {
             return;
         }
 
-        if (oauthClientDetailsConfig.getClients().stream()
-            .anyMatch(clientDetail -> uniqueUserFlag.startsWith(clientDetail.getClientId() + ":"))) {
-            LOGGER.debug("inner client login, no need check verification code.");
-            return;
-        }
-
         String verificationCode = ServletRequestUtils.getStringParameter(request, "verifyCode", "");
         if (!identityService.checkVerificatinCode(RedisUtil.RedisKeyType.IMG_VERIFICATION_CODE,
             request.getSession().getId(), verificationCode)) {
@@ -124,12 +143,12 @@ public class MecUserDetailsServiceImpl implements UserDetailsService {
     }
 
     /**
-     * to parse the username if this is a client user, and return this user.
+     * parse the username if this is a client user, and return this user.
      *
      * @param userName input username
      * @return User
      */
-    public User parserClientUser(String userName) {
+    public User parseClientUser(String userName) {
         final TenantPo clientUser = new TenantPo();
         String[] userNameArr = userName.split(":");
         if (userNameArr.length != 2) {

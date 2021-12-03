@@ -19,6 +19,9 @@ package org.edgegallery.user.auth.controller;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +32,13 @@ import org.edgegallery.user.auth.config.OAuthClientDetailsConfig;
 import org.edgegallery.user.auth.controller.dto.response.ErrorRespDto;
 import org.edgegallery.user.auth.controller.dto.response.FormatRespDto;
 import org.edgegallery.user.auth.controller.dto.response.TenantRespDto;
+import org.edgegallery.user.auth.db.EnumPlatform;
+import org.edgegallery.user.auth.db.entity.RolePo;
 import org.edgegallery.user.auth.db.entity.TenantPo;
 import org.edgegallery.user.auth.db.mapper.TenantPoMapper;
+import org.edgegallery.user.auth.external.iam.ExternalUserUtil;
+import org.edgegallery.user.auth.external.iam.model.ExternalUser;
+import org.edgegallery.user.auth.utils.Consts;
 import org.edgegallery.user.auth.utils.ErrorEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,16 +114,41 @@ public class OAuthServerController {
                 ErrorRespDto.build(ErrorEnum.NO_LOGIN_USER));
             return ResponseEntity.status(response.getErrStatus().getStatusCode()).body(response.getErrorRespDto());
         }
-        LOGGER.info(String.format("%s want to get login user information.", authentication.getName()));
-        TenantPo user = tenantPoMapper.getTenantByUsername(authentication.getName());
-        if (user == null) {
-            FormatRespDto response = new FormatRespDto(Response.Status.NOT_FOUND,
-                ErrorRespDto.build(ErrorEnum.NO_LOGIN_USER));
-            return ResponseEntity.status(response.getErrStatus().getStatusCode()).body(response.getErrorRespDto());
+
+        boolean isExternalUser = ExternalUserUtil.isExternalUser(authentication.getName());
+        if (isExternalUser) {
+            return buildExternalUserResp(authentication);
+        } else {
+            LOGGER.info(String.format("%s want to get login user information.", authentication.getName()));
+            TenantPo user = tenantPoMapper.getTenantByUsername(authentication.getName());
+            if (user == null) {
+                FormatRespDto response = new FormatRespDto(Response.Status.NOT_FOUND,
+                    ErrorRespDto.build(ErrorEnum.NO_LOGIN_USER));
+                return ResponseEntity.status(response.getErrStatus().getStatusCode()).body(response.getErrorRespDto());
+            }
+            TenantRespDto tenantRespDto = new TenantRespDto();
+            tenantRespDto.setResponse(user);
+            tenantRespDto.setPermission(tenantPoMapper.getRolePoByTenantId(tenantRespDto.getUserId()));
+            return ResponseEntity.ok(tenantRespDto);
         }
+    }
+
+    private ResponseEntity<Object> buildExternalUserResp(Authentication authentication) {
+        ExternalUser externalUser = new ExternalUser();
+        externalUser.parse(authentication.getName());
+        LOGGER.info(String.format("%s want to get login user information.", externalUser.getUserName()));
+
         TenantRespDto tenantRespDto = new TenantRespDto();
-        tenantRespDto.setResponse(user);
-        tenantRespDto.setPermission(tenantPoMapper.getRolePoByTenantId(tenantRespDto.getUserId()));
+        TenantPo tenantPo = new TenantPo();
+        tenantPo.setTenantId(externalUser.getUserId());
+        tenantPo.setUsername(externalUser.getUserName());
+        tenantPo.setMailAddress(externalUser.getMailAddress());
+        tenantRespDto.setResponse(tenantPo);
+
+        List<RolePo> rolePos = Arrays.stream(EnumPlatform.values())
+            .map(plat -> new RolePo(plat, ExternalUserUtil.convertUserRole(externalUser.getUserRole())))
+            .collect(Collectors.toList());
+        tenantRespDto.setPermission(rolePos);
         return ResponseEntity.ok(tenantRespDto);
     }
 }
