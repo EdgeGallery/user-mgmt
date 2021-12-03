@@ -64,7 +64,7 @@ public class ExternalUser {
     /**
      * parse from combined user info.
      *
-     * @param combinedUserInfo
+     * @param combinedUserInfo combined user info
      */
     public void parse(String combinedUserInfo) {
         String[] combinedUserInfoArr = combinedUserInfo.split(";");

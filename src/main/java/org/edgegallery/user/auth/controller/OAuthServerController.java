@@ -138,11 +138,12 @@ public class OAuthServerController {
         externalUser.parse(authentication.getName());
         LOGGER.info(String.format("%s want to get login user information.", externalUser.getUserName()));
 
-        TenantRespDto tenantRespDto = new TenantRespDto();
         TenantPo tenantPo = new TenantPo();
         tenantPo.setTenantId(externalUser.getUserId());
         tenantPo.setUsername(externalUser.getUserName());
         tenantPo.setMailAddress(externalUser.getMailAddress());
+
+        TenantRespDto tenantRespDto = new TenantRespDto();
         tenantRespDto.setResponse(tenantPo);
 
         List<RolePo> rolePos = Arrays.stream(EnumPlatform.values())
