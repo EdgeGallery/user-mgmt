@@ -48,6 +48,8 @@ mybatis:
   mapper-locations: classpath:mybatis/sql/*.xml
 oauth2:
   clients:
-    - clientId: test
+    - clientEnabled: true
+      clientId: test
       clientSecret: test
       clientUrl: test
+      clientAccessUrl: test
