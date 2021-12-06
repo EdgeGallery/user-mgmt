@@ -22,6 +22,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class OAuthClientDetail {
+    private boolean clientEnabled;
+
     private String clientId;
 
     private String clientSecret;

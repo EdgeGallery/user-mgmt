@@ -82,7 +82,7 @@ public class OAuthServerController {
     public ResponseEntity<String> logout(HttpServletRequest request) {
         new SecurityContextLogoutHandler().logout(request, null, null);
         String ssoSessionId = request.getRequestedSessionId();
-        oauthClientDetailsConfig.getClients().forEach(clientDetail -> {
+        oauthClientDetailsConfig.getEnabledClients().forEach(clientDetail -> {
             String clientUrl = clientDetail.getClientUrl();
             if (StringUtils.isEmpty(clientUrl)) {
                 return;
