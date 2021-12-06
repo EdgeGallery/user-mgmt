@@ -18,6 +18,7 @@ package org.edgegallery.user.auth.config;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -25,10 +26,17 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ConfigurationProperties(prefix = "oauth2")
-@Getter
 @Setter
 public class OAuthClientDetailsConfig {
 
     private List<OAuthClientDetail> clients = new ArrayList<>();
 
+    /**
+     * get enabled clients.
+     *
+     * @return enabled client list
+     */
+    public List<OAuthClientDetail> getEnabledClients() {
+        return clients.stream().filter(clientDetail -> clientDetail.isClientEnabled()).collect(Collectors.toList());
+    }
 }

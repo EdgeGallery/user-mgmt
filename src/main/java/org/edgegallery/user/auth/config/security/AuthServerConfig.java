@@ -89,7 +89,7 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         InMemoryClientDetailsServiceBuilder inMemoryClientDetailsServiceBuilder = clients.inMemory();
-        for (OAuthClientDetail oauthClientDetail : oauthClientDetailsConfig.getClients()) {
+        for (OAuthClientDetail oauthClientDetail : oauthClientDetailsConfig.getEnabledClients()) {
             String clientId = oauthClientDetail.getClientId();
             String clientSecret = oauthClientDetail.getClientSecret();
             String clientUrl = oauthClientDetail.getClientAccessUrl();

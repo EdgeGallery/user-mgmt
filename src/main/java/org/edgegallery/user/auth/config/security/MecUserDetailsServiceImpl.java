@@ -91,7 +91,7 @@ public class MecUserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String uniqueUserFlag) throws UsernameNotFoundException {
-        if (oauthClientDetailsConfig.getClients().stream()
+        if (oauthClientDetailsConfig.getEnabledClients().stream()
             .anyMatch(clientDetail -> uniqueUserFlag.startsWith(clientDetail.getClientId() + ":"))) {
             LOGGER.debug("inner client login, parse client user.");
             User user = parseClientUser(uniqueUserFlag);
@@ -159,7 +159,7 @@ public class MecUserDetailsServiceImpl implements UserDetailsService {
         if (new Date().getTime() - Long.parseLong(inTime) > CLIENT_LOGIN_TIMEOUT) {
             return null;
         }
-        Optional<OAuthClientDetail> client = oauthClientDetailsConfig.getClients().stream()
+        Optional<OAuthClientDetail> client = oauthClientDetailsConfig.getEnabledClients().stream()
             .filter(clientDetail -> inClientId.equalsIgnoreCase(clientDetail.getClientId())).findFirst();
         if (!client.isPresent()) {
             LOGGER.error("client not found.");
