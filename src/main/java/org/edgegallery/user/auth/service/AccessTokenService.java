@@ -32,15 +32,22 @@ import org.edgegallery.user.auth.controller.dto.request.GetAccessTokenReqDto;
 import org.edgegallery.user.auth.controller.dto.response.ErrorRespDto;
 import org.edgegallery.user.auth.controller.dto.response.FormatRespDto;
 import org.edgegallery.user.auth.controller.dto.response.GetAccessTokenRespDto;
+import org.edgegallery.user.auth.db.EnumPlatform;
+import org.edgegallery.user.auth.db.EnumRole;
 import org.edgegallery.user.auth.db.entity.RolePo;
 import org.edgegallery.user.auth.db.entity.TenantPo;
 import org.edgegallery.user.auth.db.mapper.TenantPoMapper;
+import org.edgegallery.user.auth.external.iam.ExternalUserUtil;
+import org.edgegallery.user.auth.external.iam.IExternalIamService;
+import org.edgegallery.user.auth.external.iam.model.ExternalUser;
+import org.edgegallery.user.auth.utils.CommonUtil;
 import org.edgegallery.user.auth.utils.Consts;
 import org.edgegallery.user.auth.utils.ErrorEnum;
 import org.edgegallery.user.auth.utils.UserLockUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.security.jwt.JwtHelper;
 import org.springframework.security.jwt.crypto.sign.RsaSigner;
@@ -66,6 +73,12 @@ public class AccessTokenService {
     @Autowired
     private KeyPair keyPair;
 
+    @Value("${external.iam.enabled}")
+    private boolean externalIamEnabled;
+
+    @Autowired
+    private IExternalIamService externalIamService;
+
     private JsonParser jsonParser = JsonParserFactory.create();
 
     /**
@@ -76,38 +89,47 @@ public class AccessTokenService {
      */
     @ParameterValidate
     public Either<GetAccessTokenRespDto, FormatRespDto> getAccessToken(GetAccessTokenReqDto getAccessTokenReqDto) {
-        LOGGER.info("get access token in service. userFlag = {}", getAccessTokenReqDto.getUserFlag());
-        TenantPo user = tenantPoMapper.getTenantByUniqueFlag(getAccessTokenReqDto.getUserFlag());
-        if (user == null || !user.isAllowed()) {
-            LOGGER.error("user {} not found or not allowed.", getAccessTokenReqDto.getUserFlag());
-            return Either.right(new FormatRespDto(Status.UNAUTHORIZED, ErrorRespDto.build(ErrorEnum.LOGIN_FAILED)));
-        }
-
-        if (userLockUtil.isLocked(getAccessTokenReqDto.getUserFlag())) {
+        String userFlag = getAccessTokenReqDto.getUserFlag();
+        LOGGER.info("get access token in service. userFlag = {}", userFlag);
+        if (userLockUtil.isLocked(userFlag)) {
             LOGGER.error("user has locked.");
             return Either.right(new FormatRespDto(Status.UNAUTHORIZED, ErrorRespDto.build(ErrorEnum.USER_LOCKED)));
         }
 
-        if (!passwordEncoder.matches(getAccessTokenReqDto.getPassword(), user.getPassword())) {
-            LOGGER.error("password incorrect.");
-            userLockUtil.addFailedCount(getAccessTokenReqDto.getUserFlag());
-            return Either.right(new FormatRespDto(Status.UNAUTHORIZED, ErrorRespDto.build(ErrorEnum.LOGIN_FAILED)));
+        Map<String, Object> userInfoMap = null;
+        if (!externalIamEnabled || CommonUtil.isInnerDefaultUser(userFlag)) {
+            TenantPo user = tenantPoMapper.getTenantByUniqueFlag(userFlag);
+            if (user == null || !user.isAllowed()) {
+                LOGGER.error("user {} not found or not allowed.", userFlag);
+                userLockUtil.addFailedCount(userFlag);
+                return Either.right(new FormatRespDto(Status.UNAUTHORIZED, ErrorRespDto.build(ErrorEnum.LOGIN_FAILED)));
+            }
+
+            if (!passwordEncoder.matches(getAccessTokenReqDto.getPassword(), user.getPassword())) {
+                LOGGER.error("password incorrect.");
+                userLockUtil.addFailedCount(userFlag);
+                return Either.right(new FormatRespDto(Status.UNAUTHORIZED, ErrorRespDto.build(ErrorEnum.LOGIN_FAILED)));
+            }
+
+            List<RolePo> rolePos = tenantPoMapper.getRolePoByTenantId(user.getTenantId());
+            userInfoMap = buildUserInfoMap(user, rolePos);
+        } else {
+            ExternalUser externalUser = externalIamService.login(userFlag, getAccessTokenReqDto.getPassword());
+            if (externalUser == null) {
+                LOGGER.error("external login failed.");
+                userLockUtil.addFailedCount(userFlag);
+                return Either.right(new FormatRespDto(Status.UNAUTHORIZED, ErrorRespDto.build(ErrorEnum.LOGIN_FAILED)));
+            }
+
+            userInfoMap = buildUserInfoMap(externalUser);
         }
 
-        userLockUtil.clearFailedCount(getAccessTokenReqDto.getUserFlag());
-        List<RolePo> rolePos = tenantPoMapper.getRolePoByTenantId(user.getTenantId());
-        Map<String, Object> userInfoMap = buildUserInfoMap(user, rolePos);
+        LOGGER.info("generate access token.");
         String accessToken = generateAccessToken(userInfoMap);
 
-        LOGGER.info("get access token succeed! userFlag = {}", getAccessTokenReqDto.getUserFlag());
+        LOGGER.info("get access token succeed! userFlag = {}", userFlag);
+        userLockUtil.clearFailedCount(userFlag);
         return Either.left(new GetAccessTokenRespDto(accessToken));
-    }
-
-    private String generateAccessToken(Map<String, Object> userInfoMap) {
-        String content = jsonParser.formatMap(userInfoMap);
-        PrivateKey privateKey = keyPair.getPrivate();
-        Signer signer = new RsaSigner((RSAPrivateKey) privateKey);
-        return JwtHelper.encode(content, signer).getEncoded();
     }
 
     private Map<String, Object> buildUserInfoMap(TenantPo user, List<RolePo> rolePos) {
@@ -123,5 +145,30 @@ public class AccessTokenService {
         dataMap.put("scope", Arrays.asList("all"));
 
         return dataMap;
+    }
+
+    private Map<String, Object> buildUserInfoMap(ExternalUser externalUser) {
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("user_name", externalUser.getUserName());
+        dataMap.put("userName", externalUser.getUserName());
+        dataMap.put("userId", externalUser.getUserId());
+
+        EnumRole userRole = ExternalUserUtil.convertUserRole(externalUser.getUserRole());
+        dataMap.put("authorities",
+            Arrays.stream(EnumPlatform.values()).map(plat -> "ROLE_" + plat + "_" + userRole.toString())
+                .collect(Collectors.toList()));
+        dataMap.put("jti", UUID.randomUUID().toString());
+
+        dataMap.put("exp", System.currentTimeMillis() / 1000 + Consts.SECOND_HALF_DAY);
+        dataMap.put("scope", Arrays.asList("all"));
+
+        return dataMap;
+    }
+
+    private String generateAccessToken(Map<String, Object> userInfoMap) {
+        String content = jsonParser.formatMap(userInfoMap);
+        PrivateKey privateKey = keyPair.getPrivate();
+        Signer signer = new RsaSigner((RSAPrivateKey) privateKey);
+        return JwtHelper.encode(content, signer).getEncoded();
     }
 }
