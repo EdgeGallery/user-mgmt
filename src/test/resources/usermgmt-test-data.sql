@@ -17,7 +17,8 @@
     (4, 'DEVELOPER', 'GUEST'),(5, 'DEVELOPER', 'TENANT'),(6, 'DEVELOPER', 'ADMIN'),
     (7, 'MECM', 'GUEST'),(8, 'MECM', 'TENANT'),(9, 'MECM', 'ADMIN'),
     (10, 'ATP', 'GUEST'),(11, 'ATP', 'TENANT'),(12, 'ATP', 'ADMIN'),
-    (13, 'LAB', 'GUEST'),(14, 'LAB', 'TENANT'),(15, 'LAB', 'ADMIN');
+    (13, 'LAB', 'GUEST'),(14, 'LAB', 'TENANT'),(15, 'LAB', 'ADMIN'),
+    (16, 'APPMGMT', 'GUEST'),(17, 'APPMGMT', 'TENANT'),(18, 'APPMGMT', 'ADMIN');
 --    ON CONFLICT(id) do nothing;
 
 -- add a guest user
@@ -48,7 +49,8 @@
     ('de3565b1-a7c2-42b9-b281-3f032af29ff7', 4),
     ('de3565b1-a7c2-42b9-b281-3f032af29ff7', 7),
     ('de3565b1-a7c2-42b9-b281-3f032af29ff7', 10),
-    ('de3565b1-a7c2-42b9-b281-3f032af29ff7', 13);
+    ('de3565b1-a7c2-42b9-b281-3f032af29ff7', 13),
+    ('de3565b1-a7c2-42b9-b281-3f032af29ff7', 16);
 --    ON CONFLICT(TENANTID, ROLEID) do nothing;
 
     merge into tbl_tenant_role (TENANTID, ROLEID) key(TENANTID, ROLEID) values
@@ -56,7 +58,8 @@
     ('39937079-99fe-4cd8-881f-04ca8c4fe09d', 6),
     ('39937079-99fe-4cd8-881f-04ca8c4fe09d', 9),
     ('39937079-99fe-4cd8-881f-04ca8c4fe09d', 12),
-    ('39937079-99fe-4cd8-881f-04ca8c4fe09d', 15);
+    ('39937079-99fe-4cd8-881f-04ca8c4fe09d', 15),
+    ('39937079-99fe-4cd8-881f-04ca8c4fe09d', 18);
 --    ON CONFLICT(TENANTID, ROLEID) do nothing;
 
     merge into tbl_tenant_role (TENANTID, ROLEID) key(TENANTID, ROLEID) values
@@ -64,11 +67,13 @@
     ('dad58d01-1251-4a4c-b01a-20f221da7d39', 5),
     ('dad58d01-1251-4a4c-b01a-20f221da7d39', 8),
     ('dad58d01-1251-4a4c-b01a-20f221da7d39', 11),
-    ('dad58d01-1251-4a4c-b01a-20f221da7d39', 14);
+    ('dad58d01-1251-4a4c-b01a-20f221da7d39', 14),
+    ('dad58d01-1251-4a4c-b01a-20f221da7d39', 17);
 
     merge into tbl_tenant_role (TENANTID, ROLEID) key(TENANTID, ROLEID) values
     ('d1209326-6577-4cd5-8e8e-94709931734e', 2),
     ('d1209326-6577-4cd5-8e8e-94709931734e', 5),
     ('d1209326-6577-4cd5-8e8e-94709931734e', 8),
     ('d1209326-6577-4cd5-8e8e-94709931734e', 11),
-    ('d1209326-6577-4cd5-8e8e-94709931734e', 14);
+    ('d1209326-6577-4cd5-8e8e-94709931734e', 14),
+    ('d1209326-6577-4cd5-8e8e-94709931734e', 17);

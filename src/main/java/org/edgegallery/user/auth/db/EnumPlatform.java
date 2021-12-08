@@ -39,5 +39,9 @@ public enum EnumPlatform {
     /**
      * Laboratory.
      */
-    LAB
+    LAB,
+    /**
+     * AppMgmt.
+     */
+    APPMGMT
 }
