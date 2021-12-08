@@ -36,6 +36,6 @@ public class OAuthClientDetailsConfig {
      * @return enabled client list
      */
     public List<OAuthClientDetail> getEnabledClients() {
-        return clients.stream().filter(clientDetail -> clientDetail.isClientEnabled()).collect(Collectors.toList());
+        return clients.stream().filter(OAuthClientDetail::isClientEnabled).collect(Collectors.toList());
     }
 }
