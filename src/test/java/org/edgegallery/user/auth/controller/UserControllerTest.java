@@ -17,15 +17,13 @@
 package org.edgegallery.user.auth.controller;
 
 import com.google.gson.Gson;
-import org.junit.Before;
 import org.edgegallery.user.auth.service.UserMgmtService;
+import org.junit.Before;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.filter.CorsFilter;
 
 public class UserControllerTest {
 
@@ -33,9 +31,6 @@ public class UserControllerTest {
 
     @InjectMocks
     protected UserController userController;
-
-    @MockBean
-    private CorsFilter corsFilter;
 
     @Mock
     protected UserMgmtService userMgmtService;
