@@ -16,6 +16,8 @@
 
 package org.edgegallery.user.auth.controller;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
 
@@ -36,6 +38,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -80,16 +83,6 @@ public class LoginTest {
             public void checkVerificationCode(String uniqueUserFlag) {
             }
         };
-    }
-
-    private TenantRespDto getCurrentLoginUser() throws Exception {
-        MvcResult mvcResult = mvc.perform(
-            MockMvcRequestBuilders.get("/auth/login-info").contentType(MediaType.APPLICATION_JSON_VALUE)
-                .header("X-XSRF-TOKEN", xsrfToken).accept(MediaType.APPLICATION_JSON_VALUE).cookie(cookies))
-            .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
-        int result = mvcResult.getResponse().getStatus();
-        String content = mvcResult.getResponse().getContentAsString();
-        return gson.fromJson(content, TenantRespDto.class);
     }
 
     @Test
@@ -178,5 +171,41 @@ public class LoginTest {
                 .header("X-XSRF-TOKEN", xsrfToken).cookie(cookies).accept(MediaType.APPLICATION_JSON_VALUE)
                 .param("username", "not_found_user").param("password", "Test!123"))
             .andExpect(MockMvcResultMatchers.status().isUnauthorized()).andReturn();
+    }
+
+    @Test
+    @WithMockUser(username = "guest",
+        roles = {"APPSTORE_GUEST", "DEVELOPER_GUEST", "MECM_GUEST", "LAB_GUEST", "ATP_GUEST"})
+    public void should_return_guest_when_login_with_guest() throws Exception {
+        MvcResult mvcResult = mvc.perform(
+            MockMvcRequestBuilders.get("/auth/login-info").contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header("X-XSRF-TOKEN", xsrfToken).accept(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+        String content = mvcResult.getResponse().getContentAsString();
+        TenantRespDto user = gson.fromJson(content, TenantRespDto.class);
+        assertFalse(user == null);
+        assertEquals("guest", user.getUsername());
+    }
+
+    @Test
+    public void should_failed_when_not_login_user() throws Exception {
+        MvcResult mvcResult = mvc.perform(
+            MockMvcRequestBuilders.get("/auth/login-info").contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header("X-XSRF-TOKEN", xsrfToken).accept(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn();
+    }
+
+    @Test
+    @WithMockUser(username = "EU-1;userid-test;username-test;usermail-test;TENANT",
+        roles = {"APPSTORE_TENANT", "DEVELOPER_TENANT", "MECM_TENANT", "LAB_TENANT", "ATP_TENANT"})
+    public void should_return_externaluser() throws Exception {
+        MvcResult mvcResult = mvc.perform(
+            MockMvcRequestBuilders.get("/auth/login-info").contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header("X-XSRF-TOKEN", xsrfToken).accept(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+        String content = mvcResult.getResponse().getContentAsString();
+        TenantRespDto user = gson.fromJson(content, TenantRespDto.class);
+        assertFalse(user == null);
+        assertEquals("username-test", user.getUsername());
     }
 }

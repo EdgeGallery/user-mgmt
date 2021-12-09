@@ -17,6 +17,10 @@
 package org.edgegallery.user.auth.service;
 
 import fj.data.Either;
+import java.awt.image.BufferedImage;
+import java.util.Map;
+import javax.servlet.ServletRequest;
+import javax.ws.rs.core.Response;
 import mockit.Mock;
 import mockit.MockUp;
 import org.edgegallery.user.auth.MainServer;
@@ -37,11 +41,6 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.bind.ServletRequestUtils;
 
-import javax.servlet.ServletRequest;
-import javax.ws.rs.core.Response;
-import java.awt.image.BufferedImage;
-import java.util.Map;
-
 @SpringBootTest(classes = {MainServer.class})
 @RunWith(SpringJUnit4ClassRunner.class)
 @EnableAspectJAutoProxy(proxyTargetClass = true)
@@ -51,13 +50,7 @@ public class VerificationTest {
     private IdentityService identityService;
 
     @Autowired
-    private HwCloudVerification hwCloudVerification;
-
-    @Autowired
     private SmsConfig smsConfig;
-
-    @Autowired
-    private HttpsUtil httpsUtil;
 
     @Before
     public void begin() {
@@ -178,7 +171,7 @@ public class VerificationTest {
             public boolean sendSimpleMail(String receiver, String subject, String content) {
                 return false;
             }
-        };
+        }.tearDown();
         Either<Boolean, FormatRespDto> either = identityService.sendVerificationCodeByMail(request);
         Assert.assertTrue(either.isRight());
         Assert.assertEquals(either.right().value().getErrStatus(), Response.Status.EXPECTATION_FAILED);
