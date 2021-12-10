@@ -56,7 +56,7 @@ public class ExternalUser {
             .append(Consts.ExternalUserType.EXTERNAL_IAM_USER).append(";")
             .append(getUserId()).append(";")
             .append(getUserName()).append(";")
-            .append(getMailAddress()).append(";")
+            .append(getMailAddress() == null ? "" : getMailAddress()).append(";")
             .append(ExternalUserUtil.convertUserRole(getUserRole())).append(";");
         return combinedUserInfo.toString();
     }

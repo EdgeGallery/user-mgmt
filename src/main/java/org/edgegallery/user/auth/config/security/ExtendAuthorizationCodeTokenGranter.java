@@ -65,7 +65,7 @@ public class ExtendAuthorizationCodeTokenGranter extends AbstractTokenGranter {
             throw new InvalidRequestException("An authorization code must be supplied.");
         }
 
-        OAuth2Authentication storedAuth = this.authorizationCodeServices.consumeAuthorizationCode(authorizationCode);
+        OAuth2Authentication storedAuth = getStoredAuth(authorizationCode);
         if (storedAuth == null) {
             throw new InvalidGrantException("Invalid authorization code: " + authorizationCode);
         }
@@ -88,5 +88,9 @@ public class ExtendAuthorizationCodeTokenGranter extends AbstractTokenGranter {
         OAuth2Request finalStoredOAuth2Request = pendingOAuth2Request.createOAuth2Request(combinedParameters);
         Authentication userAuth = storedAuth.getUserAuthentication();
         return new OAuth2Authentication(finalStoredOAuth2Request, userAuth);
+    }
+
+    private OAuth2Authentication getStoredAuth(String authorizationCode) {
+        return this.authorizationCodeServices.consumeAuthorizationCode(authorizationCode);
     }
 }
