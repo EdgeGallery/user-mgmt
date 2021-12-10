@@ -23,6 +23,7 @@ import org.edgegallery.user.auth.MainServer;
 import org.edgegallery.user.auth.controller.dto.request.GetAccessTokenReqDto;
 import org.edgegallery.user.auth.controller.dto.response.FormatRespDto;
 import org.edgegallery.user.auth.controller.dto.response.GetAccessTokenRespDto;
+import org.edgegallery.user.auth.db.EnumRole;
 import org.edgegallery.user.auth.external.iam.IExternalIamService;
 import org.edgegallery.user.auth.external.iam.model.ExternalUser;
 import org.edgegallery.user.auth.utils.ErrorEnum;
@@ -138,7 +139,7 @@ public class AccessTokenTest {
             public ResponseEntity<ExternalUser> exchange(String url, HttpMethod method,
                 @Nullable HttpEntity<String> requestEntity, Class<ExternalUser> responseType, Object... uriVariables)
                 throws RestClientException {
-                return new ResponseEntity(null, HttpStatus.UNAUTHORIZED);
+                return new ResponseEntity<ExternalUser>(new ExternalUser(), HttpStatus.UNAUTHORIZED);
             }
         };
 
@@ -160,12 +161,8 @@ public class AccessTokenTest {
             public ResponseEntity<ExternalUser> exchange(String url, HttpMethod method,
                 @Nullable HttpEntity<String> requestEntity, Class<ExternalUser> responseType, Object... uriVariables)
                 throws RestClientException {
-                ExternalUser externalUser = new ExternalUser();
-                externalUser.setUserId("userid-test");
-                externalUser.setUserName("username-test");
-                externalUser.setUserRole("TENANT");
-
-                return new ResponseEntity(externalUser, HttpStatus.OK);
+                return new ResponseEntity<ExternalUser>(
+                    new ExternalUser("userid-test", "username-test", "", EnumRole.TENANT.name()), HttpStatus.OK);
             }
         };
 
