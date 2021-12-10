@@ -57,4 +57,4 @@ EXPOSE 8067
 USER $USER_NAME
 # Execute script & application
 ENTRYPOINT ["sh", "-c"]
-CMD ["exec java -jar ./bin/$APP_FILE"]
+CMD ["exec java -jar -Dlog4j2.formatMsgNoLookups=true ./bin/$APP_FILE"]
