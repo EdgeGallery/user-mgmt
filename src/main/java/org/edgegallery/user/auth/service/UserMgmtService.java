@@ -17,9 +17,10 @@
 package org.edgegallery.user.auth.service;
 
 import fj.data.Either;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.ws.rs.core.Response.Status;
 import org.apache.commons.lang3.StringUtils;
 import org.edgegallery.user.auth.config.validate.annotation.ParameterValidate;
@@ -132,12 +133,8 @@ public class UserMgmtService {
         }
         tenantVo.setAllowed(reqParam.isAllowed());
 
-        List<RolePo> rolePoList = new ArrayList<>();
-        rolePoList.add(new RolePo(EnumPlatform.APPSTORE, EnumRole.TENANT));
-        rolePoList.add(new RolePo(EnumPlatform.DEVELOPER, EnumRole.TENANT));
-        rolePoList.add(new RolePo(EnumPlatform.MECM, EnumRole.TENANT));
-        rolePoList.add(new RolePo(EnumPlatform.ATP, EnumRole.TENANT));
-        rolePoList.add(new RolePo(EnumPlatform.LAB, EnumRole.TENANT));
+        List<RolePo> rolePoList = Arrays.stream(EnumPlatform.values())
+            .map(plat -> new RolePo(plat, EnumRole.TENANT)).collect(Collectors.toList());
         tenantVo.setRoles(rolePoList);
 
         return tenantVo;
