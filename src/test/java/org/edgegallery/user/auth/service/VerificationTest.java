@@ -115,12 +115,6 @@ public class VerificationTest {
     public void mail_should_successfully_when_disabled() {
         VerificationReqByMailDto request = new VerificationReqByMailDto();
         request.setMailAddress("13800000003@edgegallery.org");
-        new MockUp<Boolean>() {
-            @Mock
-            public boolean parseBoolean(String boolValue) {
-                return false;
-            }
-        };
         Either<Boolean, FormatRespDto> either = identityService.sendVerificationCodeByMail(request);
         Assert.assertTrue(either.isLeft());
         Assert.assertTrue(either.left().value());
@@ -136,16 +130,13 @@ public class VerificationTest {
                 return true;
             }
         };
-        MockUp mailServiceMockup = new MockUp<MailService>() {
+        new MockUp<MailService>() {
             @Mock
             public boolean sendSimpleMail(String receiver, String subject, String content) {
                 return true;
             }
         };
-
         Either<Boolean, FormatRespDto> either = identityService.sendVerificationCodeByMail(request);
-        mailServiceMockup.tearDown();
-
         Assert.assertTrue(either.isLeft());
         Assert.assertTrue(either.left().value());
     }
@@ -175,6 +166,12 @@ public class VerificationTest {
                 return true;
             }
         };
+        new MockUp<MailService>() {
+            @Mock
+            public boolean sendSimpleMail(String receiver, String subject, String content) {
+                return false;
+            }
+        }.tearDown();
         Either<Boolean, FormatRespDto> either = identityService.sendVerificationCodeByMail(request);
         Assert.assertTrue(either.isRight());
         Assert.assertEquals(either.right().value().getErrStatus(), Response.Status.EXPECTATION_FAILED);

@@ -86,6 +86,9 @@ public class MecUserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     private IExternalIamLogin externalIamLogin;
 
+    @Autowired
+    private HttpServletRequest httpServletRequest;
+
     @Override
     public UserDetails loadUserByUsername(String uniqueUserFlag) throws UsernameNotFoundException {
         if (oauthClientDetailsConfig.getEnabledClients().stream()
@@ -104,7 +107,7 @@ public class MecUserDetailsServiceImpl implements UserDetailsService {
         if (!externalIamEnabled || CommonUtil.isInnerDefaultUser(uniqueUserFlag)) {
             return loadInnerUser(uniqueUserFlag);
         } else {
-            return externalIamLogin.loadUser(uniqueUserFlag, request.getParameter("password"));
+            return externalIamLogin.loadUser(uniqueUserFlag, httpServletRequest.getParameter("password"));
         }
     }
 
