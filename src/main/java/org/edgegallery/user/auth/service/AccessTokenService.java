@@ -21,12 +21,16 @@ import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response.Status;
+import org.edgegallery.user.auth.config.OAuthClientDetail;
+import org.edgegallery.user.auth.config.OAuthClientDetailsConfig;
 import org.edgegallery.user.auth.config.validate.annotation.ParameterValidate;
 import org.edgegallery.user.auth.controller.dto.request.GetAccessTokenReqDto;
 import org.edgegallery.user.auth.controller.dto.response.ErrorRespDto;
@@ -79,6 +83,9 @@ public class AccessTokenService {
     @Autowired
     private IExternalIamService externalIamService;
 
+    @Autowired
+    private OAuthClientDetailsConfig oauthClientDetailsConfig;
+
     private JsonParser jsonParser = JsonParserFactory.create();
 
     /**
@@ -90,79 +97,142 @@ public class AccessTokenService {
     @ParameterValidate
     public Either<GetAccessTokenRespDto, FormatRespDto> getAccessToken(GetAccessTokenReqDto getAccessTokenReqDto) {
         String userFlag = getAccessTokenReqDto.getUserFlag();
-        LOGGER.info("get access token in service. userFlag = {}", userFlag);
+        if (!oauthClientDetailsConfig.getEnabledClients().stream()
+            .anyMatch(clientDetail -> userFlag.startsWith(clientDetail.getClientId() + ":"))) {
+            LOGGER.info("get access token. userFlag = {}", userFlag);
+            return getAccessToken(userFlag, getAccessTokenReqDto.getPassword());
+        } else {
+            LOGGER.info("get access token for inner client user. userFlag = {}", userFlag);
+            return getAccessTokenForClientUser(userFlag, getAccessTokenReqDto.getPassword());
+        }
+    }
+
+    private Either<GetAccessTokenRespDto, FormatRespDto> getAccessToken(String userFlag, String password) {
         if (userLockUtil.isLocked(userFlag)) {
             LOGGER.error("user has locked.");
             return Either.right(new FormatRespDto(Status.UNAUTHORIZED, ErrorRespDto.build(ErrorEnum.USER_LOCKED)));
         }
 
-        Map<String, Object> userInfoMap = null;
+        Either<Map, FormatRespDto> userInfoMap = null;
         if (!externalIamEnabled || CommonUtil.isInnerDefaultUser(userFlag)) {
-            TenantPo user = tenantPoMapper.getTenantByUniqueFlag(userFlag);
-            if (user == null || !user.isAllowed()) {
-                LOGGER.error("user {} not found or not allowed.", userFlag);
-                userLockUtil.addFailedCount(userFlag);
-                return Either.right(new FormatRespDto(Status.UNAUTHORIZED, ErrorRespDto.build(ErrorEnum.LOGIN_FAILED)));
-            }
-
-            if (!passwordEncoder.matches(getAccessTokenReqDto.getPassword(), user.getPassword())) {
-                LOGGER.error("password incorrect.");
-                userLockUtil.addFailedCount(userFlag);
-                return Either.right(new FormatRespDto(Status.UNAUTHORIZED, ErrorRespDto.build(ErrorEnum.LOGIN_FAILED)));
-            }
-
-            List<RolePo> rolePos = tenantPoMapper.getRolePoByTenantId(user.getTenantId());
-            userInfoMap = buildUserInfoMap(user, rolePos);
+            userInfoMap = buildInnerUserInfoMap(userFlag, password);
         } else {
-            ExternalUser externalUser = externalIamService.login(userFlag, getAccessTokenReqDto.getPassword());
-            if (externalUser == null) {
-                LOGGER.error("external login failed.");
-                userLockUtil.addFailedCount(userFlag);
-                return Either.right(new FormatRespDto(Status.UNAUTHORIZED, ErrorRespDto.build(ErrorEnum.LOGIN_FAILED)));
-            }
+            userInfoMap = buildExternalUserInfoMap(userFlag, password);
+        }
 
-            userInfoMap = buildUserInfoMap(externalUser);
+        if (userInfoMap.isRight()) {
+            LOGGER.error("user info build failed.");
+            return Either.right(userInfoMap.right().value());
         }
 
         LOGGER.info("generate access token.");
-        String accessToken = generateAccessToken(userInfoMap);
+        String accessToken = generateAccessToken(userInfoMap.left().value());
 
         LOGGER.info("get access token succeed! userFlag = {}", userFlag);
         userLockUtil.clearFailedCount(userFlag);
         return Either.left(new GetAccessTokenRespDto(accessToken));
     }
 
-    private Map<String, Object> buildUserInfoMap(TenantPo user, List<RolePo> rolePos) {
-        Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("user_name", user.getUsername());
-        dataMap.put("userName", user.getUsername());
-        dataMap.put("userId", user.getTenantId());
-        dataMap.put("authorities",
+    private Either<Map, FormatRespDto> buildInnerUserInfoMap(String userFlag, String password) {
+        TenantPo user = tenantPoMapper.getTenantByUniqueFlag(userFlag);
+        if (user == null || !user.isAllowed()) {
+            LOGGER.error("user {} not found or not allowed.", userFlag);
+            userLockUtil.addFailedCount(userFlag);
+            return Either.right(new FormatRespDto(Status.UNAUTHORIZED, ErrorRespDto.build(ErrorEnum.LOGIN_FAILED)));
+        }
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            LOGGER.error("password incorrect.");
+            userLockUtil.addFailedCount(userFlag);
+            return Either.right(new FormatRespDto(Status.UNAUTHORIZED, ErrorRespDto.build(ErrorEnum.LOGIN_FAILED)));
+        }
+
+        Map<String, Object> userInfoMap = new HashMap<>();
+        userInfoMap.put("user_name", user.getUsername());
+        userInfoMap.put("userName", user.getUsername());
+        userInfoMap.put("userId", user.getTenantId());
+
+        List<RolePo> rolePos = tenantPoMapper.getRolePoByTenantId(user.getTenantId());
+        userInfoMap.put("authorities",
             rolePos.stream().map(rolePo -> "ROLE_" + rolePo.toString()).collect(Collectors.toList()));
-        dataMap.put("jti", UUID.randomUUID().toString());
 
-        dataMap.put("exp", System.currentTimeMillis() / 1000 + Consts.SECOND_HALF_DAY);
-        dataMap.put("scope", Arrays.asList("all"));
-
-        return dataMap;
+        enhanceCommonInfo(userInfoMap);
+        return Either.left(userInfoMap);
     }
 
-    private Map<String, Object> buildUserInfoMap(ExternalUser externalUser) {
-        Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("user_name", externalUser.getUserName());
-        dataMap.put("userName", externalUser.getUserName());
-        dataMap.put("userId", externalUser.getUserId());
+    private Either<Map, FormatRespDto> buildExternalUserInfoMap(String userFlag, String password) {
+        ExternalUser externalUser = externalIamService.login(userFlag, password);
+        if (externalUser == null) {
+            LOGGER.error("external login failed.");
+            userLockUtil.addFailedCount(userFlag);
+            return Either.right(new FormatRespDto(Status.UNAUTHORIZED, ErrorRespDto.build(ErrorEnum.LOGIN_FAILED)));
+        }
+
+        Map<String, Object> userInfoMap = new HashMap<>();
+        userInfoMap.put("user_name", externalUser.getUserName());
+        userInfoMap.put("userName", externalUser.getUserName());
+        userInfoMap.put("userId", externalUser.getUserId());
 
         EnumRole userRole = ExternalUserUtil.convertUserRole(externalUser.getUserRole());
-        dataMap.put("authorities",
+        userInfoMap.put("authorities",
             Arrays.stream(EnumPlatform.values()).map(plat -> "ROLE_" + plat + "_" + userRole.toString())
                 .collect(Collectors.toList()));
-        dataMap.put("jti", UUID.randomUUID().toString());
 
-        dataMap.put("exp", System.currentTimeMillis() / 1000 + Consts.SECOND_HALF_DAY);
-        dataMap.put("scope", Arrays.asList("all"));
+        enhanceCommonInfo(userInfoMap);
+        return Either.left(userInfoMap);
+    }
 
-        return dataMap;
+    private Either<GetAccessTokenRespDto, FormatRespDto> getAccessTokenForClientUser(String userFlag, String password) {
+        String[] userNameArr = userFlag.split(":");
+        if (userNameArr.length != 2) {
+            LOGGER.error("inner client user {} not illegal.", userFlag);
+            return Either.right(new FormatRespDto(Status.BAD_REQUEST, ErrorRespDto.build(ErrorEnum.PARA_ILLEGAL)));
+        }
+
+        String inTime = userNameArr[1];
+        if (new Date().getTime() - Long.parseLong(inTime) > Consts.CLIENT_LOGIN_TIMEOUT) {
+            LOGGER.error("inner client user {} timeout.", userFlag);
+            return Either.right(new FormatRespDto(Status.UNAUTHORIZED, ErrorRespDto.build(ErrorEnum.LOGIN_FAILED)));
+        }
+
+        String inClientId = userNameArr[0];
+        Optional<OAuthClientDetail> client = oauthClientDetailsConfig.getEnabledClients().stream()
+            .filter(clientDetail -> inClientId.equalsIgnoreCase(clientDetail.getClientId())).findFirst();
+        if (!client.isPresent()) {
+            LOGGER.error("inner client user {} not found.", userFlag);
+            return Either.right(new FormatRespDto(Status.UNAUTHORIZED, ErrorRespDto.build(ErrorEnum.LOGIN_FAILED)));
+        }
+
+        OAuthClientDetail clientDetail = client.get();
+        if (!passwordEncoder.matches(password, passwordEncoder.encode(clientDetail.getClientSecret()))) {
+            LOGGER.error("inner client's password incorrect.");
+            return Either.right(new FormatRespDto(Status.UNAUTHORIZED, ErrorRespDto.build(ErrorEnum.LOGIN_FAILED)));
+        }
+
+        LOGGER.info("build user info and generate access token.");
+        String accessToken = generateAccessToken(buildClientUserInfoMap(inClientId));
+
+        LOGGER.info("get access token succeed! userFlag = {}", userFlag);
+        return Either.left(new GetAccessTokenRespDto(accessToken));
+    }
+
+    private Map<String, Object> buildClientUserInfoMap(String clientId) {
+        Map<String, Object> userInfoMap = new HashMap<>();
+        userInfoMap.put("user_name", clientId);
+        userInfoMap.put("userName", clientId);
+        userInfoMap.put("userId", clientId);
+        userInfoMap.put("authorities",
+            Arrays.stream(EnumPlatform.values()).map(plat -> "ROLE_" + plat + "_" + EnumRole.TENANT.toString())
+                .collect(Collectors.toList()));
+
+        enhanceCommonInfo(userInfoMap);
+        return userInfoMap;
+    }
+
+    private void enhanceCommonInfo(Map<String, Object> userInfoMap) {
+        userInfoMap.put("jti", UUID.randomUUID().toString());
+        userInfoMap.put("exp", System.currentTimeMillis() / 1000 + Consts.SECOND_HALF_DAY);
+        userInfoMap.put("scope", Arrays.asList("all"));
     }
 
     private String generateAccessToken(Map<String, Object> userInfoMap) {

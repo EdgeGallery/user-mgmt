@@ -17,6 +17,7 @@
 package org.edgegallery.user.auth.service;
 
 import fj.data.Either;
+import java.util.Date;
 import mockit.Mock;
 import mockit.MockUp;
 import org.edgegallery.user.auth.MainServer;
@@ -169,6 +170,54 @@ public class AccessTokenTest {
         GetAccessTokenReqDto getAccessTokenReqDto = new GetAccessTokenReqDto();
         getAccessTokenReqDto.setUserFlag("username-test");
         getAccessTokenReqDto.setPassword("username-test-pw");
+        Either<GetAccessTokenRespDto, FormatRespDto> either = accessTokenService.getAccessToken(getAccessTokenReqDto);
+        Assert.assertTrue(either.isLeft());
+        Assert.assertNotNull(either.left().value().getAccessToken());
+    }
+
+    @Test
+    public void get_accesstoken_userillegal_innerclient() {
+        ReflectionTestUtils.setField(accessTokenService, "externalIamEnabled", false);
+
+        GetAccessTokenReqDto getAccessTokenReqDto = new GetAccessTokenReqDto();
+        getAccessTokenReqDto.setUserFlag("test:");
+        getAccessTokenReqDto.setPassword("test");
+        Either<GetAccessTokenRespDto, FormatRespDto> either = accessTokenService.getAccessToken(getAccessTokenReqDto);
+        Assert.assertTrue(either.isRight());
+        Assert.assertEquals(ErrorEnum.PARA_ILLEGAL.code(), either.right().value().getErrorRespDto().getCode());
+    }
+
+    @Test
+    public void get_accesstoken_timeout_innerclient() {
+        ReflectionTestUtils.setField(accessTokenService, "externalIamEnabled", false);
+
+        GetAccessTokenReqDto getAccessTokenReqDto = new GetAccessTokenReqDto();
+        getAccessTokenReqDto.setUserFlag("test:" + (new Date().getTime() - 6000));
+        getAccessTokenReqDto.setPassword("test");
+        Either<GetAccessTokenRespDto, FormatRespDto> either = accessTokenService.getAccessToken(getAccessTokenReqDto);
+        Assert.assertTrue(either.isRight());
+        Assert.assertEquals(ErrorEnum.LOGIN_FAILED.code(), either.right().value().getErrorRespDto().getCode());
+    }
+
+    @Test
+    public void get_accesstoken_wrongpw_innerclient() {
+        ReflectionTestUtils.setField(accessTokenService, "externalIamEnabled", false);
+
+        GetAccessTokenReqDto getAccessTokenReqDto = new GetAccessTokenReqDto();
+        getAccessTokenReqDto.setUserFlag("test:" + new Date().getTime());
+        getAccessTokenReqDto.setPassword("test_wrongpw");
+        Either<GetAccessTokenRespDto, FormatRespDto> either = accessTokenService.getAccessToken(getAccessTokenReqDto);
+        Assert.assertTrue(either.isRight());
+        Assert.assertEquals(ErrorEnum.LOGIN_FAILED.code(), either.right().value().getErrorRespDto().getCode());
+    }
+
+    @Test
+    public void get_accesstoken_success_innerclient() {
+        ReflectionTestUtils.setField(accessTokenService, "externalIamEnabled", false);
+
+        GetAccessTokenReqDto getAccessTokenReqDto = new GetAccessTokenReqDto();
+        getAccessTokenReqDto.setUserFlag("test:" + new Date().getTime());
+        getAccessTokenReqDto.setPassword("test");
         Either<GetAccessTokenRespDto, FormatRespDto> either = accessTokenService.getAccessToken(getAccessTokenReqDto);
         Assert.assertTrue(either.isLeft());
         Assert.assertNotNull(either.left().value().getAccessToken());

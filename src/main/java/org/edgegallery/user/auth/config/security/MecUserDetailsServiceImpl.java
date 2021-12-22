@@ -57,8 +57,6 @@ import org.springframework.web.bind.ServletRequestUtils;
 public class MecUserDetailsServiceImpl implements UserDetailsService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MecUserDetailsServiceImpl.class);
 
-    private static final int CLIENT_LOGIN_TIMEOUT = 5000;
-
     @Autowired
     private TenantPoMapper tenantPoMapper;
 
@@ -153,7 +151,7 @@ public class MecUserDetailsServiceImpl implements UserDetailsService {
         }
         final String inClientId = userNameArr[0];
         String inTime = userNameArr[1];
-        if (new Date().getTime() - Long.parseLong(inTime) > CLIENT_LOGIN_TIMEOUT) {
+        if (new Date().getTime() - Long.parseLong(inTime) > Consts.CLIENT_LOGIN_TIMEOUT) {
             return null;
         }
         Optional<OAuthClientDetail> client = oauthClientDetailsConfig.getEnabledClients().stream()

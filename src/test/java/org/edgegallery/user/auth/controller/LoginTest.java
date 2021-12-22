@@ -136,12 +136,12 @@ public class LoginTest {
     }
 
     @Test
-    public void should_failed_when_login_with_client_user_not_found() throws Exception {
+    public void should_failed_when_login_with_client_user_illegal() throws Exception {
         ReflectionTestUtils.setField(mecUserDetailsService, "externalIamEnabled", false);
 
         mvc.perform(MockMvcRequestBuilders.post("/login").contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .header("X-XSRF-TOKEN", xsrfToken).cookie(cookies).accept(MediaType.APPLICATION_JSON_VALUE)
-            .param("username", "testnotfound:" + new Date().getTime()).param("password", "test"))
+            .param("username", "test:").param("password", "test"))
             .andExpect(MockMvcResultMatchers.status().is4xxClientError());
     }
 
