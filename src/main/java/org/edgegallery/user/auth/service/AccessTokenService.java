@@ -65,6 +65,16 @@ public class AccessTokenService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AccessTokenService.class);
 
+    private static final String USERINFO_KEY_USERID = "userId";
+
+    private static final String USERINFO_KEY_USERNAME = "userName";
+
+    private static final String USERINFO_KEY_USER_NAME = "user_name";
+
+    private static final String USERINFO_KEY_AUTHORITIES = "authorities";
+
+    private static final String USERINFO_ROLE_PREFIX = "ROLE_";
+
     @Autowired
     private TenantPoMapper tenantPoMapper;
 
@@ -97,8 +107,8 @@ public class AccessTokenService {
     @ParameterValidate
     public Either<GetAccessTokenRespDto, FormatRespDto> getAccessToken(GetAccessTokenReqDto getAccessTokenReqDto) {
         String userFlag = getAccessTokenReqDto.getUserFlag();
-        if (!oauthClientDetailsConfig.getEnabledClients().stream()
-            .anyMatch(clientDetail -> userFlag.startsWith(clientDetail.getClientId() + ":"))) {
+        if (oauthClientDetailsConfig.getEnabledClients().stream()
+            .noneMatch(clientDetail -> userFlag.startsWith(clientDetail.getClientId() + ":"))) {
             LOGGER.info("get access token. userFlag = {}", userFlag);
             return getAccessToken(userFlag, getAccessTokenReqDto.getPassword());
         } else {
@@ -113,7 +123,7 @@ public class AccessTokenService {
             return Either.right(new FormatRespDto(Status.UNAUTHORIZED, ErrorRespDto.build(ErrorEnum.USER_LOCKED)));
         }
 
-        Either<Map, FormatRespDto> userInfoMap = null;
+        Either<Map<String, Object>, FormatRespDto> userInfoMap = null;
         if (!externalIamEnabled || CommonUtil.isInnerDefaultUser(userFlag)) {
             userInfoMap = buildInnerUserInfoMap(userFlag, password);
         } else {
@@ -133,7 +143,7 @@ public class AccessTokenService {
         return Either.left(new GetAccessTokenRespDto(accessToken));
     }
 
-    private Either<Map, FormatRespDto> buildInnerUserInfoMap(String userFlag, String password) {
+    private Either<Map<String, Object>, FormatRespDto> buildInnerUserInfoMap(String userFlag, String password) {
         TenantPo user = tenantPoMapper.getTenantByUniqueFlag(userFlag);
         if (user == null || !user.isAllowed()) {
             LOGGER.error("user {} not found or not allowed.", userFlag);
@@ -148,19 +158,19 @@ public class AccessTokenService {
         }
 
         Map<String, Object> userInfoMap = new HashMap<>();
-        userInfoMap.put("user_name", user.getUsername());
-        userInfoMap.put("userName", user.getUsername());
-        userInfoMap.put("userId", user.getTenantId());
+        userInfoMap.put(USERINFO_KEY_USER_NAME, user.getUsername());
+        userInfoMap.put(USERINFO_KEY_USERNAME, user.getUsername());
+        userInfoMap.put(USERINFO_KEY_USERID, user.getTenantId());
 
         List<RolePo> rolePos = tenantPoMapper.getRolePoByTenantId(user.getTenantId());
-        userInfoMap.put("authorities",
-            rolePos.stream().map(rolePo -> "ROLE_" + rolePo.toString()).collect(Collectors.toList()));
+        userInfoMap.put(USERINFO_KEY_AUTHORITIES,
+            rolePos.stream().map(rolePo -> USERINFO_ROLE_PREFIX + rolePo.toString()).collect(Collectors.toList()));
 
         enhanceCommonInfo(userInfoMap);
         return Either.left(userInfoMap);
     }
 
-    private Either<Map, FormatRespDto> buildExternalUserInfoMap(String userFlag, String password) {
+    private Either<Map<String, Object>, FormatRespDto> buildExternalUserInfoMap(String userFlag, String password) {
         ExternalUser externalUser = externalIamService.login(userFlag, password);
         if (externalUser == null) {
             LOGGER.error("external login failed.");
@@ -169,13 +179,13 @@ public class AccessTokenService {
         }
 
         Map<String, Object> userInfoMap = new HashMap<>();
-        userInfoMap.put("user_name", externalUser.getUserName());
-        userInfoMap.put("userName", externalUser.getUserName());
-        userInfoMap.put("userId", externalUser.getUserId());
+        userInfoMap.put(USERINFO_KEY_USER_NAME, externalUser.getUserName());
+        userInfoMap.put(USERINFO_KEY_USERNAME, externalUser.getUserName());
+        userInfoMap.put(USERINFO_KEY_USERID, externalUser.getUserId());
 
         EnumRole userRole = ExternalUserUtil.convertUserRole(externalUser.getUserRole());
-        userInfoMap.put("authorities",
-            Arrays.stream(EnumPlatform.values()).map(plat -> "ROLE_" + plat + "_" + userRole.toString())
+        userInfoMap.put(USERINFO_KEY_AUTHORITIES,
+            Arrays.stream(EnumPlatform.values()).map(plat -> USERINFO_ROLE_PREFIX + plat + "_" + userRole.toString())
                 .collect(Collectors.toList()));
 
         enhanceCommonInfo(userInfoMap);
@@ -218,12 +228,11 @@ public class AccessTokenService {
 
     private Map<String, Object> buildClientUserInfoMap(String clientId) {
         Map<String, Object> userInfoMap = new HashMap<>();
-        userInfoMap.put("user_name", clientId);
-        userInfoMap.put("userName", clientId);
-        userInfoMap.put("userId", clientId);
-        userInfoMap.put("authorities",
-            Arrays.stream(EnumPlatform.values()).map(plat -> "ROLE_" + plat + "_" + EnumRole.TENANT.toString())
-                .collect(Collectors.toList()));
+        userInfoMap.put(USERINFO_KEY_USER_NAME, clientId);
+        userInfoMap.put(USERINFO_KEY_USERNAME, clientId);
+        userInfoMap.put(USERINFO_KEY_USERID, clientId);
+        userInfoMap.put(USERINFO_KEY_AUTHORITIES, Arrays.stream(EnumPlatform.values())
+            .map(plat -> USERINFO_ROLE_PREFIX + plat + "_" + EnumRole.TENANT.toString()).collect(Collectors.toList()));
 
         enhanceCommonInfo(userInfoMap);
         return userInfoMap;
