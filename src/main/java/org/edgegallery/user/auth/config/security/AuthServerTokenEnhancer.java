@@ -64,7 +64,7 @@ public class AuthServerTokenEnhancer implements TokenEnhancer {
             additionalMap.put("userName", externalUser.getUserName());
         } else {
             TenantPo tenant = tenantPoMapper.getTenantByUsername(user.getUsername());
-            additionalMap.put("userId", tenant != null ? tenant.getTenantId() : null);
+            additionalMap.put("userId", tenant != null ? tenant.getTenantId() : user.getUsername());
             additionalMap.put("userName", user.getUsername());
             if (mecUserDetailsService.getPwModifyScene(user.getUsername()) > 0) {
                 additionalMap.put("pwmodiscene", null);

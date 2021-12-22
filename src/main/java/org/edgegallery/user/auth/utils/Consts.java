@@ -39,6 +39,8 @@ public class Consts {
 
     public static final int SECOND_HALF_DAY = 3600 * 12;
 
+    public static final int CLIENT_LOGIN_TIMEOUT = 5000;
+
     public static final class PwModifyScene {
         private PwModifyScene() {
         }
