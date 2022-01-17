@@ -34,8 +34,8 @@
         <lombok.version>1.18.10</lombok.version>
         <gson.version>2.8.5</gson.version>
         <httpclient.version>4.5.10</httpclient.version>
-        <log4j2.version>2.17.0</log4j2.version>
-        <spring-framework-bom.version>5.2.8.RELEASE</spring-framework-bom.version>
+        <log4j2.version>2.17.1</log4j2.version>
+        <spring-framework-bom.version>5.2.19.RELEASE</spring-framework-bom.version>
         <spring-boot.version>2.3.3.RELEASE</spring-boot.version>
         <spring-security.version>5.3.10.RELEASE</spring-security.version>
         <spring-security-oauth2-autoconfigure.version>2.2.2.RELEASE</spring-security-oauth2-autoconfigure.version>
@@ -59,7 +59,7 @@
             <dependency>
                 <groupId>org.apache.servicecomb</groupId>
                 <artifactId>java-chassis-dependencies-springboot2</artifactId>
-                <version>1.3.2</version>
+                <version>1.3.6</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -75,6 +75,10 @@
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.netflix.servo</groupId>
+                    <artifactId>servo-core</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -159,6 +163,34 @@
         </dependency>
 
         <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-core</artifactId>
+            <version>3.9.12</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.7</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport</artifactId>
+            <version>4.1.72.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec-dns</artifactId>
+            <version>4.1.72.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec-http2</artifactId>
+            <version>4.1.72.Final</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
             <version>5.3.8.RELEASE</version>
@@ -177,18 +209,18 @@
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
             <artifactId>mybatis-spring-boot-starter</artifactId>
-            <version>2.2.0</version>
+            <version>2.2.1</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
-            <version>9.0.44</version>
+            <version>9.0.56</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
-            <version>9.0.44</version>
+            <version>9.0.56</version>
         </dependency>
 
         <dependency>
@@ -240,6 +272,12 @@
             <groupId>io.lettuce</groupId>
             <artifactId>lettuce-core</artifactId>
             <version>5.1.8.RELEASE</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-transport</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.projectreactor</groupId>
@@ -284,7 +322,7 @@
         <dependency>
             <groupId>org.apache.servicecomb</groupId>
             <artifactId>transport-rest-vertx</artifactId>
-            <version>1.3.2</version>
+            <version>1.3.6</version>
             <exclusions>
                 <exclusion>
                     <groupId>log4j</groupId>
@@ -293,6 +331,14 @@
                 <exclusion>
                     <groupId>org.apache.httpcomponents</groupId>
                     <artifactId>httpclient</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-io</groupId>
+                    <artifactId>commons-io</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>io.vertx</groupId>
+                    <artifactId>vertx-core</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -335,7 +381,7 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.4.199</version>
+            <version>2.0.206</version>
             <scope>test</scope>
         </dependency>
         <dependency>
