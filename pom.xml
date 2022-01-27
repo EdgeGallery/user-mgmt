@@ -38,7 +38,7 @@
         <netty.version>4.1.72.Final</netty.version>
         <spring-framework-bom.version>5.2.19.RELEASE</spring-framework-bom.version>
         <spring-boot.version>2.3.3.RELEASE</spring-boot.version>
-        <spring-security.version>5.3.10.RELEASE</spring-security.version>
+        <spring-security.version>5.3.13.RELEASE</spring-security.version>
         <spring-security-oauth2-autoconfigure.version>2.2.2.RELEASE</spring-security-oauth2-autoconfigure.version>
     </properties>
     <dependencyManagement>
@@ -281,7 +281,7 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
-            <version>5.3.8.RELEASE</version>
+            <version>${spring-security.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -291,7 +291,7 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-config</artifactId>
-            <version>5.3.8.RELEASE</version>
+            <version>${spring-security.version}</version>
         </dependency>
 
         <dependency>
@@ -501,7 +501,7 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
-            <version>5.3.10.RELEASE</version>
+            <version>${spring-security.version}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
