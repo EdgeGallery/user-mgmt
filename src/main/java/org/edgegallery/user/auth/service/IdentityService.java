@@ -197,7 +197,7 @@ public class IdentityService {
         graphics.setColor(new Color(56, 33, 137));
         graphics.fillRect(0, 0, VERIFY_CODE_IMG_WIDTH, VERIFY_CODE_IMG_HEIGHT);
 
-        graphics.setFont(new Font("HarmonyHeiTi", Font.BOLD, 36));
+        graphics.setFont(new Font(null, Font.BOLD, 36));
         graphics.setColor(new Color(VERIFY_CODE_IMG_FONTCOLOR, VERIFY_CODE_IMG_FONTCOLOR, VERIFY_CODE_IMG_FONTCOLOR));
         for (int i = 0; i < verifyCode.length(); i++) {
             graphics.drawString(String.valueOf(verifyCode.charAt(i)), 30 * i + 35, VERIFY_CODE_IMG_HEIGHT - 15);
