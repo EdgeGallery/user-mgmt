@@ -57,11 +57,9 @@ public class IdentityService {
         + "The edgegallery platform is verifing your email, the verification code is: %s.%n"
         + "It will expire in %d minutes.";
 
-    private static final int VERIFY_CODE_IMG_WIDTH = 100;
+    private static final int VERIFY_CODE_IMG_WIDTH = 175;
 
-    private static final int VERIFY_CODE_IMG_HEIGHT = 36;
-
-    private static final int VERIFY_CODE_IMG_LINECOUNT = 40;
+    private static final int VERIFY_CODE_IMG_HEIGHT = 60;
 
     private static final Random RANDOM_INSTANCE = new SecureRandom();
 
@@ -193,32 +191,19 @@ public class IdentityService {
         BufferedImage bufferedImage = new BufferedImage(VERIFY_CODE_IMG_WIDTH, VERIFY_CODE_IMG_HEIGHT,
             BufferedImage.TYPE_INT_RGB);
         Graphics graphics = bufferedImage.getGraphics();
-        graphics.setColor(getRandColor(200, 50));
-        graphics.fillRect(0, 0, VERIFY_CODE_IMG_WIDTH, VERIFY_CODE_IMG_HEIGHT);
-        graphics.setFont(new Font("Times New Roman", Font.ITALIC, 30));
-        graphics.setColor(getRandColor(160, 40));
-        for (int i = 0; i < VERIFY_CODE_IMG_LINECOUNT; i++) {
-            int firstX = RANDOM_INSTANCE.nextInt(VERIFY_CODE_IMG_WIDTH);
-            int firstY = RANDOM_INSTANCE.nextInt(VERIFY_CODE_IMG_HEIGHT);
-            int secondX = RANDOM_INSTANCE.nextInt(VERIFY_CODE_IMG_WIDTH);
-            int secondY = RANDOM_INSTANCE.nextInt(VERIFY_CODE_IMG_HEIGHT);
-            graphics.drawLine(firstX, firstY, secondX, secondY);
-        }
 
+        graphics.setColor(new Color(56, 33, 137));
+        graphics.fillRect(0, 0, VERIFY_CODE_IMG_WIDTH, VERIFY_CODE_IMG_HEIGHT);
+
+        final int FONT_COLOR_INT = 255;
+        graphics.setFont(new Font("HarmonyHeiTi", Font.BOLD, 36));
+        graphics.setColor(new Color(FONT_COLOR_INT, FONT_COLOR_INT, FONT_COLOR_INT));
         for (int i = 0; i < verifyCode.length(); i++) {
-            graphics.setColor(new Color(20 + RANDOM_INSTANCE.nextInt(110),
-                20 + RANDOM_INSTANCE.nextInt(110), 20 + RANDOM_INSTANCE.nextInt(110)));
-            graphics.drawString(String.valueOf(verifyCode.charAt(i)), 20 * i + 10, VERIFY_CODE_IMG_HEIGHT - 8);
+            graphics.drawString(String.valueOf(verifyCode.charAt(i)), 30 * i + 35, VERIFY_CODE_IMG_HEIGHT - 15);
         }
 
         graphics.dispose();
         return bufferedImage;
-    }
-
-    private Color getRandColor(int foregroundColor, int deltaValue) {
-        return new Color(foregroundColor + RANDOM_INSTANCE.nextInt(deltaValue),
-            foregroundColor + RANDOM_INSTANCE.nextInt(deltaValue),
-            foregroundColor + RANDOM_INSTANCE.nextInt(deltaValue));
     }
 
     /**
