@@ -61,6 +61,8 @@ public class IdentityService {
 
     private static final int VERIFY_CODE_IMG_HEIGHT = 60;
 
+    private static final int VERIFY_CODE_IMG_FONTCOLOR = 255;
+
     private static final Random RANDOM_INSTANCE = new SecureRandom();
 
     @Autowired
@@ -195,9 +197,8 @@ public class IdentityService {
         graphics.setColor(new Color(56, 33, 137));
         graphics.fillRect(0, 0, VERIFY_CODE_IMG_WIDTH, VERIFY_CODE_IMG_HEIGHT);
 
-        final int FONT_COLOR_INT = 255;
         graphics.setFont(new Font("HarmonyHeiTi", Font.BOLD, 36));
-        graphics.setColor(new Color(FONT_COLOR_INT, FONT_COLOR_INT, FONT_COLOR_INT));
+        graphics.setColor(new Color(VERIFY_CODE_IMG_FONTCOLOR, VERIFY_CODE_IMG_FONTCOLOR, VERIFY_CODE_IMG_FONTCOLOR));
         for (int i = 0; i < verifyCode.length(); i++) {
             graphics.drawString(String.valueOf(verifyCode.charAt(i)), 30 * i + 35, VERIFY_CODE_IMG_HEIGHT - 15);
         }
