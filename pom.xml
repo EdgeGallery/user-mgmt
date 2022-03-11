@@ -343,7 +343,6 @@
         <dependency>
             <groupId>org.apache.servicecomb</groupId>
             <artifactId>transport-rest-vertx</artifactId>
-            <version>${java.chassis.dep.springboot2.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>log4j</groupId>
@@ -401,7 +400,6 @@
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-module-junit4</artifactId>
-            <version>2.0.4</version>
             <scope>test</scope>
         </dependency>
         <dependency>
